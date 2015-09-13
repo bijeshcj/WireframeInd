@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_gray_bar"
+                tools:context="com.verizontelematics.indrivemobile.activity.NewDeviceAuthorizationActivity">
+
+    <RelativeLayout
+        android:id="@+id/newDeviceCodeRL"
+        android:layout_width="300dp"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/newDeviceCodeTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_code_pairing"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/authCodeET"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/newDeviceCodeTV"
+            android:paddingLeft="@dimen/list_item_top_margin"
+
+            android:maxLength="8"
+            android:hint="@string/auth_code_prompt"
+            android:background="@color/white"
+            />
+
+        <TextView
+            android:id="@+id/enterAuthCodeTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/authCodeET"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/authorization_code"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:text="@string/submit"
+            android:id="@+id/submitBTN"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/enterAuthCodeTV"
+            android:layout_marginTop="@dimen/form_labels_text_height"/>
+    </RelativeLayout>
+</RelativeLayout>

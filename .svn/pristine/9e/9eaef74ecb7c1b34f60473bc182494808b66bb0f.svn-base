@@ -1,0 +1,115 @@
+package com.verizontelematics.indrivemobile.utils.ui;
+
+import android.content.Context;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+
+import com.verizontelematics.indrivemobile.R;
+
+/**
+ * Created by z689649 on 10/10/14.
+ */
+public class UiStateHelper {
+
+    public static void disableView(final View aView) {
+        // check the version info and use setAlpha if it is available otherwise use animation.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            aView.setAlpha(0.7f);
+            aView.setEnabled(false);
+        } else {
+            float lFromAlpha = 0.0f;
+            float lToAlpha = 0.7f;
+            AlphaAnimation lAnimation = new AlphaAnimation(lFromAlpha, lToAlpha);
+            lAnimation.setFillAfter(true);
+            lAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    // check this in case of edit text
+                    aView.setEnabled(false);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            aView.setAnimation(lAnimation);
+            lAnimation.start();
+        }
+    }
+
+    public static void enableView(final View aView) {
+        // check the version info and use setAlpha if it is available otherwise use animation.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            aView.setAlpha(1.0f);
+            aView.setEnabled(true);
+        } else {
+            float lFromAlpha = 0.7f;
+            float lToAlpha = 0.0f;
+            AlphaAnimation lAnimation = new AlphaAnimation(lFromAlpha, lToAlpha);
+            lAnimation.setFillAfter(true);
+            lAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    // check this in case of edit text
+                    aView.setEnabled(true);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            aView.setAnimation(lAnimation);
+            lAnimation.start();
+        }
+    }
+
+    public static int getDisplayDensity(Context context) {
+        int displayMetrics = context.getResources().getDisplayMetrics().densityDpi;
+        return displayMetrics;
+    }
+
+    public static int getListHeight(Context context) {
+        int displayMetrics = context.getResources().getDisplayMetrics().densityDpi;
+        int height = 0;
+        switch (displayMetrics) {
+            case DisplayMetrics.DENSITY_LOW:
+                height = (int) context.getResources().getDimension(R.dimen.dashboard_xhdpi_height);
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                height = (int) context.getResources().getDimension(R.dimen.dashboard_xhdpi_height);
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                height = (int) context.getResources().getDimension(R.dimen.dashboard_xhdpi_height);
+                break;
+            case DisplayMetrics.DENSITY_XHIGH:
+                height = (int) context.getResources().getDimension(R.dimen.dashboard_xhdpi_height);
+                break;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                height = (int) context.getResources().getDimension(R.dimen.dashboard_xxhdpi_height);
+                break;
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                height = (int) context.getResources().getDimension(R.dimen.dashboard_xxhdpi_height);
+                break;
+            default:
+                break;
+
+        }
+        return height;
+    }
+
+}

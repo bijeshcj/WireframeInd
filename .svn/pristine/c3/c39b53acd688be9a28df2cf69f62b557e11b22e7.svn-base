@@ -1,0 +1,833 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.verizontelematics.indrivemobile.IndriveApplication;
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.customViews.CustomDrawer1;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.GestureMessage;
+import com.verizontelematics.indrivemobile.utils.BasicUtil;
+import com.verizontelematics.indrivemobile.utils.GoogleAnalyticsUtil;
+import com.verizontelematics.indrivemobile.utils.ui.MapUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * Created by bijesh on 1/14/2015.
+ */
+@SuppressWarnings("ALL")
+public class LocationAddAlertsActivity extends FragmentActivity implements CustomDrawer1.TouchCallbacks,GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener,LocationListener,GoogleMap.OnMapLoadedCallback, GoogleMap.OnMapLongClickListener {
+
+    private static final String TAG = LocationAddAlertsActivity.class.getCanonicalName();
+    private GoogleMap googleMap;
+    private MapView locateVehicleMapView;
+    private CustomDrawer1 mDrawer;
+    private Button lDrawButton;
+    private Button btnRadius;
+    private Button mBtnDone;
+    private Circle mPreviousCircle;
+    private Context mContext;
+    private LocationClient mLocationClient;
+    private EditText findLocationET;
+    private float DEFAULT_RADIUS = 600f;
+    private LatLng mLatLngLocation;
+    private Marker mMarker;
+    private Location mCurrentLocation,mVehicleLocation;
+    private LinearLayout mLLayoutMapDrawerControls;
+    private final static LatLng DEFAULT_LOCATION = new LatLng(51.876491,-104.238281);
+
+    private final static LatLng DEFAULT_LOCATION_NORTH_WEST = new LatLng(67.900354,-163.652344);
+    private final static LatLng DEFAULT_LOCATION_NORTH_EAST = new LatLng(67.500161,-62.753906);
+    private final static LatLng DEFAULT_LOCATION_SOUTH_WEST = new LatLng(15.686510,-156.621094);
+    private final static LatLng DEFAULT_LOCATION_SOUTH_EAST = new LatLng(16.699340,-55.722656);
+    private float mRadiusDelta = 0.0f;
+    private Marker mCircleRadiusMarker;
+    private double circleCentreLatitude = 0.0d;
+    private double circleCentreLongitude = 0.0d;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mContext = this;
+        setContentView(R.layout.activity_add_alerts);//
+        locateVehicleMapView = (MapView) this.findViewById(R.id.addLocationMapView);
+        locateVehicleMapView.onCreate(savedInstanceState);
+        setupUI();
+
+        lDrawButton = (Button)findViewById(R.id.btnDraw);
+        btnRadius = (Button)findViewById(R.id.btnRadius);
+        mBtnDone = (Button) findViewById(R.id.btnDone);
+        mLLayoutMapDrawerControls = (LinearLayout)findViewById(R.id.mapDrawControllers);
+        mBtnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setMapMode(true);
+                // clear circle to.
+                if (mPreviousCircle != null) {
+                    mPreviousCircle.remove();
+                    mPreviousCircle = null;
+                }
+                if (mCircleRadiusMarker != null) {
+                    mCircleRadiusMarker.remove();
+                }
+            }
+        });
+        lDrawButton.setPressed(false);
+        lDrawButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                new GoogleAnalyticsUtil().trackEvents(IndriveApplication.getInstance(),getResources().getString(R.string.category_location),
+                        "LocationAddLocationDraw");
+
+                // switch radius mode to ff
+                if (mDrawer.getScaleMode()) {
+                    btnRadius.setTextColor(Color.BLACK);
+                    mBtnDone.setVisibility(View.GONE);
+                    mDrawer.setScaleMode(false);
+                    btnRadius.setPressed(false);
+                    // switch ended.
+                    mDrawer.reset();
+                    if (mPreviousCircle != null) {
+                        mPreviousCircle.remove();
+                        mPreviousCircle = null;
+                    }
+                    if (mCircleRadiusMarker != null) {
+                        mCircleRadiusMarker.remove();
+                    }
+                    mDrawer.setVisibility(View.VISIBLE);
+                    lDrawButton.setTextColor(Color.BLUE);
+                    lDrawButton.setPressed(true);
+                }
+                else {
+                    if (mDrawer.getVisibility() == View.VISIBLE) {
+                        mDrawer.setVisibility(View.GONE);
+                        mDrawer.resetGestureLocations();
+                        lDrawButton.setTextColor(Color.BLACK);
+                        lDrawButton.setPressed(false);
+                    } else {
+                        mDrawer.reset();
+                        if (mPreviousCircle != null) {
+                            mPreviousCircle.remove();
+                            mPreviousCircle = null;
+                        }
+                        mDrawer.setVisibility(View.VISIBLE);
+                        lDrawButton.setTextColor(Color.BLUE);
+                        lDrawButton.setPressed(true);
+                    }
+                }
+            }
+        });
+
+        ImageView infoView = (ImageView) findViewById(R.id.info_location_alerts);
+        infoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToBeDecidedDialog dialog = new ToBeDecidedDialog(LocationAddAlertsActivity.this, LocationAddAlertsActivity.this.getResources().getString(R.string.location_alerts_info_text));
+                dialog.setTitle(getResources().getString(R.string.about_location_alerts));
+                dialog.show();
+            }
+        });
+
+        btnRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new GoogleAnalyticsUtil().trackEvents(IndriveApplication.getInstance(),getResources().getString(R.string.category_location),
+                        "LocationAddLocationDraw");
+
+                if (googleMap == null
+                    || mDrawer == null)
+                    return;
+// Below code is comment as per the B-REQ.
+// may be removed or added back depends on final B-REQ after demo.
+//                if (mDrawer.getScaleMode()) {
+//                    btnRadius.setTextColor(Color.BLACK);
+//                    btnRadius.setPressed(false);
+//                    mDrawer.setScaleMode(false);
+//                    mBtnDone.setVisibility(View.GONE);
+//                }
+//                else {
+                    btnRadius.setTextColor(Color.BLUE);
+                    btnRadius.setPressed(true);
+                    mBtnDone.setVisibility(View.VISIBLE);
+                    mDrawer.setScaleMode(true);
+                    onUpdateLocation();
+//                }
+                if (mDrawer.getScaleMode()) {
+                    if (mDrawer.getVisibility() == View.VISIBLE) {
+                        mDrawer.reset();
+                        mDrawer.resetGestureLocations();
+                        lDrawButton.setTextColor(Color.BLACK);
+                        lDrawButton.setPressed(false);
+                    }
+                    else {
+                        mDrawer.setVisibility(View.VISIBLE);
+                    }
+                }
+                else {
+                    mDrawer.reset();
+                    mDrawer.resetGestureLocations();
+                    mDrawer.setVisibility(View.GONE);
+                    lDrawButton.setTextColor(Color.BLACK);
+                    lDrawButton.setPressed(false);
+                }
+            }
+        });
+
+        ImageButton locateIV = (ImageButton) this.findViewById(R.id.locateIV);
+        locateIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new GoogleAnalyticsUtil().trackEvents(IndriveApplication.getInstance(),getResources().getString(R.string.category_location),
+                        "LocationAddLocationSearch");
+                // Get Location Manager and check for GPS & Network location services
+                LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+                if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    // Build the alert dialog
+
+                    new AlertDialog.Builder(LocationAddAlertsActivity.this)
+                            .setTitle(getResources().getString(R.string.location_services_inactive))
+                            .setMessage(getResources().getString(R.string.enable_location_services))
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    // Show location settings when the user acknowledges the alert dialog
+                                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    startActivity(intent);
+                                }
+                            })
+                            .show();
+                } else {
+                    if (googleMap == null || googleMap.getMyLocation() == null)
+                        return;
+                    // clear focus.
+                    findLocationET.clearFocus();
+                    findLocationET.setText("");
+                    // set to map mode
+                    setMapMode(true);
+                    // move to current location.
+                    showMyLocation1();
+                }
+            }
+        });
+
+        findLocationET = (EditText) this.findViewById(R.id.findLocationET);
+        findLocationET.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    // set map mode
+                    setMapMode(true);
+
+                    String address = findLocationET.getText().toString();
+                    if (address.isEmpty()) {
+                        Toast.makeText(mContext, "Please fill the address ", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    showSearchLocation(address);
+                    BasicUtil.hideKeyboard(LocationAddAlertsActivity.this);
+                    mLLayoutMapDrawerControls.setVisibility(View.VISIBLE);
+
+
+                    return true;
+                }
+                return false;
+            }
+        });
+//        findLocationET.setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//
+//                if(event.getAction() == KeyEvent.ACTION_DOWN){
+//                    switch (keyCode){
+//                        case KeyEvent.KEYCODE_DPAD_CENTER:
+//                        case KeyEvent.KEYCODE_ENTER:
+//                            String findText = findLocationET.getText().toString();
+//                            if (!findText.equalsIgnoreCase("")) {
+//                                showSearchLocation(findText);
+//                                BasicUtil.hideKeyboard(LocationAddAlertsActivity.this);
+//                                mLLayoutMapDrawerControls.setVisibility(View.VISIBLE);
+//                                return true;
+//                            }
+//                            default:
+//                                break;
+//                    }
+//                }
+//                return false;
+//            }
+//        });
+
+
+    }
+
+    private void setMapMode(boolean b) {
+        mDrawer.setVisibility(View.GONE);
+        btnRadius.setTextColor(Color.BLACK);
+        mDrawer.setScaleMode(false);
+        mDrawer.reset();
+        mDrawer.resetGestureLocations();
+        mBtnDone.setVisibility(View.GONE);
+        lDrawButton.setTextColor(Color.BLACK);
+        mBtnDone.setVisibility(View.GONE);
+//            if(googleMap != null){
+//                googleMap.clear();
+//            }
+    }
+
+    private void lockMap() {
+
+        googleMap.getUiSettings().setScrollGesturesEnabled(false);
+    }
+
+
+    private void resizeCircle(float delta) {
+        double radius = 0;
+        if (mPreviousCircle != null) {
+            radius = mPreviousCircle.getRadius() + delta;
+            mPreviousCircle.setRadius(radius);
+        }
+        if (!mPreviousCircle.isVisible()) {
+            mPreviousCircle.setVisible(true);
+        }
+
+        if(radius < 0 )
+            mPreviousCircle.setRadius(0);
+
+        updateCircleRadiusLabel(mPreviousCircle);
+    }
+
+    private void setupUI() {
+        setupHeaderView();
+        initMap();
+    }
+
+    private void initMap(){
+        googleMap = locateVehicleMapView.getMap();
+        if (googleMap != null) {
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            googleMap.setMyLocationEnabled(true);
+        }
+        try {
+            MapsInitializer.initialize(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Updates the location and zoom of the MapView
+        if (googleMap != null) {
+            googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                @Override
+                public void onMyLocationChange(Location location) {
+
+                    //centerMapOnMyLocation();
+
+
+                }
+            });
+            googleMap.setOnMapLoadedCallback(this);
+        }
+        googleMap.setOnMapLongClickListener(this);
+        if(locateVehicleMapView.getViewTreeObserver().isAlive()){
+            locateVehicleMapView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                        locateVehicleMapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    }else{
+                        locateVehicleMapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+
+                    setBoundsOnMap();
+                }
+            });
+        }
+
+        mDrawer = (CustomDrawer1)findViewById(R.id.customDrawer);
+        mDrawer.setMap(googleMap);
+        mDrawer.setRecognizer(this);
+
+        // stub to testing
+        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                Log.d(TAG, " Zoom "+cameraPosition.zoom);
+            }
+        });
+        // stub
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locateVehicleMapView.onResume();
+        setUpLocationClientIfNeeded();
+        mLocationClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locateVehicleMapView.onPause();
+        if (mLocationClient != null) {
+            mLocationClient.disconnect();
+        }
+    }
+
+    private void setUpLocationClientIfNeeded() {
+        if (mLocationClient == null) {
+            mLocationClient = new LocationClient(
+                    this,
+                    this,  // ConnectionCallbacks
+                    this); // OnConnectionFailedListener
+        }
+    }
+
+
+
+    private void setupHeaderView() {
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerLayout);
+        headerRL.setBackgroundResource(R.drawable.location_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        headerBtn.setVisibility(View.VISIBLE);
+        headerBtn.setText(this.getResources().getString(R.string.next));
+        headerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new GoogleAnalyticsUtil().trackEvents(IndriveApplication.getInstance(),getResources().getString(R.string.category_location),
+                        "LocationAddLocationNext");
+                if (mPreviousCircle == null) {
+                    Toast.makeText(mContext, "Please create boundary ...", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent(LocationAddAlertsActivity.this, LocationAlertsActivity.class);
+                intent.putExtra("Radius", (float)mPreviousCircle.getRadius());
+                intent.putExtra("Latitude", circleCentreLatitude);
+                intent.putExtra("Longitude", circleCentreLongitude);
+                startActivityForResult(intent, 2);
+            }
+        });
+        headerTitleTV.setText(this.getResources().getString(R.string.add_location_alert));
+    }
+
+
+
+    @Override
+    public void addPoint(int x, int y) {
+
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public void end(boolean isLongClicked,ArrayList<LatLng> locations) {
+        drawCircle();
+        mDrawer.setVisibility(View.GONE);
+        mDrawer.resetGestureLocations();
+        lDrawButton.setTextColor(Color.BLACK);
+        lDrawButton.setPressed(false);
+    }
+
+    private void drawCircle() {
+        if(mDrawer.getAllGestureLocations() == null
+            || mDrawer.getAllGestureLocations().size() == 0
+            || googleMap == null)
+            return;
+        GestureMessage mCircleBoundary = mDrawer.detectGesture1();
+        if(mCircleBoundary != null) {
+            if (mPreviousCircle != null) {
+                mPreviousCircle.setCenter(mCircleBoundary.getCenterLatLng());
+                mPreviousCircle.setRadius(mCircleBoundary.getRadius());
+            }
+            else {
+                mPreviousCircle = MapUtils.drawGeofenceCircle(googleMap, mCircleBoundary.getCenterLatLng(), mCircleBoundary.getRadius());
+            }
+            if (mCircleRadiusMarker != null) {
+                mCircleRadiusMarker.remove();
+                mCircleRadiusMarker = null;
+            }
+            updateCircleRadiusLabel(mPreviousCircle);
+        }
+        mDrawer.reset();
+        mDrawer.resetGestureLocations();
+    }
+
+    public void updateCircleRadiusLabel(Circle circle) {
+
+        LatLng center = circle.getCenter();
+
+        double latSpan = (circle.getRadius() + 15*circle.getStrokeWidth()) /111325.0;
+        double longSpan = ((circle.getRadius() + circle.getStrokeWidth()) /111325.0)*(1/ Math.cos(Math.toRadians(center.latitude)));
+
+        LatLng labelPosition = new LatLng(center.latitude - latSpan, center.longitude);
+        float circleRadiusInMetre = MapUtils.getMeters((float) circle.getRadius());
+        circleCentreLatitude = center.latitude;
+        circleCentreLongitude = center.longitude;
+        Bitmap bitmap = null;
+        if (circle.getRadius() > 0) {
+
+            bitmap = MapUtils.createBitmap(400, 60,
+                    String.format("%.3f miles", MapUtils.getMiles((float) circle.getRadius())),
+                    50, Color.BLACK);
+        } else {
+            bitmap = MapUtils.createBitmap(400, 60,
+                    "0 miles",
+                    50, Color.BLACK);
+        }
+        if (mCircleRadiusMarker == null) {
+            mCircleRadiusMarker = googleMap.addMarker(new MarkerOptions().position(labelPosition)
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+        }
+        else {
+            mCircleRadiusMarker.setPosition(labelPosition);
+            mCircleRadiusMarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+        }
+        bitmap.recycle();
+    }
+
+    public void clearCircle() {
+        if (mPreviousCircle != null) {
+            mPreviousCircle.remove();
+            mPreviousCircle = null;
+        }
+        if (mCircleRadiusMarker != null) {
+            mCircleRadiusMarker.remove();
+            mCircleRadiusMarker = null;
+        }
+    }
+
+    /**
+     * Please don't use this method for long click on map this method is deprecated. Use  onMapLongClick(LatLng latLng) which is implemented
+     * in this class.
+     * @param x
+     * @param y
+     */
+    @Override
+    public void longPress(int x, int y) {
+        if (googleMap == null)
+            return;
+        //googleMap.clear();
+        mLatLngLocation = MapUtils.getLatLngFromScreenCoordinates(googleMap, x, y);
+        onUpdateLocation();
+        mDrawer.resetGestureLocations();
+    }
+
+    private void onUpdateLocation() {
+        if (mLatLngLocation == null) {
+            return;
+        }
+
+        float radius = getDefaultRadius();
+        if (mPreviousCircle == null) {
+            mPreviousCircle = MapUtils.drawGeofenceCircle(googleMap, mLatLngLocation, radius);
+        }
+        else {
+            mPreviousCircle.setCenter(mLatLngLocation);
+            mPreviousCircle.setRadius(radius);
+        }
+        if (mCircleRadiusMarker != null) {
+            mCircleRadiusMarker.remove();
+            mCircleRadiusMarker = null;
+        }
+        updateCircleRadiusLabel(mPreviousCircle);
+
+        // move map to center the location
+        MapUtils.animateMoveToWithoutZoom(googleMap, mLatLngLocation);
+
+    }
+
+
+    public float getDefaultRadius() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        Point centerPoint = googleMap.getProjection().toScreenLocation(mLatLngLocation);
+        Point pointOnCircle = new Point(centerPoint.x + displayMetrics.widthPixels / 4, centerPoint.y);
+        LatLng mLocationOnCircle = googleMap.getProjection().fromScreenLocation(pointOnCircle);
+        float radius = MapUtils.getDistanceInMeters(mLatLngLocation, mLocationOnCircle);
+        mRadiusDelta = radius / (displayMetrics.widthPixels / 4);
+        return radius;
+    }
+
+    public List<LatLng> getRadialBoundaries() {
+        // Get the center of map
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        Point centerPoint = new Point(displayMetrics.widthPixels / 2, displayMetrics.heightPixels / 2);
+        // Get the default radius of map
+        //LatLng centerLatLang = googleMap.getProjection().fromScreenLocation(centerPoint);
+        LatLng centerLatLang = mLatLngLocation;
+        LatLng lowerLatLang = new LatLng(centerLatLang.latitude - MapUtils.getMeters(10), centerLatLang.longitude - MapUtils.getMeters(10));
+        LatLng upperLagLang = new LatLng(centerLatLang.latitude + MapUtils.getMeters(10), centerLatLang.longitude + MapUtils.getMeters(10));
+        // find lower and upper locations.
+        ArrayList<LatLng> boundaries = new ArrayList<LatLng>();
+        boundaries.add(lowerLatLang);
+        boundaries.add(upperLagLang);
+        return boundaries;
+    }
+
+    public float getRadiusDelta() {
+        if (googleMap == null)
+            return  0;
+        return mRadiusDelta * 10;
+    }
+
+    @Override
+    public void onPinchZoomIn() {
+        resizeCircle(-getRadiusDelta());
+    }
+
+    @Override
+    public void onPinchZoomOut() {
+        resizeCircle(getRadiusDelta());
+    }
+
+    @Override
+    public void onCircleRendered(boolean isRendered) {
+        if(isRendered){
+            mBtnDone.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onDisconnected() {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onMapLoaded() {
+        Log.d(TAG, "onMapLoaded");
+//        As of now showing current location as vehicle location
+//        showMyLocation1();
+        if(mVehicleLocation != null){
+              showLocationOnMap(mVehicleLocation);
+        }else if(mCurrentLocation != null){
+              showLocationOnMap(mCurrentLocation);
+        }
+//        else {
+//              setBoundsOnMap();
+//        }
+    }
+    private void showMyLocation1(){
+        if (mLocationClient != null && mLocationClient.isConnected() && googleMap != null && mLocationClient.getLastLocation() != null) {
+            mLatLngLocation = new LatLng(mLocationClient.getLastLocation().getLatitude(), mLocationClient.getLastLocation().getLongitude());
+            MapUtils.animateMoveTo(googleMap, mLatLngLocation);
+            clearCircle();
+            // clear previous marker
+            if (mMarker != null) {
+                mMarker.remove();
+                mMarker = null;
+            }
+//            Marker mMarker = MapUtils.drawVehicleMarker(googleMap, mVehicleLocation);
+//            MapUtils.setMarkerWithAddress(mContext, mMarker, mVehicleLocation);
+        }
+        mLLayoutMapDrawerControls.setVisibility(View.VISIBLE);
+    }
+
+    private void showLocationOnMap(Location location){
+        LatLng loc = new LatLng(location.getLatitude(),location.getLongitude());
+        MapUtils.animateMoveTo(googleMap, loc);
+    }
+
+    private void setBoundsOnMap(){
+        MapUtils.setBoundsOnMap(googleMap, DEFAULT_LOCATION_NORTH_WEST, DEFAULT_LOCATION_NORTH_EAST, DEFAULT_LOCATION_SOUTH_WEST, DEFAULT_LOCATION_SOUTH_EAST);
+    }
+
+    private void showSearchLocation(final String address) {
+
+        MapUtils.searchAddress(mContext, address,new MapUtils.OnAddressSearchFinished() {
+
+            @Override
+            public void onSearchFinished(int code, LatLng[] latLng) {
+                if (code == MapUtils.OnAddressSearchFinished.ADDRESS_NOT_FOUND
+                        || code == MapUtils.OnAddressSearchFinished.MULTIPLE_ADDRESS_FOUND) {
+                    Toast.makeText(mContext, "Address not found. Please refine address ", Toast.LENGTH_SHORT).show();
+                    BasicUtil.showKeyboard(LocationAddAlertsActivity.this);
+                    mLLayoutMapDrawerControls.setVisibility(View.GONE);
+                    return;
+                }
+                MapUtils.animateMoveTo(googleMap, latLng[0]);
+                if (mMarker == null)
+                    mMarker = googleMap.addMarker(new MarkerOptions().position(latLng[0]));
+                else {
+                    mMarker.setPosition(latLng[0]);
+                    mMarker.setVisible(true);
+                }
+                MapUtils.setMarkerWithAddress(mContext, mMarker, latLng[0]);
+                mLatLngLocation = latLng[0];
+                // clear circle and radius
+                clearCircle();
+            }
+        });
+
+//        // Getting user input location
+//
+//
+//        if(location!=null && !location.equals("")){
+//            System.out.println("$$$ location is "+location);
+//            new GeocoderTask().execute(location);
+//        }
+
+    }
+
+    private void dropMarker(LatLng latLng){
+        MapUtils.animateMoveTo(googleMap, latLng);
+        Marker mMarker = MapUtils.drawVehicleMarker(googleMap, latLng);
+        MapUtils.setMarkerWithAddress(mContext, mMarker, latLng);
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Log.d(TAG, "onLong pressed on map");
+        if (!MapUtils.checkReady(googleMap)) {
+            return;
+        }
+        mLLayoutMapDrawerControls.setVisibility(View.VISIBLE);
+
+        clearCircle();
+
+        if (mMarker == null) {
+            mMarker = googleMap.addMarker(new MarkerOptions().position(latLng));
+        }
+        else {
+            mMarker.setPosition(latLng);
+        }
+        mMarker.setVisible(true);
+        MapUtils.setMarkerWithAddress(mContext, mMarker, latLng);
+        MapUtils.dropPinEffect(mMarker);
+        mLatLngLocation = latLng;
+    }
+
+    // An AsyncTask class for accessing the GeoCoding Web Service
+    private class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
+
+        LatLng latLng;
+        MarkerOptions markerOptions;
+
+        @Override
+        protected List<Address> doInBackground(String... locationName) {
+            // Creating an instance of Geocoder class
+            Geocoder geocoder = new Geocoder(getBaseContext());
+            List<Address> addresses = null;
+
+            try {
+                // Getting a maximum of 3 Address that matches the input text
+                addresses = geocoder.getFromLocationName(locationName[0], 3);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return addresses;
+        }
+
+
+        @Override
+        protected void onPostExecute(List<Address> addresses) {
+
+            if(addresses==null || addresses.size()==0){
+                Toast.makeText(getBaseContext(), "No Location found", Toast.LENGTH_SHORT).show();
+            }
+
+            // Clears all the existing markers on the map
+            googleMap.clear();
+
+            // Adding Markers on Google Map for each matching address
+            for(int i=0;i<addresses.size();i++){
+
+                Address address = addresses.get(i);
+
+                // Creating an instance of GeoPoint, to display in Google Map
+                latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                String addressText = String.format("%s, %s",
+                        address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
+                        address.getCountryName());
+
+                markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title(addressText);
+
+                googleMap.addMarker(markerOptions);
+
+                // Locate the first location
+                if(i==0)
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int req, int resultCode, Intent resultIntent) {
+        super.onActivityResult(req, resultCode, resultIntent);
+        if (resultCode == 2) {
+            finish();
+        }
+    }
+}

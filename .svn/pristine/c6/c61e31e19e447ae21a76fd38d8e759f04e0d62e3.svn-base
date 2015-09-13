@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.verizontelematics.indrivemobile.activity.LocationHistoryActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/history_headerLL"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/maintenance_log_header_height"
+        android:background="@drawable/gradient_gray_bar">
+
+
+        <TextView
+            android:id="@+id/selectedDayTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="start"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="10dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/header_text_size"
+            />
+
+        <Button
+            android:id="@+id/editDayBtn"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:text="@string/edit_day"
+            android:textSize="@dimen/form_labels_text_size"
+            android:textColor="@color/white"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_height="wrap_content"/>
+
+
+    </RelativeLayout>
+
+    <com.google.android.gms.maps.MapView
+        android:layout_below="@id/history_headerLL"
+        android:id="@+id/locationHistoryMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</RelativeLayout>

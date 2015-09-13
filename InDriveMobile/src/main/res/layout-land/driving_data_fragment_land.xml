@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="@drawable/driving_data_background">
+
+    <RelativeLayout
+        android:id="@+id/miles_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_item_top_margin">
+
+        <TextView
+            android:id="@+id/txt_month_year_date_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginLeft="@dimen/graph_margin_left"
+            android:layout_marginStart="@dimen/graph_margin_left"
+            android:textColor="@color/white"
+            android:layout_alignParentTop="true"/>
+
+        <TextView
+            android:id="@+id/miles_txtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/graph_margin_left"
+            android:layout_marginStart="@dimen/graph_margin_left"
+            android:text="@string/total_miles"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:layout_below="@id/txt_month_year_date_label"/>
+
+        <TextView
+            android:id="@+id/header_current_recalls_date_issued"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:layout_toRightOf="@+id/miles_txtView"
+            android:layout_toEndOf="@+id/miles_txtView"
+            android:layout_alignTop="@id/miles_txtView"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/chartLayout"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <RelativeLayout
+            android:id="@+id/backArrowRL"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/right_arrow_btn"
+            android:rotation="180"
+            android:contentDescription="@string/left_black_arrow_cd"
+            android:id="@+id/imgPreviousRecords"
+            />
+
+        </RelativeLayout>
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/drivingDataGraph"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            />
+        <RelativeLayout
+            android:id="@+id/forwardArrowRL"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/right_black_arrow_cd"
+            android:background="@drawable/right_arrow_btn"
+            android:id="@+id/imgSubsequentRecords"
+            />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

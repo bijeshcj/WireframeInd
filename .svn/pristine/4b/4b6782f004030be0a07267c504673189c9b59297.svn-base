@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.1.0'
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 19
+        versionCode 1
+        versionName '1.10'
+    }
+    sourceSets {
+        instrumentTest.setRoot('src/androidTest')
+    }
+    signingConfigs {
+        release {
+            storeFile file("BuildEssentials/MapKeyStore/debug-Android.keystore")
+            storePassword "password"
+            keyAlias "debug_key"
+            keyPassword "password"
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            runProguard true
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    productFlavors {
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile files('libs/IndriveCustomComponents.jar')
+    compile project(':captureActivity')
+    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:appcompat-v7:20.0.0'
+    compile project(':google-play-services_lib')
+    compile project(':MPChartLib')
+    compile files('libs/joda-time-2.4.jar')
+    compile project(':NumberPickerLib')
+    compile files('libs/bcpkix-jdk15on-151.jar')
+    compile files('libs/bcprov-jdk15on-151.jar')
+}

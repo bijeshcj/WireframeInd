@@ -1,0 +1,195 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Html;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.data.MaintenanceReminderData;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.ui.DateDataFormat;
+
+import java.text.SimpleDateFormat;
+
+public class MaintenanceReminderDetailActivity extends Activity {
+
+    private static final String TAG = MaintenanceReminderDetailActivity.class.getCanonicalName();
+    private MaintenanceReminderData mMaintenanceReminderData;
+    private static final int FINISH_DETAIL_ACTIVITY = 8;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maintenance_reminder_detail);
+        parseArguments();
+        setupUI();
+    }
+
+    private void parseArguments() {
+
+        Bundle arguments = getIntent().getExtras();
+        if (arguments != null) {
+            if ((arguments.containsKey("selected_data")) && (arguments.getParcelable("selected_data") != null)) {
+                mMaintenanceReminderData = arguments.getParcelable("selected_data");
+            }
+        }
+    }
+
+    private void setupHeaderView() {
+
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerRL);
+//        headerRL.setBackgroundColor(this.getResources().getColor(R.color.diagnostics_code));
+        headerRL.setBackgroundResource(R.drawable.diagnostic_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        headerTitleTV.setText(this.getResources().getString(R.string.maintenance_reminder));
+        headerBtn.setText(this.getResources().getString(R.string.edit));
+        headerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onEditReminder();
+            }
+        });
+
+
+    }
+
+    private void onEditReminder() {
+        Intent createReminderIntent = new Intent(this, CreateMaintenanceReminderActivity.class);
+        createReminderIntent.putExtra("edit_mode", true);
+        createReminderIntent.putExtra("selected_data", mMaintenanceReminderData);
+        startActivityForResult(createReminderIntent, FINISH_DETAIL_ACTIVITY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == FINISH_DETAIL_ACTIVITY) && (resultCode == RESULT_OK)) {
+
+            // parse input data
+            if (data == null || data.getAction() == null) {
+                return;
+            }
+            if (data.getAction().equals("updated")) {
+                if (data.getExtras() == null)
+                    return;
+                mMaintenanceReminderData = data.getExtras().getParcelable("reminder_data");
+                setupUI();
+            }
+            else if (data.getAction().equals("deleted")) {
+                finish();
+            }
+        }
+
+    }
+
+    private void setupUI() {
+        // populate detailed view
+
+        if (mMaintenanceReminderData == null)
+            return;
+
+        setupHeaderView();
+
+        ImageView infoIV = (ImageView)findViewById(R.id.btn_info);
+        infoIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ToBeDecidedDialog dialog = new ToBeDecidedDialog(MaintenanceReminderDetailActivity.this,"TBD");
+                dialog.setTitle("TBD");
+                dialog.show();
+
+            }
+        });
+
+        TextView serviceTypeTV = (TextView) this.findViewById(R.id.serviceTypeText);
+        TextView customServiceTypeTV = (TextView) this.findViewById(R.id.customServiceTypeText);
+
+        String customText = getResources().getString(R.string.custom);
+        if (mMaintenanceReminderData.getServiceType().equalsIgnoreCase(customText)) {
+            serviceTypeTV.setText(customText);
+            customServiceTypeTV.setVisibility(View.VISIBLE);
+            customServiceTypeTV.setText(mMaintenanceReminderData.getReminderName());
+        } else {
+            customServiceTypeTV.setVisibility(View.GONE);
+            serviceTypeTV.setText(mMaintenanceReminderData.getServiceName());
+        }
+
+        TextView serviceDescTV = (TextView) this.findViewById(R.id.serviceDescText);
+        String serviceDesc = mMaintenanceReminderData.getReminderDescription() == null ? "" : mMaintenanceReminderData.getReminderDescription();
+        serviceDescTV.setText(Html.fromHtml("<b>" + getResources().getString(R.string.description) + " : </b>" + serviceDesc));
+
+        LinearLayout dateLL = (LinearLayout) this.findViewById(R.id.dateDetailLL);
+        TextView mileageTV = (TextView) this.findViewById(R.id.mileageText);
+        TextView dateTV = (TextView) this.findViewById(R.id.dateText);
+        TextView frequencyTV = (TextView) this.findViewById(R.id.frequencyText);
+
+
+        // Select Date or Mileage option
+        AppConstants.USER_SELECTION mUserSelection = (mMaintenanceReminderData.getReminderDate() <= 0) ? AppConstants.USER_SELECTION.MILEAGE : AppConstants.USER_SELECTION.DATE;
+        if (mUserSelection.equals(AppConstants.USER_SELECTION.MILEAGE)) {
+            dateLL.setVisibility(View.GONE);
+            mileageTV.setVisibility(View.VISIBLE);
+            mileageTV.setText(Html.fromHtml("<b>" + getResources().getString(R.string.mileage_interval) + " : </b>" + String.valueOf(mMaintenanceReminderData.getReminderConfigMiles())));
+
+        } else {
+            // Alert Date
+            dateLL.setVisibility(View.VISIBLE);
+            mileageTV.setVisibility(View.GONE);
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat mFormatter = new SimpleDateFormat("MM/dd/yyyy");
+            dateTV.setText(Html.fromHtml("<b>" + getResources().getString(R.string.date) + " : </b>" + DateDataFormat.convertMillisAsDateString(this, mMaintenanceReminderData.getReminderDate(), mFormatter, true)));
+            frequencyTV.setText(Html.fromHtml("<b>" + getResources().getString(R.string.repeat) + " : </b>" + mMaintenanceReminderData.getReminderConfigMonths()));
+
+        }
+        //Commenting part of removing Notify Me layout
+       /* TextView emailTV = (TextView) this.findViewById(R.id.emailText);
+        TextView messageTV = (TextView) this.findViewById(R.id.messageText);
+
+        if (mMaintenanceReminderData.isNotificationFlagEmail())
+            emailTV.setVisibility(View.VISIBLE);
+        else
+            emailTV.setVisibility(View.GONE);
+
+        if (mMaintenanceReminderData.isNotificationFlagSms())
+            messageTV.setVisibility(View.VISIBLE);
+        else
+            messageTV.setVisibility(View.GONE);*/
+
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_maintenance_reminder_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+}

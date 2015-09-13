@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/time_period"
+              android:orientation="vertical"
+              android:id="@+id/vehicle_health_details_container">
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <TextView
+        android:id="@+id/diagnosticsSummaryTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:text="@string/battery"
+        android:textColor="@color/diagnostics_text_color"
+        android:textStyle="bold"
+        android:textSize="20sp"/>
+
+
+    <TextView
+        android:id="@+id/diagnosticsStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:text="@string/service_required"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
+
+    <RelativeLayout
+        android:id="@+id/labelsRLParent"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/diagnosticsCodeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:ellipsize="end"
+            android:layout_centerVertical="true"
+            android:text="@string/dtc_code"
+            android:textColor="@color/diagnostics_text_color"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/diagnosticsCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/diagnosticsCodeLabel"
+            android:layout_toEndOf="@id/diagnosticsCodeLabel"
+            android:ellipsize="end"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/not_activated"
+            android:textColor="@color/diagnostics_text_color"
+            android:textSize="16sp"/>
+
+
+        <ImageView
+            android:id="@+id/infoIcon"
+            android:contentDescription="@string/red_alert_cd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/information_button"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_toRightOf="@id/diagnosticsCode"
+            android:layout_toEndOf="@id/diagnosticsCode"
+            />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/callCentreSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:ellipsize="end"
+        android:padding="10dp"
+        android:text="@string/call_centre_summary"
+        android:textColor="@color/diagnostics_text_color"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/diagnosticsSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:ellipsize="end"
+        android:padding="10dp"
+        android:text="@string/diagnostic_summary"
+        android:textColor="@color/diagnostics_text_color"
+        android:textSize="18sp"/>
+
+</LinearLayout>

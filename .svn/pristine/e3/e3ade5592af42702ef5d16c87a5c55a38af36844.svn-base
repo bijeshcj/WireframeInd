@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:id="@+id/vehicle_health_details_container">
+
+    <!--<LinearLayout
+        android:id="@+id/headerBarlayout"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:background="@color/diagnostics_code"
+
+        android:layout_height="@dimen/abc_action_bar_default_height">
+
+        <Button
+            android:id="@+id/ab_cancel_btn"
+            android:text="@string/cancel"
+            android:textSize="16dp"
+            android:layout_width="80dp"
+            android:layout_gravity="left|center_vertical"
+            android:layout_height="40dp"/>
+        <TextView
+            android:id="@+id/action_bar_titleTV"
+            android:layout_width="0dp"
+            android:text="@string/diagnostics_detail"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/ab_save_btn"
+            android:text="@string/done"
+            android:textSize="16dp"
+            android:layout_width="80dp"
+            android:layout_gravity="right|center_vertical"
+            android:layout_height="40dp"/>
+    </LinearLayout>-->
+    <RelativeLayout
+        android:id="@+id/headerRL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/diagnosticsSummaryTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:ellipsize="end"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/battery"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="20sp"/>
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/diagnosticsStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/headerRL"
+        android:ellipsize="end"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:text="@string/service_required"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
+
+    <RelativeLayout
+        android:id="@+id/labelsRLParent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/diagnosticsStatus">
+
+        <RelativeLayout
+            android:id="@+id/labelsRL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            >
+
+            <TextView
+                android:id="@+id/diagnosticsCodeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:ellipsize="end"
+                android:layout_centerInParent="true"
+                android:text="@string/dtc_code"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/diagnosticsCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/diagnosticsCodeLabel"
+                android:layout_toEndOf="@id/diagnosticsCodeLabel"
+                android:ellipsize="end"
+                android:padding="10dp"
+                android:text="@string/not_activated"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/redAlertIcon1"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/information_button"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/red_alert_cd"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/labelsRL"
+            android:layout_toEndOf="@+id/labelsRL"
+            android:layout_alignBaseline="@+id/labelsRL"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/callCentreSummary"
+        android:layout_below="@id/labelsRLParent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:ellipsize="end"
+        android:padding="10dp"
+        android:text="@string/call_centre_summary"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/diagnosticsSummary"
+        android:layout_below="@id/callCentreSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:ellipsize="end"
+        android:padding="10dp"
+        android:text="@string/diagnostic_summary"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
+
+</RelativeLayout>

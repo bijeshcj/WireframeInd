@@ -1,0 +1,93 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 3/12/15.
+ */
+public class Vehicle extends  BaseData {
+    String MobileUserID;
+    String VehicleID;
+    String AccountID;
+    String Year;
+    String Make;
+    String Model;
+    String BodyType;
+    String UserType;
+    String DeviceStatus;
+
+    public Vehicle() {
+        super();
+    }
+
+    public String getMobileUserID() {
+        return MobileUserID;
+    }
+
+    public void setMobileUserID(String mobileUserID) {
+        MobileUserID = mobileUserID;
+    }
+
+    public String getVehicleID() {
+        return VehicleID;
+    }
+
+    public void setVehicleID(String vehicleID) {
+        VehicleID = vehicleID;
+    }
+
+    public String getAccountID() {
+        return AccountID;
+    }
+
+    public void setAccountID(String accountID) {
+        AccountID = accountID;
+    }
+
+    public String getYear() {
+        return Year;
+    }
+
+    public void setYear(String year) {
+        Year = year;
+    }
+
+    public String getMake() {
+        return Make;
+    }
+
+    public void setMake(String make) {
+        Make = make;
+    }
+
+    public String getModel() {
+        return Model;
+    }
+
+    public void setModel(String model) {
+        Model = model;
+    }
+
+    public String getBodyType() {
+        return BodyType;
+    }
+
+    public void setBodyType(String bodyType) {
+        BodyType = bodyType;
+    }
+
+    public String getUserType() {
+        return UserType;
+    }
+
+    public void setUserType(String userType) {
+        UserType = userType;
+    }
+
+    public String getDeviceStatus() {
+        return DeviceStatus;
+    }
+
+    public void setDeviceStatus(String deviceStatus) {
+        DeviceStatus = deviceStatus;
+    }
+
+}

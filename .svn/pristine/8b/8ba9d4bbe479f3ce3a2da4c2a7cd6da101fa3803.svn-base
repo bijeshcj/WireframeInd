@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/time_period"
+              android:orientation="vertical">
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"
+        />
+
+    <ImageView
+        android:layout_gravity="end"
+        android:id="@+id/infoIV"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:src="@drawable/info_button"
+        android:layout_marginRight="@dimen/list_item_top_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/dtc_list_refresh_layout">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/dtc_list_view"
+            android:minHeight="@dimen/list_item_height"
+            />
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

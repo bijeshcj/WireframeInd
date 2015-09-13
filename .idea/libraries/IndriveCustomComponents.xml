@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="IndriveCustomComponents">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/InDriveMobile/libs/IndriveCustomComponents.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<resources>
+
+<style name="AppTheme" parent="Theme.AppCompat.Light"/>
+    <style name="drawerListItemAppearanceStyle" parent="@android:style/TextAppearance">
+        <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
+        <item name="android:background">?android:attr/activatedBackgroundIndicator</item>
+        <item name="android:minHeight">?android:attr/listPreferredItemHeightSmall</item>
+    </style>
+    <style name="spinner_style_mode">
+        <item name="android:spinnerMode">dropdown</item>
+    </style>
+</resources>

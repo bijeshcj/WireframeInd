@@ -1,0 +1,25 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 3/6/15.
+ */
+public class SubcriptionInfoType {
+    private String PackageName;
+    private String PartNumber;
+
+    public String getPartNumber() {
+        return PartNumber;
+    }
+
+    public void setPartNumber(String partNumber) {
+        PartNumber = partNumber;
+    }
+
+    public String getPackageName() {
+        return PackageName;
+    }
+
+    public void setPackageName(String packageName) {
+        PackageName = packageName;
+    }
+}

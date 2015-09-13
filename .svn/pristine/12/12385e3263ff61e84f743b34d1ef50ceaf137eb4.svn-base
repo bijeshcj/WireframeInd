@@ -1,0 +1,150 @@
+package com.verizontelematics.indrivemobile.connection.ssl;
+
+import android.util.Log;
+
+import org.apache.http.conn.ssl.SSLSocketFactory;
+
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
+/**
+ * Created by bijesh on 2/4/2015.
+ *
+ */
+public class VerizonSSLSocketFactory extends SSLSocketFactory {
+
+    private static final String TAG = VerizonSSLSocketFactory.class.getCanonicalName();
+
+    private SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+    private  SSLSocketFactory delegate = null;
+
+    public VerizonSSLSocketFactory(KeyStore trustStore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+        super(trustStore);
+
+        TrustManager tm = new X509TrustManager() {
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            }
+
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            }
+
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+        };
+
+        sslContext.init(null, getTrustManagers1() , null);//new TrustManager[]{tm}
+//        printSupportedCipherSuites();
+    }
+
+
+
+    @Override
+    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException {
+        Log.d(TAG, "$$$ create Socket1 ");
+        Socket returnSocket = sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
+//        ((SSLSocket)returnSocket).setEnabledCipherSuites(PREFERRED_ALL_CIPHER_SUITES);
+        ((SSLSocket)returnSocket).setEnabledProtocols(new String[] {"TLSv1.2"} );
+        return returnSocket;
+    }
+
+    @Override
+    public Socket createSocket() throws IOException {
+        Log.d(TAG, "$$$ create Socket2 ");
+        Socket returnSocket = sslContext.getSocketFactory().createSocket();
+//        ((SSLSocket)returnSocket).setEnabledCipherSuites(PREFERRED_ALL_CIPHER_SUITES);
+        ((SSLSocket)returnSocket).setEnabledProtocols(new String[] {"TLSv1.2"} );
+        return returnSocket;
+    }
+
+
+
+    private TrustManager[] getTrustManagers1(){
+
+        CertificateFactory cf = null;
+        InputStream caInput = null;
+        TrustManagerFactory tmf = null;
+        KeyStore keyStore = null;
+        // Load CAs from an InputStream
+// (could be from a resource or ByteArrayInputStream or ...)
+        try {
+            cf = CertificateFactory.getInstance("X.509");
+        }catch (CertificateException e){
+            e.printStackTrace();
+        }
+// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+        try {
+            caInput = new BufferedInputStream(new FileInputStream("/storage/emulated/0/api-sit.vtitel.com.cer"));
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+        Certificate ca = null;
+        try {
+            ca = cf.generateCertificate(caInput);
+            System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+        }catch (CertificateException e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                caInput.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        // Create a KeyStore containing our trusted CAs
+        String keyStoreType = KeyStore.getDefaultType();
+        try {
+            keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        // Create a TrustManager that trusts the CAs in our KeyStore
+        String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+        try {
+            tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+        }catch (NoSuchAlgorithmException e){
+            e.printStackTrace();
+        }catch (KeyStoreException e){
+            e.printStackTrace();
+        }
+
+
+        return tmf.getTrustManagers();
+
+    }
+
+
+//    private void printSupportedCipherSuites(){
+//            String[] defaultCipherSuites = sslContext.getSocketFactory().getDefaultCipherSuites();
+//            for(String s:defaultCipherSuites){
+//                System.out.println("$$$ printing default ciphers "+s);
+//            }
+//    }
+
+}

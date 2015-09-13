@@ -1,0 +1,536 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/headerRL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <ScrollView
+        android:layout_below="@id/headerRL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context="com.verizontelematics.indrivemobile.activity.AppSettingsActivity">
+
+
+            <RelativeLayout
+                android:id="@+id/pushNotificationRL"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/pushNotificationTV"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/header_text_size"
+                    android:layout_width="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/push_notifications"
+                    android:layout_height="wrap_content"/>
+
+
+                <CheckBox
+                    android:id="@+id/pushNotificationCB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableRight="@drawable/switch_drawable"
+                    android:drawableEnd="@drawable/switch_drawable"
+                    android:text="@string/on_off"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:button="@null"
+                    android:checked="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    />
+
+                <ImageView
+                    android:layout_below="@id/pushNotificationCB"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:src="@color/gray"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/check_box_cd"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/autoUpdatesRL"
+                android:layout_below="@id/pushNotificationRL"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/autoUpdatesTV"
+                    android:layout_width="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/header_text_size"
+                    android:text="@string/auto_updates"
+                    android:layout_height="wrap_content"/>
+
+
+                <CheckBox
+                    android:id="@+id/autoUpdatesCB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableRight="@drawable/switch_drawable"
+                    android:drawableEnd="@drawable/switch_drawable"
+                    android:text="@string/on_off"
+                    android:button="@null"
+                    android:checked="true"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+
+                    />
+
+                <ImageView
+                    android:layout_below="@id/autoUpdatesCB"
+                    android:layout_width="match_parent"
+                    android:src="@color/gray"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/check_box_cd"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/messageNotificationRL"
+                android:layout_below="@id/autoUpdatesRL"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/messageNotificationTV"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/header_text_size"
+                    android:text="@string/message_notification"
+                    android:layout_marginBottom="@dimen/list_item_top_margin"
+                    android:layout_height="wrap_content"/>
+
+
+                <CheckBox
+                    android:id="@+id/textCB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableRight="@drawable/switch_drawable"
+                    android:drawableEnd="@drawable/switch_drawable"
+                    android:text="@string/text"
+                    android:button="@null"
+                    android:checked="true"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_below="@id/messageNotificationTV"
+                    />
+
+                <CheckBox
+                    android:id="@+id/emailCB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableRight="@drawable/switch_drawable"
+                    android:drawableEnd="@drawable/switch_drawable"
+                    android:text="@string/email"
+                    android:button="@null"
+                    android:checked="true"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@id/messageNotificationTV"
+                    />
+
+                <ImageView
+                    android:layout_below="@id/emailCB"
+                    android:layout_width="match_parent"
+                    android:src="@color/gray"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/check_box_cd"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/locationRL"
+                android:layout_below="@id/messageNotificationRL"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/locationTV"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/header_text_size"
+                    android:layout_width="wrap_content"
+                    android:text="@string/location"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/radiusDefaultTV"
+                    android:layout_below="@id/locationTV"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:text="@string/radius_default"
+                    android:layout_height="wrap_content"/>
+
+                <RadioGroup
+                    android:layout_below="@id/radiusDefaultTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:id="@+id/radius_selection_layout"
+                    android:weightSum="3"
+                    >
+
+                    <RadioButton
+                        android:id="@+id/firstRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/radius_half_mile"
+                        android:gravity="center"
+                        android:checked="true"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/secondRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:layout_height="wrap_content"
+                        android:text="@string/radius_one_mile"
+                        android:gravity="center"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/thirdRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/radius_two_miles"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        />
+                </RadioGroup>
+
+
+                <ImageView
+                    android:layout_below="@id/radius_selection_layout"
+                    android:layout_width="match_parent"
+                    android:src="@color/gray"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/check_box_cd"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/drivingDataRL"
+                android:layout_below="@id/locationRL"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/drivingDataTV"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/header_text_size"
+                    android:layout_width="wrap_content"
+                    android:text="@string/driving_data"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/timeDefaultTV"
+                    android:layout_below="@id/drivingDataTV"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:text="@string/time_period_default"
+                    android:layout_height="wrap_content"/>
+
+                <RadioGroup
+                    android:layout_below="@id/timeDefaultTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:id="@+id/time_selection_layout"
+                    android:weightSum="3"
+                    >
+
+                    <RadioButton
+                        android:id="@+id/thisWeekRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/this_week"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:onClick="radioButtonClick"
+                        android:checked="true"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/lastWeekRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/last_week"
+                        android:onClick="radioButtonClick"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/thisMonthRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/this_month"
+                        android:onClick="radioButtonClick"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        />
+                </RadioGroup>
+
+                <RadioGroup
+                    android:layout_below="@id/time_selection_layout"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:id="@+id/time_selection_layout_two"
+                    android:weightSum="3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/lastMonthRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/last_month"
+                        android:onClick="radioButtonClick"
+                        android:layout_gravity="bottom"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/customRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/custom"
+                        android:gravity="center"
+                        android:onClick="radioButtonClick"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        />
+                </RadioGroup>
+
+                <ImageView
+                    android:layout_below="@id/time_selection_layout_two"
+                    android:layout_width="match_parent"
+                    android:src="@color/gray"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/check_box_cd"/>
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/dataCategoryRL"
+                android:layout_below="@id/drivingDataRL"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/dataCategoryTV"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/header_text_size"
+                    android:text="@string/data_category_default"
+                    android:layout_height="wrap_content"/>
+
+
+                <RadioGroup
+                    android:layout_below="@id/dataCategoryTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:id="@+id/category_selection_layout"
+                    android:weightSum="3"
+                    >
+
+                    <RadioButton
+                        android:id="@+id/totalMilesRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_miles"
+                        android:gravity="center"
+                        android:checked="true"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:onClick="radioButtonClick"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/maxSpeedRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/max_speed"
+                        android:gravity="center"
+                        android:onClick="radioButtonClick"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/avgTripRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/average_trip"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:onClick="radioButtonClick"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        />
+                </RadioGroup>
+
+                <RadioGroup
+                    android:layout_below="@id/category_selection_layout"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:id="@+id/category_selection_layout_two"
+                    android:weightSum="3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/carbonFootPrintRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/carbon_footprint"
+                        android:onClick="radioButtonClick"
+                        android:layout_gravity="bottom"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/cityMPGRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/city_mpg_text"
+                        android:gravity="center"
+                        android:onClick="radioButtonClick"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/highwayMPGRB"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/highway_mpg_text"
+                        android:onClick="radioButtonClick"
+                        android:gravity="center"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:background="@android:color/transparent"
+                        android:button="@android:color/transparent"
+                        android:drawableTop="@drawable/custom_radio_button1"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        />
+                </RadioGroup>
+
+                <ImageView
+                    android:layout_below="@id/category_selection_layout_two"
+                    android:layout_width="match_parent"
+                    android:src="@color/gray"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/check_box_cd"/>
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

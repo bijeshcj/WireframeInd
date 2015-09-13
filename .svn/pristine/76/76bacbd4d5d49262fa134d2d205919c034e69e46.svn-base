@@ -1,0 +1,17 @@
+package com.verizontelematics.indrivemobile.utils.ui;
+
+/**
+ * Created by z688522 on 1/9/15.
+ */
+public enum VehicleType {
+    COMPACT
+    , CONVERTABLE
+    , MB_SEDAN
+    , MB_SUV
+    , MINIVAN
+    , PICKUP
+    , SEDAN
+    , SPORTS_CAR
+    , SUV
+    , WAGON
+}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="@color/time_period"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_gray_bar"
+        android:id="@+id/boundaryHistoryHeaderRL"
+        >
+
+        <TextView
+            android:id="@+id/boundaryHistoryHeaderTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:text="@string/boundary_alert_text"
+            android:textColor="@color/white"
+            android:textSize="18sp"/>
+
+        <ImageView
+            android:id="@+id/btn_info_boundary_alert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:paddingRight="10dp"
+            android:paddingEnd="10dp"
+            android:contentDescription="@string/info_img_cd"
+            android:src="@drawable/info_button"/>
+
+    </RelativeLayout>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/refresh_layout_id"
+        android:layout_below="@id/boundaryHistoryHeaderRL">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/boundaryHistoryHeaderRL"
+            android:id="@+id/boundaryHistoryListView"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+</RelativeLayout>

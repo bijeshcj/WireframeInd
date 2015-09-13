@@ -1,0 +1,297 @@
+package com.verizontelematics.indrivemobile.utils.ui;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.util.Log;
+
+import com.verizontelematics.indrivemobile.R;
+
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
+
+/**
+ * Created by z684985 on 10/15/14.
+ */
+public class DateDataFormat {
+
+    private static final String TAG = "DateDataFormat" ;
+
+    // cannot be instantiated
+    private DateDataFormat(){}
+
+    /**
+     * <p>A date formatter for database fields.</p>
+     */
+    public static final String DATE_FORMAT = "yyyyMMddHHmmss";
+
+    @SuppressLint("SimpleDateFormat")
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+
+    @SuppressLint("SimpleDateFormat")
+    private static final DateFormat mFormatter = new SimpleDateFormat("MM/d/yy");
+
+    /**
+     * Use this method to convert the millis to Date
+     * @param milliSeconds
+     * @return
+     */
+    public static String convertMillisAsDateString(Context ctx, long milliSeconds, boolean labeled){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+
+        Calendar today = Calendar.getInstance();
+
+        if (labeled && calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR)) {
+            int delta = calendar.get(Calendar.DAY_OF_MONTH) - today.get(Calendar.DAY_OF_MONTH);
+            if (delta == 0) {
+                return ctx.getResources().getString(R.string.today);
+            }
+            if (delta == 1) {
+                return ctx.getResources().getString(R.string.tomorrow);
+            }
+            if (delta == -1) {
+                return ctx.getResources().getString(R.string.yesterday);
+            }
+        }
+        return mFormatter.format(calendar.getTime());
+    }
+
+    public static String convertMillisAsDateString(Context ctx, long milliSeconds, DateFormat fmt, boolean labeled){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        Calendar today = Calendar.getInstance();
+
+        if (labeled && calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR)) {
+            int delta = calendar.get(Calendar.DAY_OF_MONTH) - today.get(Calendar.DAY_OF_MONTH);
+            if (delta == 0) {
+                return ctx.getResources().getString(R.string.today);
+            }
+            if (delta == 1) {
+                return ctx.getResources().getString(R.string.tomorrow);
+            }
+            if (delta == -1) {
+                return ctx.getResources().getString(R.string.yesterday);
+            }
+        }
+        String formattedStr = fmt.format(calendar.getTime());
+        return getFormattedString(formattedStr);
+    }
+
+
+
+    public static String getFormattedString(String str) {
+        String formattedStr;
+        if (str.contains("Sun")) {
+            formattedStr =str.replace("Sun", "S");
+        } else if (str.contains("Mon")) {
+            formattedStr =str.replace("Mon", "M");
+        } else if (str.contains("Tue")) {
+            formattedStr =str.replace("Tue", "T");
+        } else if (str.contains("Wed")) {
+            formattedStr = str.replace("Wed", "W");
+        } else if (str.contains("Thu")) {
+            formattedStr =str.replace("Thu", "T");
+        } else if (str.contains("Fri")) {
+            formattedStr = str.replace("Fri", "F");
+        } else {
+            formattedStr =str.replace("Sat", "S");
+        }
+        return formattedStr;
+
+
+    }
+
+
+
+
+    public String[] getDatesOfThisWeek(){
+        Calendar now = Calendar.getInstance();
+
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("dd");
+
+        String[] days = new String[7];
+        int delta = -now.get(GregorianCalendar.DAY_OF_WEEK) + 1; //add 2 if your week start on monday
+        now.add(Calendar.DAY_OF_MONTH, delta );
+        for (int i = 0; i < 7; i++)
+        {
+            days[i] = format.format(now.getTime());
+            now.add(Calendar.DAY_OF_MONTH, 1);
+        }
+//        System.out.println(Arrays.toString(days));
+        return days;
+    }
+
+
+    public static long formatDateAsLong(Calendar cal){
+        return Long.parseLong(dateFormat.format(cal.getTime()));
+    }
+
+    @Deprecated
+    public static Calendar getCalendarFromFormattedLong(long l){
+        Calendar c = Calendar.getInstance();
+        try {
+            c.setTime(dateFormat.parse(String.valueOf(l)));
+            return c;
+        } catch (ParseException e) {
+            return c;
+        }
+    }
+
+    public static long getNowFormattedLong(){
+        return DateDataFormat.formatDateAsLong(Calendar.getInstance());
+    }
+
+    public static long getTimeInMilliSeconds(String date, String format) {
+        Calendar instance = Calendar.getInstance();
+        int dd=0, mm=0, yyyy=0;
+
+        if (format.equals("MM/dd/yyyy")) {
+            //there is no need to again convert the int into int by passing int value
+            mm = Integer.valueOf(date.substring(0, 2));
+            dd = Integer.valueOf(date.substring(3, 5));
+            yyyy = Integer.valueOf(date.substring(6, 10));
+
+        }
+        if (format.equals("MM/dd/yy")) {
+
+            mm = Integer.valueOf(date.substring(0, 2));
+            dd = Integer.valueOf(date.substring(3, 5));
+            yyyy = Integer.valueOf(date.substring(6, 8));
+        }
+        instance.set(Calendar.MONTH, mm);
+        instance.set(Calendar.DAY_OF_MONTH, dd);
+        instance.set(Calendar.YEAR, yyyy);
+        return instance.getTimeInMillis();
+    }
+
+    /**
+     * Deprecated this method as it returns incorrect value, Use
+     *
+     * @param l
+     * @return
+     */
+    @Deprecated
+    public static String getUIStringFromCalender(Long l)
+    {
+        //Calendar object=
+        //String date = object.
+
+        Calendar cal = getCalendarFromFormattedLong(l);
+      //  cal.add(Calendar.DATE, 1);
+        Date date = cal.getTime();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format1 = new SimpleDateFormat("MM/dd/yyyy");
+        String dateUIFormat = null;
+        try {
+            dateUIFormat = format1.format(date);
+
+            return dateUIFormat;
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+            return "";
+        }
+
+    }
+
+    public  static long convertZuluDateToMilliseconds(String dateInput)
+    {
+        Log.d(TAG, "$$$ dateInput "+dateInput);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Date date=null;
+        try {
+            if(date != null)
+              date = format.parse(dateInput);
+            else
+                return 0;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+        long millis = date.getTime();
+        return  millis;
+    }
+
+
+    public  static String convertMillisToZuluFormat(long inputMilliDate)
+    {
+        SimpleDateFormat zuluFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(inputMilliDate);
+        return zuluFormat.format(calendar.getTimeInMillis());
+
+    }
+
+    public static Date convertStringToDate(String date)
+    {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yy");
+
+        Date dateFormatted =null;
+        try {
+
+            dateFormatted = formatter.parse(date);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dateFormatted;
+    }
+
+    public static boolean compareWithToday(Date toCompare)
+    {
+        if(toCompare!=null)
+        {
+            //long time = toCompare.getTime();
+            long today = System.currentTimeMillis();
+            java.util.Date todayDate = new java.util.Date(today);
+            int comparison = toCompare.compareTo(todayDate);
+            return comparison == 0;
+        }
+        else
+         return  false;
+    }
+
+    public static int differenceInMinutes(long startTime, long endTime) {
+        Minutes minutes = Minutes.minutesBetween(new DateTime(startTime), new DateTime(endTime));
+        Log.v("differenceInMinutes", "" + minutes.getMinutes());
+        return minutes.getMinutes();
+    }
+
+    public static int differenceFromMidNight(long startTime) {
+        DateTime now = new DateTime();
+        DateTime midNightTime = now.withTimeAtStartOfDay();
+        DateTime startDateTime = new DateTime(startTime);
+        Minutes minutes = Minutes.minutesBetween(midNightTime, startDateTime);
+        Log.v("getMinutesFromMidNight", ""+minutes.getMinutes());
+        return minutes.getMinutes();
+    }
+
+    public static long getStartTimeOfADay(long selectedDay) {
+        DateTime selectedDateTime = new DateTime(selectedDay);
+        DateTime dayAtStartMidNight = selectedDateTime.withTimeAtStartOfDay();
+        Log.v("MidNight start is", dayAtStartMidNight.toString("yyyy-MM-dd HH:mm:ss") + dayAtStartMidNight.getMillis());
+        return dayAtStartMidNight.getMillis();
+    }
+
+    public static long getEndTimeOfADay(long selectedDay) {
+        DateTime selectedDateTime = new DateTime(selectedDay);
+        DateTime dayAtStartMidNight = selectedDateTime.withTimeAtStartOfDay();
+        DateTime dayAtEndMidNight = dayAtStartMidNight.plusHours(23).plusMinutes(59).plusSeconds(59).plusMillis(999);
+        Log.v("MidNight end is ", dayAtEndMidNight.toString("yyyy-MM-dd HH:mm:ss") + dayAtEndMidNight.getMillis());
+        return dayAtEndMidNight.getMillis();
+    }
+
+}
+

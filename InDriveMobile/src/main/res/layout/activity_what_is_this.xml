@@ -1,0 +1,29 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:context="com.verizontelematics.indrivemobile.activity.WhatIsThisActivity">
+
+
+    <ImageView
+        android:id="@+id/helpIV"
+        android:background="@color/white"
+        android:src="@drawable/serial_number_pop_up"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"/>
+
+    <TextView
+        android:id="@+id/descriptionTV"
+        android:text="@string/serial_number_help"
+        android:layout_alignBottom="@id/helpIV"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="@dimen/scroll_top_margin"
+        android:layout_marginBottom="@dimen/form_labels_text_height"
+        android:layout_alignRight="@id/helpIV"
+        android:layout_alignLeft="@id/helpIV"
+        android:layout_alignStart="@id/helpIV"
+        android:layout_alignEnd="@id/helpIV"/>
+
+
+</RelativeLayout>

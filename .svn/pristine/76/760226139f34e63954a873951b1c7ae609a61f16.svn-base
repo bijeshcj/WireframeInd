@@ -1,0 +1,36 @@
+package com.verizontelematics.indrivemobile.utils.errormanagement;
+
+import android.content.Context;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.models.Operation;
+
+/**
+ * Created by bijesh on 6/4/2015.
+ */
+public class AuthenticateErrorController implements ErrorManager {
+
+
+
+    @Override
+    public String getResponseDescription(Context context, int responseCode,Operation.OperationCode operationCode, String exceptionMessage) {
+
+        if(responseCode == SUCCESS_RESPONSE_CODE){
+            return context.getResources().getString(R.string.success_response);
+        }else if(responseCode == FAILURE_RESPONSE_CODE){
+            return context.getResources().getString(R.string.failure_response)+" : "+exceptionMessage;
+        }
+        switch (operationCode) {
+            case AUTHENTICATE:
+                 if(responseCode == INVALID_USER_NAME_PASSWORD){
+                     return "Invalid Username/password";
+                 }
+                break;
+
+        }
+
+            return null;
+    }
+
+
+}

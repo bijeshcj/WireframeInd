@@ -1,0 +1,43 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+    >
+
+    <TextView
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/alertDetailTV"
+        android:layout_centerVertical="true"
+        android:gravity="start|center"
+        android:textColor="@color/diagnostics_text_color"
+        android:layout_marginStart="@dimen/maintenance_alert_list_item_left_margin"
+        android:layout_marginLeft="@dimen/maintenance_alert_list_item_left_margin"
+
+        />
+
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/diagnostics_text_color"
+        android:id="@+id/alertTimeTV"
+        android:gravity="end"
+        android:layout_centerVertical="true"
+        android:layout_alignBaseline="@+id/alertDetailTV"
+        android:layout_toLeftOf="@+id/service_type_arrow_btn_list"
+        android:layout_toStartOf="@+id/service_type_arrow_btn_list"
+        android:layout_marginEnd="@dimen/maintenance_alert_list_item_left_margin"
+        android:layout_marginRight="@dimen/maintenance_alert_list_item_left_margin"
+        />
+
+    <ImageView
+        android:id="@+id/service_type_arrow_btn_list"
+        android:layout_width="wrap_content"
+        android:contentDescription="@string/service_type_arrow_cd"
+        android:layout_height="wrap_content"
+        android:background="@drawable/forward_arrow_gray"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="12dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
+</RelativeLayout>

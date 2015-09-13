@@ -1,0 +1,56 @@
+package com.verizontelematics.indrivemobile.adapters;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+/**
+ * Created by z688522 on 8/28/14.
+ */
+public class OptionsListAdapter extends BaseAdapter {
+
+    private ArrayList<String> mOptions = new ArrayList<String>();
+    private Context mContext;
+    public OptionsListAdapter(Context ctx, String[]  arr) {
+        if (arr == null)
+            return;
+        mContext = ctx;
+        Collections.addAll(mOptions, arr);
+    }
+
+    @Override
+    public int getCount() {
+        return mOptions.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return mOptions.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(
+                 Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.options_list_item, parent, false);
+        }
+
+        TextView tv = (TextView) convertView.findViewById(R.id.options_list_item_name);
+        tv.setText(mOptions.get(position));
+        return convertView;
+    }
+}

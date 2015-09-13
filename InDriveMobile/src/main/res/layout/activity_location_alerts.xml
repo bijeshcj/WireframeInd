@@ -1,0 +1,334 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/time_period"
+                tools:context="com.verizontelematics.indrivemobile.activity.LocationAlertsActivity">
+
+    <include
+        android:id="@+id/headerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
+        android:fadeScrollbars="true"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/form_labels_text_height"
+                android:hint="@string/location"
+                android:maxLength="50"
+                android:textSize="@dimen/form_labels_text_size"
+                android:paddingLeft="10dp"
+                android:id="@+id/edtLocation"
+                android:inputType="textCapSentences"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginRight="@dimen/list_item_right_margin"
+                android:layout_marginEnd="@dimen/list_item_right_margin"
+                android:background="@drawable/et_border"
+                android:layout_marginTop="@dimen/list_item_top_margin"/>
+
+            <TextView
+                android:id="@+id/name_alert"
+                android:layout_below="@id/edtLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/name_location_alert"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                />
+
+            <TextView
+                android:id="@+id/setLocationAlert"
+                android:layout_below="@id/name_alert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/location_schedule"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                />
+
+            <LinearLayout
+                android:id="@+id/weekDayLayout"
+                android:layout_below="@id/setLocationAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="7"
+                android:orientation="horizontal"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginEnd="@dimen/list_item_right_margin"
+                android:layout_marginRight="@dimen/list_item_right_margin"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                >
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/sunday"
+                    android:background="@drawable/green_radio_button"
+                    android:id="@+id/sun_id"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/monday"
+                    android:background="@drawable/green_radio_button"
+                    android:id="@+id/mon_id"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tuesday"
+                    android:layout_weight="1"
+                    android:background="@drawable/green_radio_button"
+                    android:id="@+id/tue_id"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/wednesday"
+                    android:background="@drawable/green_radio_button"
+                    android:id="@+id/wed_id"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/thursday"
+                    android:layout_weight="1"
+                    android:background="@drawable/green_radio_button"
+                    android:id="@+id/thu_id"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/friday"
+                    android:layout_weight="1"
+                    android:background="@drawable/green_radio_button"
+                    android:id="@+id/fri_id"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/saturday"
+                    android:layout_weight="1"
+                    android:background="@drawable/green_radio_button"
+                    android:id="@+id/sat_id"
+                    tools:ignore="ButtonStyle"/>
+            </LinearLayout>
+
+            <RadioGroup
+                android:layout_below="@id/weekDayLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:id="@+id/alerts_selection_layout"
+                android:weightSum="3"
+                >
+
+                <RadioButton
+                    android:id="@+id/weekDaysRB"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/week_days"
+                    android:gravity="center"
+                    android:background="@android:color/transparent"
+                    android:button="@android:color/transparent"
+                    android:drawableTop="@drawable/custom_radio_button1"
+                    />
+
+                <RadioButton
+                    android:id="@+id/weekEndsRB"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/week_ends"
+                    android:gravity="center"
+                    android:background="@android:color/transparent"
+                    android:button="@android:color/transparent"
+                    android:drawableTop="@drawable/custom_radio_button1"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"
+                    />
+
+                <RadioButton
+                    android:id="@+id/alwaysOnRB"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/always_on"
+                    android:gravity="center"
+                    android:background="@android:color/transparent"
+                    android:button="@android:color/transparent"
+                    android:drawableTop="@drawable/custom_radio_button1"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"
+                    />
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/time_picker_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/alerts_selection_layout"
+                android:weightSum="2"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/start_time"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"
+                        />
+
+                    <com.verizontelematics.indrivemobile.customViews.CustomizedTimePicker
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/start_time_picker_id"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/end_time"
+                        android:layout_marginStart="@dimen/list_item_left_margin"
+                        android:layout_marginLeft="@dimen/list_item_left_margin"/>
+
+                    <com.verizontelematics.indrivemobile.customViews.CustomizedTimePicker
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/end_time_picker_id"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtVwAlertWhen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/time_picker_layout"
+                android:text="@string/alert_when"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:id="@+id/checkboxRL"
+                android:layout_below="@id/txtVwAlertWhen"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/enteredCB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/switch_drawable"
+                    android:drawableStart="@drawable/switch_drawable"
+                    android:text="@string/entered"
+                    android:checked="true"
+                    android:button="@null"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="@dimen/list_item_left_margin"
+                    android:layout_marginLeft="@dimen/list_item_left_margin"/>
+
+                <CheckBox
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableRight="@drawable/switch_drawable"
+                    android:drawableEnd="@drawable/switch_drawable"
+                    android:checked="true"
+                    android:text="@string/exit"
+                    android:id="@+id/exitCB"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/list_item_right_margin"
+                    android:layout_marginRight="@dimen/list_item_right_margin"
+                    />
+            </RelativeLayout>
+            <Button
+                android:layout_below="@id/checkboxRL"
+                android:id="@+id/update_alert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/form_labels_text_size"
+                android:textColor="@color/white"
+                android:background="@drawable/button_press"
+                android:layout_marginBottom="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:text="@string/update_alert"
+                android:visibility="gone"
+                />
+            <Button
+                android:layout_alignTop="@id/update_alert"
+                android:id="@+id/delete_alert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/form_labels_text_size"
+                android:textColor="@color/white"
+                android:background="@drawable/button_press"
+                android:layout_marginBottom="@dimen/list_item_top_margin"
+                android:layout_marginRight="@dimen/list_item_left_margin"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="@dimen/list_item_left_margin"
+                android:text="@string/delete_alert"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"
+
+                />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\gson-2.2.4.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="973e832af433b44c3ed11c426f2f390b29f3f3f8">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\gson-2.2.4-fcd31a3030673c762f06c7a3651e5a775e969202.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\robotium-solo-5.0.1-javadoc.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="937b14e0d7f78b97be855f539fc97efbffaee969">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\robotium-solo-5.0.1-javadoc-43f978ae57790b25680320f9c06f4f1f50fc9288.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\IndriveMobile\MPChartLib\unspecified\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="2e1e2442cb7544b3871815d735d4e24314a73ea1">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\classes-e73f2f8871e03cca250292dbabc0939b910d80f2.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\IndriveMobile\google-play-services_lib\unspecified\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="63f4048399d51ee3249d25844640e01d29fac8f1">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\classes-98d8cfd8d034f7e00443304b8ac6d18a21fc993d.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\bcprov-jdk15on-151.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="9ab8afcc2842d5ef06eb775a0a2b12783b99aa80">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\bcprov-jdk15on-151-6caf618207b7b6ff6c6544ad3cc08265dec2899b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Sony\.gradle\caches\modules-2\files-2.1\com.nineoldandroids\library\2.4.0\e9b63380f3a242dbdbf103a2355ad7e43bad17cb\library-2.4.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\library-2.4.0-86404faf95e6b41143132cfbc27ccd6513653ff8.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="8694693636ab36910c8100ce527c258ff3ebece0">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\classes-f40cb4393bea083fe0bf1359500fb52ef160fb09.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\IndriveCustomComponents.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="16c99aa0be1fa3e2f894683830e1ecc27a17cd5f">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\IndriveCustomComponents-647da48830360248087bf4e2a74c4ac05313df12.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\robotium-solo-5.2.1.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="56ab8d87d966a067ee3795ee137fbd51b6581ec9">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\robotium-solo-5.2.1-bc39923bb667e8a14a1679db4f4884b24244be8a.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\IndriveMobile\NumberPickerLib\unspecified\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="aaff3f37c941b31899a960fd76b3f1454de8f6ca">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\classes-50fc5065d62616dcfa91299b02539d85d1ca123e.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\DevelopmentTools\adt-bundle-windows-x86_64-20140321\adt-bundle-windows-x86_64-20140321\sdk\extras\android\m2repository\com\android\support\support-annotations\20.0.0\support-annotations-20.0.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="9d9013e9ff35fc3756411e62873c363c70c638fa">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\support-annotations-20.0.0-578df0d18709af261e0315539f428d5218a60c63.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\bcpkix-jdk15on-151.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="6c8c1f61bf27a09f9b1a8abc201523669bba9597">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\bcpkix-jdk15on-151-5ee082892aee7474cc33f6fc1ac83c6eab6ec903.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\volley.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="f745aa19472ca1ccb4e1767bd0538cdc4a619d72">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\volley-dee9ac0db620406f8df46980e5f65a5fed36b65f.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\IndriveMobile\captureActivity\unspecified\libs\core-2.2.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="cba0b93b0072105d808ef7a00a107a4eb97874e7">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\core-2.2-c98773230c5fcf158f3c999a2ae91900fcb89670.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\libs\internal_impl-20.0.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\internal_impl-20.0.0-a265acc9d84ac41c99272e9636f5dd1114a49ff7.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\com.android.support\appcompat-v7\20.0.0\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="f21927d22fe31889ecce94dd697a2e75b137e0ef">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\classes-d036471393f6a06d342a6cea2175ae76d8b94107.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\IndriveMobile\google-play-services_lib\unspecified\libs\google-play-services.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3dfdf1db5ce5ea2999a5dcde8c8e650b02660059">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\google-play-services-7367624293e79ba50373d60363b737427e48964f.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\exploded-aar\IndriveMobile\captureActivity\unspecified\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="63c36a925d3aa3860cd6f8b35e5f14e002f4637c">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\classes-873d4eb1e39d1e6d7eac37cac3d0b5b556d8a43e.jar" />
+    </item>
+    <item
+        jar="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\libs\joda-time-2.4.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="89e9725439adffbbd41c5f5c215c136082b34a7f">
+        <dex dex="C:\Bijesh\Work\Prokarma\IndriveWireframe\IndriveMobile\InDriveMobile\build\intermediates\pre-dexed\debug\joda-time-2.4-54ec85f2a5616562e4599439d1b19fa0371d7476.jar" />
+    </item>
+
+</items>

@@ -1,0 +1,11 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+/**
+ * Created by bijesh on 3/30/2015.
+ */
+public interface ControllerConstants {
+
+    public static final String TOKEN = "Authorization";
+    public static final int ERROR_CODE_TOKEN_EXPIRED = 4230004;
+
+}

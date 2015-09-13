@@ -1,0 +1,25 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 11/20/14.
+ */
+public class HealthStatus {
+    public String getServiceArea() {
+        return ServiceArea;
+    }
+
+    public void setServiceArea(String serviceArea) {
+        ServiceArea = serviceArea;
+    }
+
+    public String getServiceAreaStatus() {
+        return ServiceAreaStatus;
+    }
+
+    public void setServiceAreaStatus(String serviceAreaStatus) {
+        ServiceAreaStatus = serviceAreaStatus;
+    }
+
+    private String ServiceArea;
+    private String ServiceAreaStatus;
+}

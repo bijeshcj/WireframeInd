@@ -1,0 +1,39 @@
+package com.verizontelematics.indrivemobile.utils;
+
+
+import android.util.Log;
+
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.verizontelematics.indrivemobile.IndriveApplication;
+
+/**
+ * Created by bijesh on 5/4/2015.
+ */
+public class GoogleAnalyticsUtil {
+
+    private static final String TAG = GoogleAnalyticsUtil.class.getCanonicalName();
+
+    public void trackScreens(IndriveApplication application,String screenName){
+        Tracker mTracker = application.getTracker(IndriveApplication.TrackerName.APP_TRACKER);
+        mTracker.setScreenName(screenName);
+        mTracker.send(new HitBuilders.AppViewBuilder().build());
+        Log.d(TAG,"Screen tracked" );
+    }
+
+     public void trackEvents(IndriveApplication application,String category,String label){
+          Tracker t = application.getTracker(
+                  IndriveApplication.TrackerName.APP_TRACKER);
+// Build and send an Event.
+          t.send(new HitBuilders.EventBuilder()
+                  .setCategory(category)
+                  .setAction("touch")
+                  .setLabel(label)
+                  .build());
+         Log.d(TAG,"Action Event tracked");
+      }
+
+
+
+
+}

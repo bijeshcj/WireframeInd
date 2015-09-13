@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffcccccc">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/location_alert_header"
+        android:text="@string/boundary_alert_text"
+        android:textColor="@color/white"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/header_text_size"
+        android:paddingLeft="@dimen/list_item_left_margin"
+        android:paddingRight="@dimen/list_item_left_margin"
+        android:background="@drawable/gradient_gray_bar"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_location_name"
+        android:layout_below="@id/location_alert_header"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:textColor="@color/gray"
+        android:gravity="center_vertical"
+        />
+
+    <CheckBox
+        android:id="@+id/checkbox_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@null"
+        android:drawableRight="@drawable/switch_drawable"
+        android:checked="true"
+        android:drawableEnd="@drawable/switch_drawable"
+        android:text="@string/on_off"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/location_alert_header"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/list_item_right_margin"
+        android:layout_marginEnd="@dimen/list_item_right_margin"
+        android:textColor="@color/gray"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:text="@string/delete"
+        android:id="@+id/btn_delete_location_alert"
+        android:layout_alignParentBottom="true"
+
+        android:layout_marginBottom="@dimen/list_item_top_margin"/>
+
+
+    <com.google.android.gms.maps.MapView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/location_alert_map_view"
+        android:layout_below="@id/checkbox_status"
+        android:layout_above="@id/btn_delete_location_alert"
+        android:layout_marginBottom="@dimen/list_item_top_margin"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        />
+</RelativeLayout>

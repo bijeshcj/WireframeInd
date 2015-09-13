@@ -1,0 +1,318 @@
+package com.verizontelematics.indrivemobile;
+
+import android.app.Application;
+import android.content.Context;
+import android.provider.Settings;
+import android.util.Log;
+import android.view.ViewConfiguration;
+
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.connection.ssl.VerizonSSLSocketFactory;
+import com.verizontelematics.indrivemobile.controllers.RestResponseHandlerThread;
+import com.verizontelematics.indrivemobile.cryptography.CryptoManager;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonRestClient;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonSSLSocketFactoryClient;
+import com.verizontelematics.indrivemobile.httpwrapper.RestClientFactory;
+import com.verizontelematics.indrivemobile.utils.Foreground;
+import com.verizontelematics.indrivemobile.utils.config.Config;
+import com.verizontelematics.indrivemobile.utils.config.InDrivePreference;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+/**
+ * Created by bijesh on 9/3/2014.
+ */
+public class IndriveApplication extends Application {
+    private static final String TAG = IndriveApplication.class.getSimpleName();
+
+    private String decodedDbFilePath = null;
+    private static IndriveApplication mInstance;
+    private static int ENCRYPTION_BIT = 128;
+    private static final String PROPERTY_ID = "UA-26749085-8";
+    public static int GENERAL_TRACKER = 0;
+    public HashMap<TrackerName,Tracker> mTrackers = new HashMap<TrackerName,Tracker>();
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        getOverflowMenu();
+
+
+        mInstance = this;
+
+        // Create application specific preference file.
+        InDrivePreference.createInstance(this);
+
+
+        Foreground.init(this);
+
+
+        CryptoManager.generateSecretKey2(this,CryptoManager.getKey(),ENCRYPTION_BIT);
+
+//        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+//            @Override
+//            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityStarted(Activity activity) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityResumed(Activity activity) {
+//               Log.d(TAG,"App is on foreground");
+//            }
+//
+//            @Override
+//            public void onActivityPaused(Activity activity) {
+//               Log.d(TAG,"App is on background");
+//            }
+//
+//            @Override
+//            public void onActivityStopped(Activity activity) {
+//
+//            }
+//
+//            @Override
+//            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityDestroyed(Activity activity) {
+//
+//            }
+//        });
+
+
+        // Store Default service Type in shared preferences.
+//        storeServiceType();
+
+        RestResponseHandlerThread.init();
+
+
+//        VerizonRestClient lClient = (VerizonRestClient) RestClientFactory.getDefaultRestClient();
+
+        // if layer 7 init with ssl socket for https  like below
+        //lClient.init(this, VerizonSSLSocketFactoryClient.instance().getSocketFactory());
+
+
+
+//        lClient.init(this,new TestSSLFactory());
+//        try {
+////            lClient.init(this, new VerizonSSLSocketFactory(null));
+//            lClient.init(this,newSslSocketFactory());
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+
+
+//        lClient.init(this, new SSLSocketFactory() {
+//            @Override
+//            public String[] getDefaultCipherSuites() {
+//                return new String[0];
+//            }
+//
+//            @Override
+//            public String[] getSupportedCipherSuites() {
+//                return new String[0];
+//            }
+//
+//            @Override
+//            public Socket createSocket(Socket socket, String host, int i, boolean b) throws IOException {
+//                Log.d(TAG, "layer7 createSocket");
+//                SSLSocket s = (SSLSocket) VerizonSSLSocketFactoryClient.instance().getSocketFactory().createSocket(socket, host, i, b);
+//                s.setEnabledProtocols(new String[] {"TLSv1.2"} );
+//                return s;
+//            }
+//
+//            @Override
+//            public Socket createSocket(String s, int i) throws IOException, UnknownHostException {
+//                return null;
+//            }
+//
+//            @Override
+//            public Socket createSocket(String s, int i, InetAddress inetAddress, int i2) throws IOException, UnknownHostException {
+//                return null;
+//            }
+//
+//            @Override
+//            public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+//                return null;
+//            }
+//
+//            @Override
+//            public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress2, int i2) throws IOException {
+//                return null;
+//            }
+//        });
+        // else
+        //lClient.init(this);
+        reloadCertificate("");
+
+        Config.getInstance(this);
+
+        /*
+        // create some dummy file.
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                // check if this even comes to here
+                // if it does
+                        // 1. Can we use the applicationContext still ? {  The app has crashed already }
+                CryptoWrapper.encryptDB(getApplicationContext());
+            }
+        });
+        */
+
+        // Register the app with gcm
+        //registerWithGcm();
+    }
+
+    public enum TrackerName{
+        APP_TRACKER, GLOBAL_TRACKER, ECOMMERCE_TRACKER
+    }
+
+    public synchronized Tracker getTracker(TrackerName appTracker){
+        if (!mTrackers.containsKey(appTracker)) {
+
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+
+            Tracker t = (appTracker == TrackerName.APP_TRACKER) ? analytics.newTracker(PROPERTY_ID) : (appTracker == TrackerName.GLOBAL_TRACKER) ? analytics.newTracker(R.xml.global_tracker) : analytics.newTracker(R.xml.ecommerce_tracker);
+            mTrackers.put(appTracker, t);
+        }
+        return mTrackers.get(appTracker);
+    }
+
+
+
+
+    public static synchronized IndriveApplication getInstance(){
+
+        return mInstance;
+    }
+
+    public void reloadCertificate1(){
+        Log.d(TAG,"reloadCertificate1 cert is "+InDrivePreference.getInstance().getStringData("cert",""));
+        VerizonRestClient lClient = (VerizonRestClient) RestClientFactory.getDefaultRestClient();
+        try {
+            lClient.init(this, new VerizonSSLSocketFactory(null));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public void reloadCertificate(final String certificate){
+        Log.d(TAG,"reload certificate "+certificate);
+        VerizonRestClient lClient = null;
+        VerizonSSLSocketFactoryClient.setInstance();
+        lClient = (VerizonRestClient) RestClientFactory.getDefaultRestClient();
+        Log.d(TAG,"layer7 before initilaizing socketfactory");
+        SSLSocketFactory sslSocketFactory = new SSLSocketFactory() {
+            @Override
+            public String[] getDefaultCipherSuites() {
+                return new String[0];
+            }
+
+            @Override
+            public String[] getSupportedCipherSuites() {
+                return new String[0];
+            }
+
+            @Override
+            public Socket createSocket(Socket socket, String host, int i, boolean b) throws IOException {
+                Log.d(TAG, "layer7 createSocket");
+                SSLSocket s = (SSLSocket) VerizonSSLSocketFactoryClient.instance().getSocketFactory().createSocket(socket, host, i, b);
+                s.setEnabledProtocols(new String[] {"TLSv1.2"} );
+                return s;
+            }
+
+            @Override
+            public Socket createSocket(String s, int i) throws IOException, UnknownHostException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(String s, int i, InetAddress inetAddress, int i2) throws IOException, UnknownHostException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress2, int i2) throws IOException {
+                return null;
+            }
+        };
+
+//        lClient = (VerizonRestClient) RestClientFactory.getDefaultRestClient();
+
+        // if layer 7 init with ssl socket for https  like below
+        //lClient.init(this, VerizonSSLSocketFactoryClient.instance().getSocketFactory());
+        lClient.init(this,sslSocketFactory );
+
+    }
+
+    
+
+
+
+    public Context getInDriveApplicationContext(){
+        return getApplicationContext();
+    }
+
+    public String getDeviceName(){
+        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+
+
+    private void storeServiceType() {
+        InDrivePreference appPref = InDrivePreference.getInstance();
+        ArrayList<String> serviceTypeArrList = appPref.getCustomObject(InDrivePreference.SERVICE_TYPE, new TypeToken<List<String>>() {
+        }.getType());
+        if (serviceTypeArrList == null) {
+
+            appPref.setCustomObject(InDrivePreference.SERVICE_TYPE, new ArrayList<String>(Arrays.asList(this.getResources().getStringArray(com.verizontelematics.indrivemobile.R.array.maintenance_alert_type))));
+        }
+    }
+
+    private void getOverflowMenu() {
+
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+}

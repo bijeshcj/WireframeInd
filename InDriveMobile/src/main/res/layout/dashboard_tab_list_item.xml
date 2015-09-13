@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:descendantFocusability="blocksDescendants"
+                android:background="@color/gray">
+
+    <LinearLayout
+        android:id="@+id/imageLL"
+        android:layout_width="60dp"
+        android:gravity="center"
+        android:background="@color/diagnostics_code"
+        android:layout_height="62dp">
+
+        <ImageView
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:id="@+id/tab_button"
+            android:contentDescription="@string/dashboard_img_cd"
+            android:src="@drawable/alerts_icon"
+            />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_toRightOf="@id/imageLL"
+        android:layout_toEndOf="@id/imageLL"
+        android:layout_width="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tab_title"
+            android:text="Alert Settings"
+            android:textColor="@color/white"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tab_sub_title"
+            android:text="Manage your automated alerts"
+            android:layout_below="@id/tab_title"
+            android:textColor="@color/white"
+            />
+    </RelativeLayout>
+</RelativeLayout>

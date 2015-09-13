@@ -1,0 +1,403 @@
+package com.verizontelematics.indrivemobile.userprofile;
+
+/**
+ * Created by bijesh on 2/2/2015.
+ */
+public class Connect implements UserType {
+
+
+    private UserRole userRole;
+    private PageType pageType;
+
+    public Connect(UserRole userRole){
+          this.userRole = userRole;
+    }
+
+
+//    @Override
+//    public Activity getActivityView() {
+//        return null;
+//    }
+//
+//    @Override
+//    public Fragment getFragmentView() {
+//        return null;
+//    }
+
+    @Override
+    public String toString() {
+        return "User Type: "+this.getClass().getSimpleName()+" user Role "+userRole+" locateVehicle "+locateVehicle;
+    }
+
+//    For long screen
+    private String login;
+    private String homePage;
+
+//    For navigation options
+    private String home;
+    private String appSettings;
+    private String premiumServices;
+    private String customerSupport;
+    private String profile;
+    private String fAQs;
+
+//    For Alert Settings
+    private String diagnosticsAlerts;
+    private String valetAlert;
+    private String speedAlert;
+    private String locationAlert;
+
+//    For Alert History
+    private String diagnosticsAlertHistory;
+    private String valetAlertHistory;
+    private String speedAlertHistory;
+    private String locationAlertHistory;
+
+//    For Location Services
+    private String locateVehicle;
+    private String locationAlerts;
+    private String locationHistory;
+
+//    For Driving Data
+    private String drivingData;
+
+
+
+//    For Diagnostics
+    private String vehicleHealth;
+    private String vehicleHealth_ShowServiceNotEnabled;
+    private String vehicleHealth_DiagnosticsDetailPage;
+
+    private String maintenanceRemainders_View;
+    private String maintenanceRemainders_View_EditButton;
+    private String maintenanceRemainders_Add;
+    private String maintenanceRemainders_Edit_Delete;
+
+    private String maintenanceLogs_View;
+    private String maintenanceLogs_View_EditButton;
+    private String maintenanceLogs_Add;
+    private String maintenance_Logs_Edit_Delete;
+
+
+    private String recallInformation_Current_and_Completed;
+    private String recallInformation_Details_View;
+    private String recallInformation_Details_View_Completed_or_Not;
+
+//    For Emergency
+
+    private String emergencyServices;
+    private String stolen_Vehicle_Location_Assistance;
+    private String roadsideAssistance;
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public PageType getPageType() {
+        return pageType;
+    }
+
+    public void setPageType(PageType pageType) {
+        this.pageType = pageType;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getHomePage() {
+        return homePage;
+    }
+
+    public void setHomePage(String homePage) {
+        this.homePage = homePage;
+    }
+
+    public String getHome() {
+        return home;
+    }
+
+    public void setHome(String home) {
+        this.home = home;
+    }
+
+    public String getAppSettings() {
+        return appSettings;
+    }
+
+    public void setAppSettings(String appSettings) {
+        this.appSettings = appSettings;
+    }
+
+    public String getPremiumServices() {
+        return premiumServices;
+    }
+
+    public void setPremiumServices(String premiumServices) {
+        this.premiumServices = premiumServices;
+    }
+
+    public String getCustomerSupport() {
+        return customerSupport;
+    }
+
+    public void setCustomerSupport(String customerSupport) {
+        this.customerSupport = customerSupport;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
+    }
+
+    public String getFAQs() {
+        return fAQs;
+    }
+
+    public void setFAQs(String fAQs) {
+        this.fAQs = fAQs;
+    }
+
+    public String getDiagnosticsAlerts() {
+        return diagnosticsAlerts;
+    }
+
+    public void setDiagnosticsAlerts(String diagnosticsAlerts) {
+        this.diagnosticsAlerts = diagnosticsAlerts;
+    }
+
+    public String getValetAlert() {
+        return valetAlert;
+    }
+
+    public void setValetAlert(String valetAlert) {
+        this.valetAlert = valetAlert;
+    }
+
+    public String getSpeedAlert() {
+        return speedAlert;
+    }
+
+    public void setSpeedAlert(String speedAlert) {
+        this.speedAlert = speedAlert;
+    }
+
+    public String getLocationAlert() {
+        return locationAlert;
+    }
+
+    public void setLocationAlert(String locationAlert) {
+        this.locationAlert = locationAlert;
+    }
+
+    public String getDiagnosticsAlertHistory() {
+        return diagnosticsAlertHistory;
+    }
+
+    public void setDiagnosticsAlertHistory(String diagnosticsAlertHistory) {
+        this.diagnosticsAlertHistory = diagnosticsAlertHistory;
+    }
+
+    public String getValetAlertHistory() {
+        return valetAlertHistory;
+    }
+
+    public void setValetAlertHistory(String valetAlertHistory) {
+        this.valetAlertHistory = valetAlertHistory;
+    }
+
+    public String getSpeedAlertHistory() {
+        return speedAlertHistory;
+    }
+
+    public void setSpeedAlertHistory(String speedAlertHistory) {
+        this.speedAlertHistory = speedAlertHistory;
+    }
+
+    public String getLocationAlertHistory() {
+        return locationAlertHistory;
+    }
+
+    public void setLocationAlertHistory(String locationAlertHistory) {
+        this.locationAlertHistory = locationAlertHistory;
+    }
+
+    public String getLocateVehicle() {
+        return locateVehicle;
+    }
+
+    public void setLocateVehicle(String locateVehicle) {
+        this.locateVehicle = locateVehicle;
+    }
+
+    public String getLocationAlerts() {
+        return locationAlerts;
+    }
+
+    public void setLocationAlerts(String locationAlerts) {
+        this.locationAlerts = locationAlerts;
+    }
+
+    public String getLocationHistory() {
+        return locationHistory;
+    }
+
+    public void setLocationHistory(String locationHistory) {
+        this.locationHistory = locationHistory;
+    }
+
+    public String getDrivingData() {
+        return drivingData;
+    }
+
+    public void setDrivingData(String drivingData) {
+        this.drivingData = drivingData;
+    }
+
+    public String getVehicleHealth() {
+        return vehicleHealth;
+    }
+
+    public void setVehicleHealth(String vehicleHealth) {
+        this.vehicleHealth = vehicleHealth;
+    }
+
+    public String getVehicleHealth_ShowServiceNotEnabled() {
+        return vehicleHealth_ShowServiceNotEnabled;
+    }
+
+    public void setVehicleHealth_ShowServiceNotEnabled(String vehicleHealth_ShowServiceNotEnabled) {
+        this.vehicleHealth_ShowServiceNotEnabled = vehicleHealth_ShowServiceNotEnabled;
+    }
+
+    public String getVehicleHealth_DiagnosticsDetailsPage() {
+        return vehicleHealth_DiagnosticsDetailPage;
+    }
+
+    public void setVehicleHealth_DiagnosticsDetailsPage(String vehicleHealth_DiagnosticsDetailsPage) {
+        this.vehicleHealth_DiagnosticsDetailPage = vehicleHealth_DiagnosticsDetailsPage;
+    }
+
+    public String getMaintenanceRemainders_View() {
+        return maintenanceRemainders_View;
+    }
+
+    public void setMaintenanceRemainders_View(String maintenanceRemainders_View) {
+        this.maintenanceRemainders_View = maintenanceRemainders_View;
+    }
+
+    public String getMaintenanceRemainders_View_EditButton() {
+        return maintenanceRemainders_View_EditButton;
+    }
+
+    public void setMaintenanceRemainders_View_EditButton(String maintenanceRemainders_View_EditButton) {
+        this.maintenanceRemainders_View_EditButton = maintenanceRemainders_View_EditButton;
+    }
+
+    public String getMaintenanceRemainders_Add() {
+        return maintenanceRemainders_Add;
+    }
+
+    public void setMaintenanceRemainders_Add(String maintenanceRemainders_Add) {
+        this.maintenanceRemainders_Add = maintenanceRemainders_Add;
+    }
+
+    public String getMaintenanceRemainders_Edit_Delete() {
+        return maintenanceRemainders_Edit_Delete;
+    }
+
+    public void setMaintenanceRemainders_Edit_Delete(String maintenanceRemainders_Edit_Delete) {
+        this.maintenanceRemainders_Edit_Delete = maintenanceRemainders_Edit_Delete;
+    }
+
+    public String getMaintenanceLogs_View() {
+        return maintenanceLogs_View;
+    }
+
+    public void setMaintenanceLogs_View(String maintenanceLogs_View) {
+        this.maintenanceLogs_View = maintenanceLogs_View;
+    }
+
+    public String getMaintenanceLogs_View_EditButton() {
+        return maintenanceLogs_View_EditButton;
+    }
+
+    public void setMaintenanceLogs_View_EditButton(String maintenanceLogs_View_EditButton) {
+        this.maintenanceLogs_View_EditButton = maintenanceLogs_View_EditButton;
+    }
+
+    public String getMaintenanceLogs_Add() {
+        return maintenanceLogs_Add;
+    }
+
+    public void setMaintenanceLogs_Add(String maintenanceLogs_Add) {
+        this.maintenanceLogs_Add = maintenanceLogs_Add;
+    }
+
+    public String getMaintenance_Logs_Edit_Delete() {
+        return maintenance_Logs_Edit_Delete;
+    }
+
+    public void setMaintenance_Logs_Edit_Delete(String maintenance_Logs_Edit_Delete) {
+        this.maintenance_Logs_Edit_Delete = maintenance_Logs_Edit_Delete;
+    }
+
+    public String getRecallInformation_Current_and_Completed() {
+        return recallInformation_Current_and_Completed;
+    }
+
+    public void setRecallInformation_Current_and_Completed(String recallInformation_Current_and_Completed) {
+        this.recallInformation_Current_and_Completed = recallInformation_Current_and_Completed;
+    }
+
+    public String getRecallInformation_Details_View() {
+        return recallInformation_Details_View;
+    }
+
+    public void setRecallInformation_Details_View(String recallInformation_Details_View) {
+        this.recallInformation_Details_View = recallInformation_Details_View;
+    }
+
+    public String getRecallInformation_Details_View_Completed_or_Not() {
+        return recallInformation_Details_View_Completed_or_Not;
+    }
+
+    public void setRecallInformation_Details_View_Completed_or_Not(String recallInformation_Details_View_Completed_or_Not) {
+        this.recallInformation_Details_View_Completed_or_Not = recallInformation_Details_View_Completed_or_Not;
+    }
+
+    public String getEmergencyServices() {
+        return emergencyServices;
+    }
+
+    public void setEmergencyServices(String emergencyServices) {
+        this.emergencyServices = emergencyServices;
+    }
+
+    public String getStolen_Vehicle_Location_Assistance() {
+        return stolen_Vehicle_Location_Assistance;
+    }
+
+    public void setStolen_Vehicle_Location_Assistance(String stolen_Vehicle_Location_Assistance) {
+        this.stolen_Vehicle_Location_Assistance = stolen_Vehicle_Location_Assistance;
+    }
+
+    public String getRoadsideAssistance() {
+        return roadsideAssistance;
+    }
+
+    public void setRoadsideAssistance(String roadsideAssistance) {
+        this.roadsideAssistance = roadsideAssistance;
+    }
+}

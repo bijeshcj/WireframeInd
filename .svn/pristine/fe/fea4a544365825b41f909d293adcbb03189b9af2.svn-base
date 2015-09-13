@@ -1,0 +1,319 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+import android.content.Context;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.Response;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonHttpRequest;
+import com.verizontelematics.indrivemobile.httpwrapper.RestClient;
+import com.verizontelematics.indrivemobile.models.BaseModel;
+import com.verizontelematics.indrivemobile.models.GetLocationModel;
+import com.verizontelematics.indrivemobile.models.LocationDataControllerOperation;
+import com.verizontelematics.indrivemobile.models.LocationDataModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.PollOperation;
+import com.verizontelematics.indrivemobile.models.RealVehicleEventData;
+import com.verizontelematics.indrivemobile.models.data.GetLocationData;
+import com.verizontelematics.indrivemobile.models.data.LocationDataControllerOperationData;
+import com.verizontelematics.indrivemobile.models.data.LocationHistoryDatum;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.NetworkUtil;
+import com.verizontelematics.indrivemobile.utils.config.Config;
+import com.verizontelematics.indrivemobile.utils.config.ConfigKeys;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by bijesh on 1/30/2015.
+ */
+public class LocationController extends BaseController implements RealVehicleEventListener , PollOperation.OnCheckPollListener {
+
+    private static final String TAG = LocationController.class.getCanonicalName();
+    private static final int GET_LOCATION_MODEL = 1;
+    private static final int LOCATION_HISTORY_MODEL = 0;
+
+    private static LocationController mInstance = null;
+
+    public static LocationController instance() {
+        if (mInstance == null) {
+            mInstance = new LocationController();
+            RealVehicleEventManager.instance().addEventListener("update", mInstance);
+        }
+        return mInstance;
+    }
+
+    // Location controller Operation Codes.
+    private final int GET_LOCATION_HISTORY = Operation.OperationCode.GET_LOCATION_HISTORY.ordinal();
+    private final int GET_LOCATION = Operation.OperationCode.GET_LOCATION.ordinal();
+
+
+    private OperationFactory mOperationFactory = LocationControllerOperationFactory.instance();
+
+    private LocationController() {
+        super();
+        mModels.add(new LocationDataModel());
+        mModels.add(new GetLocationModel());
+
+    }
+
+    public BaseModel getLocationModel() {
+        return mModels.get(GET_LOCATION_MODEL);
+    }
+
+    public BaseModel getLocationHistoryModel() { return mModels.get(LOCATION_HISTORY_MODEL); }
+
+
+    private String prepareBodyForLocationHistory(long start_time,long end_time){
+        // Stubbed parameter
+        String str = "{"
+                +    "\"Data\"" + ":"+ "{"
+                +        "\"VehicleID\"" + ":" + "\""+ AppController.instance().getVehicleId() +"\""+","
+                +        "\"StartDate\"" + ":" + "\""+start_time+"\""+","
+                +        "\"EndDate\""   + ":" + "\""+end_time+"\""
+                +    "}"
+                +"}";
+        // Stub ended.
+        Log.v("Request prepareBodyForLocationHistory",str);
+        return str;
+    }
+
+    public Operation getLocationHistory(Context context,long startTime,long endTime){
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(GET_LOCATION_HISTORY, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(context)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+
+                aHttpRequest.setUrl(getHost("dev")+ Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_GET_LOCATION_HISTORY));
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(GET_LOCATION_HISTORY));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForLocationHistory(startTime, endTime));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(GET_LOCATION_HISTORY);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(GET_LOCATION_HISTORY);
+                opr.setState(Operation.ERROR);
+                ((LocationDataControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(GET_LOCATION_HISTORY);
+    }
+
+    private String prepareBodyForGetLocation(String action) {
+        // Stub parameter
+        String str = "{"
+                +     "\"Data\"" + ":" + "{"
+                +         "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\"" + ","
+                +         "\"Action\"" + ":" + "\"" + action + "\""
+                +     "}"
+                + "}";
+        // Stub ended.
+        Log.d("Request is ----> prepareBodyForGetLocation",str);
+        return str;
+    }
+
+    public Operation getLocation(Context context){
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(GET_LOCATION, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(context)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost("dev")+ Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_GET_LOCATION));
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(GET_LOCATION));
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForGetLocation("RealTime"));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(GET_LOCATION);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(GET_LOCATION);
+                opr.setState(Operation.ERROR);
+                ((LocationDataControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        if (mOperationsModel.getOperation(GET_LOCATION).getState() == Operation.PENDING) {
+            onProgress(mOperationsModel.getOperation(GET_LOCATION));
+        }
+        return mOperationsModel.getOperation(GET_LOCATION);
+    }
+
+
+
+    public void handleErrorForOperation(Response aResponse, Operation aOperation) {
+        if (aOperation.getId() == Operation.OperationCode.GET_LOCATION.ordinal()
+            || aOperation.getId() == Operation.OperationCode.GET_LOCATION_HISTORY.ordinal()) {
+            aOperation.setState(Operation.ERROR);
+            aOperation.setInformation(aResponse.getResponseDescription());
+            onError(aOperation);
+            getLocationModel().clear();
+        }
+    }
+
+    public void handleResponseForOperation(Response aResponse, Operation aOperation){
+        Log.d(TAG, "handleResponseForOperation "+aOperation.getClass());
+        try{
+            Gson gson = new GsonBuilder().create();
+            JSONObject lData = aResponse.getData();
+            if (aOperation.getId() == Operation.OperationCode.GET_LOCATION_HISTORY.ordinal()) {
+                LocationDataModel model = (LocationDataModel) getLocationHistoryModel();
+
+                String strLocationHistoryInfo = lData.get("LocationHistoryData").toString();
+
+                if (!strLocationHistoryInfo.isEmpty() && !strLocationHistoryInfo.equalsIgnoreCase("null")) {
+                    Type listType = new TypeToken<ArrayList<LocationHistoryDatum>>(){}.getType();
+                    List<LocationHistoryDatum> locationDataList = gson.fromJson(lData.getJSONArray("LocationHistoryData").toString(), listType);
+                    if(locationDataList != null){
+                        model.setData(locationDataList);
+                    }
+                    else {
+                        model.clear();
+                    }
+                }
+                else {
+                    model.clear();
+                }
+            }
+            else if(aOperation.getId() == Operation.OperationCode.GET_LOCATION.ordinal()) {
+                GetLocationModel lModel = (GetLocationModel) getLocationModel();
+
+                JSONObject jsonObject = lData.getJSONObject("LocationInfo");
+                if (jsonObject != null) {
+                    JSONObject positionJsonObj = jsonObject.getJSONObject("Position");
+                    GetLocationData locationData = new GetLocationData();
+                    if (positionJsonObj != null) {
+                        locationData.setLatitude(positionJsonObj.getDouble("Latitude"));
+                        locationData.setLongitude(positionJsonObj.getDouble("Longitude"));
+                    }
+                    locationData.setTimeStamp(jsonObject.getLong("Timestamp"));
+                    lModel.setData(locationData);
+                    if (((LocationDataControllerOperationData) aOperation.getData()).getAction().equals("RealTime")) {
+                        PollOperation pollOperation = PollManager.instance().createPollRequest("update",
+                                getHost()+ Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_GET_LOCATION),
+                                prepareBodyForGetLocation("LastKnown"),
+                                this);
+                        ((LocationDataControllerOperation)aOperation).setPollOperation(pollOperation);
+                        aOperation.setState(Operation.PENDING);
+                        return;
+                    }
+
+                }
+                else {
+                    lModel.clear();
+
+                }
+
+            }
+            aOperation.setState(Operation.FINISHED);
+            onSuccess(aOperation);
+        } catch (JSONException e) {
+            aOperation.setState(Operation.ERROR);
+            aOperation.setInformation(e.getLocalizedMessage());
+            onError(aOperation);
+        } catch (JsonSyntaxException syntaxException) {
+            aOperation.setState(Operation.ERROR);
+            aOperation.setInformation(syntaxException.getLocalizedMessage());
+            onError(aOperation);
+        }
+    }
+
+    @Override
+    public void onEvent(Object target, Object eventData) {
+        RealVehicleEventData evtData = (RealVehicleEventData) eventData;
+        if (evtData.getEventId().equals("update")) {
+            Operation opr = mOperationsModel.getOperation(GET_LOCATION);
+            if (evtData.getErrorMessage().isEmpty()) {
+                Gson gson = new GsonBuilder().create();
+                Response lResponse = (Response) ((RealVehicleEventData) eventData).getUserData();
+                GetLocationData locationData = new GetLocationData();
+
+                try {
+                    GetLocationModel lModel = (GetLocationModel) getLocationModel();
+
+                    JSONObject lData = lResponse.getData();
+                    JSONObject jsonObject = lData.getJSONObject("LocationInfo");
+                    if (jsonObject != null) {
+                        JSONObject positionJsonObj = jsonObject.getJSONObject("Position");
+                        if (positionJsonObj != null) {
+                            locationData.setLatitude(positionJsonObj.getDouble("Latitude"));
+                            locationData.setLongitude(positionJsonObj.getDouble("Longitude"));
+                        }
+                        locationData.setTimeStamp(jsonObject.getLong("Timestamp"));
+                        lModel.setData(locationData);
+
+                    }
+                    opr.setState(Operation.FINISHED);
+                    onSuccess(opr);
+
+                } catch (JSONException e) {
+                    opr.setState(Operation.ERROR);
+                    onError(opr);
+                }
+            }
+            else  {
+                opr.setState(Operation.ERROR);
+                opr.setInformation(evtData.getErrorMessage());
+                onError(opr);
+            }
+        }
+    }
+
+    @Override
+    public boolean checkPollNeeded(PollOperation pollOperation) {
+        GetLocationModel lModel = (GetLocationModel) getLocationModel();
+        GetLocationData locationData = (GetLocationData) lModel.getData();
+        GetLocationData resultLocationData = new GetLocationData();
+
+        Gson gson = new GsonBuilder().create();
+        Response lResponse = (Response)pollOperation.getResponse();
+        try {
+            JSONObject lData = lResponse.getData();
+            JSONObject jsonObject = lData.getJSONObject("LocationInfo");
+            if (jsonObject != null) {
+                JSONObject positionJsonObj = jsonObject.getJSONObject("Position");
+                if (positionJsonObj != null) {
+                    resultLocationData.setLatitude(positionJsonObj.getDouble("Latitude"));
+                    resultLocationData.setLongitude(positionJsonObj.getDouble("Longitude"));
+                }
+                resultLocationData.setTimeStamp(jsonObject.getLong("Timestamp"));
+                //lModel.setData(locationData);
+            }
+        } catch( JSONException e ){
+            Log.d(TAG, "Error in checkPoll");
+
+        }
+        return locationData.getTimeStamp() == resultLocationData.getTimeStamp();
+    }
+}

@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:orientation="vertical"
+              android:layout_height="match_parent">
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <LinearLayout
+        android:id="@+id/maintenance_log_header_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/maintenance_log_header_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="@drawable/gradient_gray_bar">
+
+        <ImageView
+            android:id="@+id/btn_info"
+            android:layout_width="wrap_content"
+            android:contentDescription="@string/info_img_cd"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/info_button"/>
+    </LinearLayout>
+
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/time_period">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent">
+
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/header_text_size"
+                android:textStyle="bold"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:textColor="@color/diagnostics_text_color"
+                />
+
+            <TextView
+                android:id="@+id/txt_title_custom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/header_text_size"
+                android:layout_below="@+id/txt_title"
+                android:layout_marginLeft="@dimen/list_item_left_margin"
+                android:layout_marginStart="@dimen/list_item_left_margin"
+                android:textColor="@color/diagnostics_text_color"
+                />
+
+            <TextView
+                android:id="@+id/txt_log_detailed"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/txt_title_custom"
+                android:layout_margin="@dimen/list_item_left_margin"
+                android:textColor="@color/diagnostics_text_color"
+                />
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>

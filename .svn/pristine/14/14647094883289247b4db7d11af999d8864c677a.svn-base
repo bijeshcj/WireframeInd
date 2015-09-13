@@ -1,0 +1,17 @@
+package com.verizontelematics.indrivemobile.constants;
+
+/**
+ * Created by bijesh on 10/6/2014.
+ */
+public interface SQLiteConstants {
+
+    // DECRYPTED DATABASE NAME.
+    public static final String DATABASE_NAME_ENCRYPTED = "IndriveEnc.db";
+    // ENCRYPTED DATABASE NAME.
+    public static final String DATABASE_NAME = "Indrive.db";
+    public static final int DATABASE_VERSION = 3;
+
+
+
+
+}

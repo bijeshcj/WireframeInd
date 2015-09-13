@@ -1,0 +1,275 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.AlertsController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.AlertsDataModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.Alert;
+import com.verizontelematics.indrivemobile.models.data.SpeedAlert;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.userprofile.utils.UserUtils;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+
+import net.simonvt.numberpicker.NumberPicker;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * Created by Priyanga on 8/26/2014.
+ */
+public class SpeedAlertFragment extends BaseSubUIFragment implements UIInterface,UserRoleConstants {
+
+    private static final String TAG = "SpeedAlertFragment";
+    private ImageView onState;
+    private ImageView offState;
+    private NumberPicker speedNP;
+    private SpeedAlert mSpeedAlert;
+    boolean mSwitchOn = false;
+//    private ProgressDialogFragment mProgressDialog =  null;
+    private CustomProgressDialog mCustomProgressDialog = null;
+
+
+    public SpeedAlertFragment(){
+//        Empty constructor
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        //Set theme for number picker
+        Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.NPWidget_Holo_Light_NumberPicker);
+        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
+        View rootView = localInflater.inflate(R.layout.fragment_speed_alert,container,false);
+
+        ImageView infoView = (ImageView) rootView.findViewById(R.id.btn_info_speed_alert);
+
+
+        infoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToBeDecidedDialog dialog = new ToBeDecidedDialog(getActivity(), getActivity().getResources().getString(R.string.info_alerts_settings));
+                dialog.setTitle(getResources().getString(R.string.about_speed_alerts));
+                dialog.show();
+            }
+        });
+
+        RelativeLayout switchLayout = (RelativeLayout) rootView.findViewById(R.id.layoutSwitch);
+        onState= (ImageView)rootView.findViewById(R.id.onState);
+        offState=(ImageView)rootView.findViewById(R.id.offState);
+        switchLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(UserUtils.isUserInactive(getActivity(), inactiveMessage)){
+                    return;
+                }
+                if (offState.getVisibility() == View.VISIBLE) {
+                    //turning the state as ON
+                    onState.setVisibility(View.VISIBLE);
+                    offState.setVisibility(View.INVISIBLE);
+                    mSwitchOn = true;
+
+                } else if (offState.getVisibility() == View.INVISIBLE) {
+                    //turning the state as OFF
+                    onState.setVisibility(View.INVISIBLE);
+                    offState.setVisibility(View.VISIBLE);
+                    mSwitchOn = false;
+                }
+                onSwitchChange();
+            }
+        });
+
+        setUpNumberPicker(rootView);
+        setup();
+        AlertsDataModel mAlertsDataModel = (AlertsDataModel) AlertsController.instance().getAlertsDataModel();
+        Alert alert = (Alert) mAlertsDataModel.getData();
+        List<SpeedAlert> lstSpeedAlert = null;
+        if (alert != null)
+            lstSpeedAlert = alert.getSpeedAlert();
+        if (lstSpeedAlert != null && !lstSpeedAlert.isEmpty()) {
+            mSpeedAlert = lstSpeedAlert.get(0);
+        }
+
+        populateUI(mSpeedAlert);
+
+        AlertsController.instance().register(this);
+
+        rootView.findViewById(R.id.speedAlertHeaderRL).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+
+        return rootView;
+    }
+
+    private void setup() {
+        // setup title.
+    }
+
+    private void populateUI(SpeedAlert aSpeedAlert) {
+        setActive(aSpeedAlert != null && aSpeedAlert.getStatus().equalsIgnoreCase("Active"));
+        if (aSpeedAlert != null) {
+            int maxSpeed = aSpeedAlert.getMaximumSpeed();
+            if (maxSpeed > 0) {
+                speedNP.setValue(maxSpeed);
+            } else {
+                speedNP.setValue(AppConstants.DEFAULT_SPEED_VALUE);
+            }
+
+            mSpeedAlert = aSpeedAlert;
+        }
+        speedNP.setEnabled(!mSwitchOn);
+    }
+
+    private void onSwitchChange() {
+        if (mSpeedAlert != null) {
+            mSpeedAlert.setStatus(mSwitchOn ? "Active" : "InActive");
+            if (mSwitchOn) {
+                mSpeedAlert.setMaximumSpeed(speedNP.getValue());
+            }
+            speedNP.setEnabled(!mSwitchOn);
+            ArrayList<SpeedAlert> speedAlerts = new ArrayList<SpeedAlert>();
+            speedAlerts.add(mSpeedAlert);
+            AlertsController.instance().updateSpeedAlerts(getActivity(), speedAlerts);
+        }
+        else {
+            Toast.makeText(getActivity(), "Cannot update : Network Error", Toast.LENGTH_SHORT).show();
+            revertUI();
+        }
+    }
+
+    private void setUpNumberPicker(View rootView) {
+
+        speedNP = (NumberPicker)rootView.findViewById(R.id.speedAlertNP);
+        speedNP.setMinValue(AppConstants.MIN_SPEED_VALUE);
+        speedNP.setMaxValue(AppConstants.MAX_SPEED_VALUE);
+        speedNP.setValue(AppConstants.DEFAULT_SPEED_VALUE);
+        speedNP.setEnabled(mSwitchOn);
+    }
+
+    public void setActive(boolean status) {
+        if(status) {
+            //turning the state as ON
+            onState.setVisibility(View.VISIBLE);
+            offState.setVisibility(View.INVISIBLE);
+            mSwitchOn = true;
+        }
+        else {
+            //turning the state as OFF
+            onState.setVisibility(View.INVISIBLE);
+            offState.setVisibility(View.VISIBLE);
+            mSwitchOn = false;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(getActivity().getResources().getStringArray(R.array.alerts_array)[3]);
+    }
+
+    @Override
+    public void onSubFragmentResume() {
+        Log.d(TAG, "onSubFragmentResume");
+        super.onSubFragmentResume();
+    }
+
+    @Override
+    public void onSubFragmentPause() {
+        Log.d(TAG, "onSubFragmentPause");
+        super.onSubFragmentPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    private void cleanup() {
+        // un register with controller.
+        AlertsController.instance().unregister(this);
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.UPDATE_SPEED_ALERTS.ordinal()) {
+           /* if (mProgressDialog == null)
+                mProgressDialog = ProgressDialogFragment.createInstance("Updating SpeedAlert", getHomeFragment());
+            mProgressDialog.show(getFragmentManager(), R.id.speed_alert_container_id);*/
+            showProgressDialog(getActivity().getResources().getString(R.string.updating_speed_alert));
+        }
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.UPDATE_SPEED_ALERTS.ordinal()) {
+           /* if (mProgressDialog != null)
+                mProgressDialog.dismiss();*/
+            dismissProgressDialog();
+            Toast lToast = Toast.makeText(getActivity(), getResources().getString(R.string.error_occurred), Toast.LENGTH_SHORT);
+            lToast.show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    revertUI();
+                }
+            });
+        }
+    }
+
+    private void revertUI() {
+        mSwitchOn = !mSwitchOn;
+        if (mSpeedAlert != null) {
+            mSpeedAlert.setStatus(mSwitchOn ? "Active" : "InActive");
+
+        }
+        speedNP.setEnabled(!mSwitchOn);
+        setActive(mSwitchOn);
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.UPDATE_SPEED_ALERTS.ordinal()) {
+           /* if (mProgressDialog != null)
+                mProgressDialog.dismiss();*/
+            dismissProgressDialog();
+        }
+    }
+
+    private void showProgressDialog(String aMessage) {
+
+
+        if (mCustomProgressDialog == null) {
+            mCustomProgressDialog = new CustomProgressDialog(getActivity(), aMessage);
+            mCustomProgressDialog.show();
+        }
+
+    }
+
+    public void dismissProgressDialog() {
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
+        }
+    }
+}

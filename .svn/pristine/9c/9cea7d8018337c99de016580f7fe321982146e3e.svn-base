@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  The Verizon Telematics Software is provided by Verizon Telematics on an “AS IS” basis.  Verizon Telematics
+  MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
+  THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
+  FOR A PARTICULAR PURPOSE, REGARDING THE Verizon Telematics SOFTWARE OR ITS USE AND OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
+
+  Copyright (C) 2014 Verizon Telematics Inc. All Rights Reserved.
+-->
+<InDrive>
+        <configuration>
+            <app_version>1.0.1509</app_version>
+            <app_last_update>2015-03-27, 03:32 pm</app_last_update>
+            <https>true</https>
+            <!--false-->
+            <app_env>US</app_env>
+            <!-- EU,US-->
+            <app_env_type>itest1</app_env_type>
+            <!-- dev,Itest1,stage,Itest2,production-->
+            <host_itest1>https://api-test.vtitel.com/REST/1503</host_itest1>
+            <!-- https://portali.hughestelematics.com-->
+            <!-- <host_itest2>http://atlmsaap02d.hughestelematics.net:8180</host_itest2>  -->
+            <host_itest2/>
+            <host_itest3/>
+            <host_us_stage/>
+            <host_prod>https://api.vtitel.com</host_prod>
+
+            <host_us_dev>https://api-dev.vtitel.net</host_us_dev>
+            <!-- What theme are we focusing on.-->
+            <app_flavor/>
+        </configuration>
+</InDrive>

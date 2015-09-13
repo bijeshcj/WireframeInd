@@ -1,0 +1,279 @@
+package com.verizontelematics.indrivemobile;
+
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
+import android.view.ViewConfiguration;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.controllers.MessageController;
+import com.verizontelematics.indrivemobile.controllers.RestResponseHandlerThread;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonRestClient;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonSSLSocketFactoryClient;
+import com.verizontelematics.indrivemobile.httpwrapper.RestClientFactory;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.Foreground;
+import com.verizontelematics.indrivemobile.utils.config.Config;
+import com.verizontelematics.indrivemobile.utils.config.InDrivePreference;
+import com.verizontelematics.indrivemobile.utils.phone.AppUtils;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+/**
+ * Created by bijesh on 9/3/2014.
+ */
+public class IndriveApplication extends Application {
+    private static final String TAG = IndriveApplication.class.getSimpleName();
+
+    private String decodedDbFilePath = null;
+    private static IndriveApplication mInstance;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        getOverflowMenu();
+
+
+        mInstance = this;
+
+        // Create application specific preference file.
+        InDrivePreference.createInstance(this);
+
+
+        Foreground.init(this);
+
+//        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+//            @Override
+//            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityStarted(Activity activity) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityResumed(Activity activity) {
+//               Log.d(TAG,"App is on foreground");
+//            }
+//
+//            @Override
+//            public void onActivityPaused(Activity activity) {
+//               Log.d(TAG,"App is on background");
+//            }
+//
+//            @Override
+//            public void onActivityStopped(Activity activity) {
+//
+//            }
+//
+//            @Override
+//            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityDestroyed(Activity activity) {
+//
+//            }
+//        });
+
+
+        // Store Default service Type in shared preferences.
+//        storeServiceType();
+
+        RestResponseHandlerThread.init();
+
+
+        VerizonRestClient lClient = (VerizonRestClient) RestClientFactory.getDefaultRestClient();
+
+        // if layer 7 init with ssl socket for https  like below
+        //lClient.init(this, VerizonSSLSocketFactoryClient.instance().getSocketFactory());
+        lClient.init(this, new SSLSocketFactory() {
+            @Override
+            public String[] getDefaultCipherSuites() {
+                return new String[0];
+            }
+
+            @Override
+            public String[] getSupportedCipherSuites() {
+                return new String[0];
+            }
+
+            @Override
+            public Socket createSocket(Socket socket, String host, int i, boolean b) throws IOException {
+                SSLSocket s = (SSLSocket) VerizonSSLSocketFactoryClient.instance().getSocketFactory().createSocket(socket, host, i, b);
+                s.setEnabledProtocols(new String[] {"TLSv1.2"} );
+                return s;
+            }
+
+            @Override
+            public Socket createSocket(String s, int i) throws IOException, UnknownHostException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(String s, int i, InetAddress inetAddress, int i2) throws IOException, UnknownHostException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress2, int i2) throws IOException {
+                return null;
+            }
+        });
+        // else
+        //lClient.init(this);
+
+
+        Config.getInstance(this);
+
+        /*
+        // create some dummy file.
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                // check if this even comes to here
+                // if it does
+                        // 1. Can we use the applicationContext still ? {  The app has crashed already }
+                CryptoWrapper.encryptDB(getApplicationContext());
+            }
+        });
+        */
+
+        // Register the app with gcm
+        registerWithGcm();
+    }
+
+    private void registerWithGcm() {
+        // check if play services present
+        if (checkPlayServices()) {
+            String regId = getRegistrationId();
+            if (regId == null || regId.isEmpty()) {
+                // do registration in background
+                registerInBackground();
+            }
+        }
+    }
+
+    private String getRegistrationId() {
+        // check if already registered
+        // or app version changed.
+        String regId = InDrivePreference.getInstance().getStringData("app-register-id", "");
+        int appVersion = InDrivePreference.getInstance().getIntData("app-version", 0);
+        int currentVersion = AppUtils.getAppVersion(this);
+        if (appVersion != currentVersion)
+            return "";
+        return regId;
+    }
+
+    private void registerInBackground() {
+        final Context ctx =  this;
+        new AsyncTask() {
+
+            @Override
+            protected String doInBackground(Object[] objects) {
+                try {
+                    GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(ctx);
+                    // register with gcm
+                    String regId = gcm.register(AppConstants.SENDER_ID);
+                    // send the registered id with server
+                    MessageController.instance().sendRegistration(regId);
+                    // store in app storage.
+                    storeRegistrationId(regId);
+
+                }catch (Exception ex) {
+                    Log.e(TAG, "Exception is " + Log.getStackTraceString(ex));
+                }
+                return null;
+            }
+        }.execute(null, null, null);
+    }
+
+    private void storeRegistrationId(String regId) {
+        InDrivePreference.getInstance().setStringData("app-register-id", regId);
+        InDrivePreference.getInstance().setIntData("app-version", AppUtils.getAppVersion(this));
+    }
+
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+//            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+////                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+////                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+//            } else {
+//                Log.i(TAG, "This device is not supported.");
+//                //finish();
+//            }
+            return false;
+        }
+        return true;
+    }
+
+    public static synchronized IndriveApplication getInstance(){
+
+        return mInstance;
+    }
+
+
+
+    public Context getInDriveApplicationContext(){
+        return getApplicationContext();
+    }
+
+    public String getDeviceName(){
+        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+
+
+    private void storeServiceType() {
+        InDrivePreference appPref = InDrivePreference.getInstance();
+        ArrayList<String> serviceTypeArrList = appPref.getCustomObject(InDrivePreference.SERVICE_TYPE, new TypeToken<List<String>>() {
+        }.getType());
+        if (serviceTypeArrList == null) {
+
+            appPref.setCustomObject(InDrivePreference.SERVICE_TYPE, new ArrayList<String>(Arrays.asList(this.getResources().getStringArray(com.verizontelematics.indrivemobile.R.array.maintenance_alert_type))));
+        }
+    }
+
+    private void getOverflowMenu() {
+
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+}

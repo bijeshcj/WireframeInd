@@ -1,0 +1,445 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.AlertBoundaryActivity;
+import com.verizontelematics.indrivemobile.activity.LocationAlertsActivity;
+import com.verizontelematics.indrivemobile.controllers.AlertsController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.CircleType;
+import com.verizontelematics.indrivemobile.models.data.LocationAlert;
+import com.verizontelematics.indrivemobile.models.data.PolygonType;
+import com.verizontelematics.indrivemobile.models.data.Vertex;
+import com.verizontelematics.indrivemobile.utils.ui.MapUtils;
+
+import java.util.ArrayList;
+
+/**
+ * Created by z688522 on 1/28/15.
+ */
+public class LocationAlertSettingDetailedFragment extends Fragment implements UIInterface, CompoundButton.OnCheckedChangeListener {
+    private static final String TAG = "LocationAlertSettingDetailedFragment";
+    private MapView mLocationMapView;
+    private GoogleMap mMap;
+    private boolean mIsMapLoaded = false;
+    private LocationAlert mLocationAlert;
+    private TextView mLocationNameLabel;
+    private CheckBox mStatus;
+    private AlertBoundaryActivity mActivity;
+    private CustomProgressDialog mCustomProgressDialog;
+
+    // view data
+    private String mType = "polygon";
+    private LatLng mCenter = new LatLng(33.748556, -84.3963486);
+    private float mRadius = 0.5f;
+    private ArrayList<LatLng> mPolygonVertices;
+    private Marker mCircleRadiusMarker;
+    // view data ended.
+
+    @Override
+    public void onCreate(Bundle savedInstance) {
+        super.onCreate(savedInstance);
+
+        // parse args
+        parseArgs();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance) {
+        View rootView = inflater.inflate(R.layout.location_alert_settings_detailed_fragment, container, false);
+        mLocationMapView = (MapView) rootView.findViewById(R.id.location_alert_map_view);
+        mLocationMapView.onCreate(savedInstance);
+        // setup
+        setup(rootView);
+        // populate UI
+        populateUI();
+
+        return  rootView;
+    }
+
+    private void parseArgs() {
+        Bundle args = getArguments();
+        if(args != null) {
+            mLocationAlert = args.getParcelable("location-alert");
+        }
+    }
+
+    private void populateUI() {
+        if (mLocationAlert != null) {
+            mLocationNameLabel.setText(mLocationAlert.getAlertName());
+            mStatus.setOnCheckedChangeListener(null);
+            mStatus.setChecked(mLocationAlert.getStatus().equalsIgnoreCase("Active"));
+            mStatus.setOnCheckedChangeListener(this);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mLocationMapView.onResume();
+        setupCallbacks();
+    }
+
+    private void setupCallbacks() {
+        AlertsController.instance().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mLocationMapView.onPause();
+        cleanup();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        // revert header with parent.
+        mActivity.updateHeader();
+        cleanup();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    private void setup(View rootView) {
+        // Add "Edit" Button in header_view of activity.
+
+        // get the ui controllers.
+
+        mLocationNameLabel = (TextView) rootView.findViewById(R.id.txt_location_name);
+        // Temp fix
+        mLocationNameLabel.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+        //
+        mStatus = (CheckBox) rootView.findViewById(R.id.chkb_status);
+        // Add listeners and callbacks
+        mStatus.setOnCheckedChangeListener(this);
+        Button mDeleteBtn = (Button) rootView.findViewById(R.id.btn_delete_location_alert);
+        mDeleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteAlert();
+
+            }
+        });
+        setupCallbacks();
+        // setup map
+        setupMap();
+    }
+
+    private void deleteAlert() {
+        // make webservice call
+        if (mLocationAlert == null)
+            return;
+        AlertsController.instance().deleteLocationAlert(getActivity(),mLocationAlert);
+    }
+
+    private void updateAlert() {
+        if (mLocationAlert == null)
+            return;
+        // update location alert.
+        mLocationAlert.setStatus(mStatus.isChecked() ? "Active" : "InActive");
+//        ArrayList<LocationAlert> locationAlerts = new ArrayList<LocationAlert>();
+//        locationAlerts.add(mLocationAlert);
+        AlertsController.instance().updateLocationAlert(getActivity(), mLocationAlert);
+    }
+
+    private void setupMap() {
+        mMap = mLocationMapView.getMap();
+        if (mMap == null)
+            return;
+        // enable or disable controllers
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.setMyLocationEnabled(true);
+
+        try {
+            MapsInitializer.initialize(getActivity());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (mMap == null)
+            return;
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                mIsMapLoaded = true;
+                if (mLocationAlert.getShape() != null) {
+                    CircleType circle = mLocationAlert.getShape().getCircle();
+                    if (circle != null) {
+                        mType = "circle";
+                        mRadius = (float)circle.getRadius();
+                        mCenter = new LatLng(circle.getCircleCenter().getLatitude(), circle.getCircleCenter().getLongitude());
+                    }
+                    else {
+                        PolygonType polygon = mLocationAlert.getShape().getPolygon();
+                        ArrayList<Vertex> vertices = polygon.getVertices();
+                        mType = "polygon";
+                        if (mPolygonVertices != null) {
+                            mPolygonVertices.clear();
+                        }
+                        else {
+                            mPolygonVertices = new ArrayList<LatLng>();
+                        }
+                        for (Vertex vertex : vertices) {
+                            mPolygonVertices.add(vertex.getLatLng());
+                        }
+                    }
+                }
+                // zoom map to locations
+               if (mType.equalsIgnoreCase("circle")) {
+                    //
+                    MapUtils.animateMoveTo(mMap, mCenter);
+                }
+                else {
+                    MapUtils.animateClipTo(mMap, getLocations());
+                }
+                // draw location boundary
+                drawLocationBoundary();
+            }
+        });
+    }
+
+    private void drawLocationBoundary() {
+        if (mMap != null && mIsMapLoaded) {
+            // get the boundary type
+            // get boundary points
+            // draw on map.
+            if (mType.equals("circle")) {
+
+                float radiusInMeters = mRadius;
+                Circle circle = MapUtils.drawGeofenceCircle(mMap, mCenter, radiusInMeters);
+
+                double latSpan = (radiusInMeters/111325);
+                double longSpan = (radiusInMeters/111325)*(1/ Math.cos(Math.toRadians(mCenter.latitude)));
+
+                LatLngBounds circleBounds = new LatLngBounds(
+                        new LatLng(mCenter.latitude - latSpan , mCenter.longitude - longSpan ),
+                        new LatLng(mCenter.latitude + latSpan , mCenter.longitude + longSpan ));
+
+//                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(circleBounds, 0);
+//                mMap.animateCamera(cu);
+                ArrayList<LatLng> bounds = new ArrayList<LatLng>();
+                bounds.add(new LatLng(mCenter.latitude - latSpan , mCenter.longitude - longSpan ));
+                bounds.add(new LatLng(mCenter.latitude + latSpan , mCenter.longitude + longSpan ));
+                MapUtils.animateClipTo(mMap, bounds);
+                drawRadiusLabel(circle);
+
+            }
+            else {
+                MapUtils.drawGeofencePolygon(mMap, getLocations());
+            }
+
+        }
+    }
+
+    private void drawRadiusLabel(Circle circle) {
+        Bitmap bitmap = null;
+        LatLng center = circle.getCenter();
+
+        double latSpan = (circle.getRadius() + 15*circle.getStrokeWidth()) /111325.0;
+        double longSpan = ((circle.getRadius() + circle.getStrokeWidth()) /111325.0)*(1/ Math.cos(Math.toRadians(center.latitude)));
+
+        LatLng labelPosition = new LatLng(center.latitude - latSpan, center.longitude);
+        if (circle.getRadius() > 0) {
+
+            bitmap = MapUtils.createBitmap(400, 60,
+                    String.format("%.3f miles", MapUtils.getMiles((float) circle.getRadius())),
+                    50, Color.BLACK);
+        } else {
+            bitmap = MapUtils.createBitmap(400, 60,
+                    "0 miles",
+                    50, Color.BLACK);
+        }
+        if (mCircleRadiusMarker == null) {
+            mCircleRadiusMarker = mMap.addMarker(new MarkerOptions().position(labelPosition)
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+        }
+        else {
+            mCircleRadiusMarker.setPosition(labelPosition);
+            mCircleRadiusMarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+        }
+        bitmap.recycle();
+    }
+
+
+    private void cleanup() {
+        // de register the callbacks.
+        AlertsController.instance().unregister(this);
+        // recycle any resources
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+
+        if (opr == null)
+            return;
+
+        if (opr.getId() != Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                ) return;
+
+        String updateLocationAlertString = "Updating Location Alert...";
+        String deleteLocationAlertString = "Deleting Location Alert...";
+        if (opr.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()) {
+            showProgressDialog(deleteLocationAlertString);
+        } else {
+            showProgressDialog(updateLocationAlertString);
+        }
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (opr == null)
+            return;
+
+        if (opr.getId() != Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                ) {
+            return;
+        }
+
+        dismissProgressDialog();
+        Toast lToast = Toast.makeText(getActivity(), getResources().getString(R.string.error_occured), Toast.LENGTH_SHORT);
+        lToast.show();
+
+        //getFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr == null)
+            return;
+        if (opr.getId() != Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                ) {
+            return;
+        }
+        dismissProgressDialog();
+
+        //Informing user about the reminder type
+        String operationMsg = "";
+        if (opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()) {
+            operationMsg = "Updated Successfully";
+        } else if (opr.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()) {
+            operationMsg = "Deleted Successfully";
+        } else {
+            return;
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.location_alert)
+                .setMessage(operationMsg)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        getFragmentManager().popBackStack();
+                    }
+                })
+                .show();
+    }
+
+    private void showProgressDialog(String aMessage) {
+        if (mCustomProgressDialog == null) {
+            mCustomProgressDialog = new CustomProgressDialog(getActivity(), aMessage);
+            mCustomProgressDialog.show();
+        }
+   }
+
+    public void dismissProgressDialog() {
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
+        }
+    }
+
+    // Stubs
+    private ArrayList<LatLng> getLocations() {
+        if (mPolygonVertices == null) {
+            mPolygonVertices = new ArrayList<LatLng>();
+            mPolygonVertices.add(new LatLng(33.748556, -84.3963486));
+            mPolygonVertices.add(new LatLng(33.7475769, -84.3957344));
+            mPolygonVertices.add(new LatLng(33.7465187, -84.4046342));
+            mPolygonVertices.add(new LatLng(33.7417534, -84.4092687));
+            mPolygonVertices.add(new LatLng(33.7472539, -84.408018));
+        }
+        return mPolygonVertices;
+    }
+    // Stub ended.
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        if (AlertBoundaryActivity.class.isInstance(activity)) {
+            mActivity = (AlertBoundaryActivity)activity;
+            RelativeLayout headerView = (RelativeLayout)mActivity.getHeaderView();
+            if (headerView == null) {
+                Log.d("LocAlertSettingsDetail", "onAttach");
+                return;
+            }
+            Button action_btn = (Button) headerView.findViewById(R.id.action_btn);
+            // enable
+            action_btn.setVisibility(View.VISIBLE);
+            // change button name
+            action_btn.setText("Edit");
+            // add listener
+            action_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // temp fix for not handling callbacks
+                    cleanup();
+                    // temp fix ended.
+                    Intent editLocationAlertActivity = new Intent(getActivity(), LocationAlertsActivity.class);
+                    editLocationAlertActivity.putExtra("edit-mode", true);
+                    editLocationAlertActivity.putExtra("data", mLocationAlert);
+                    startActivityForResult(editLocationAlertActivity, 0);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        updateAlert();
+    }
+}

@@ -1,0 +1,16 @@
+package com.verizontelematics.indrivemobile.userprofile;
+
+import android.support.v4.app.Fragment;
+
+import com.verizontelematics.indrivemobile.fragments.BaseSubUIFragment;
+
+/**
+ * Created by bijesh on 2/3/2015.
+ */
+public interface GetView<F extends Fragment> {
+//    public Class getActivityView(Class defaultActivity,String subModuleType);
+    public F getFragmentView(F defaultFragment);
+    public BaseSubUIFragment getBaseSubUIFragment(BaseSubUIFragment defaultBaseSubUIFragment,String subModuleType);
+
+
+}

@@ -1,0 +1,43 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 3/6/15.
+ */
+public class UserPreferenceData extends BaseData {
+    private String MobileUserID;
+    private String PushNotification;
+    private String EmailNotification;
+    private String SmsNotification;
+
+    public String getMobileUserID() {
+        return MobileUserID;
+    }
+
+    public void setMobileUserID(String mobileUserID) {
+        MobileUserID = mobileUserID;
+    }
+
+    public String getPushNotification() {
+        return PushNotification;
+    }
+
+    public void setPushNotification(String pushNotification) {
+        PushNotification = pushNotification;
+    }
+
+    public String getEmailNotification() {
+        return EmailNotification;
+    }
+
+    public void setEmailNotification(String emailNotification) {
+        EmailNotification = emailNotification;
+    }
+
+    public String getSmsNotification() {
+        return SmsNotification;
+    }
+
+    public void setSmsNotification(String smsNotification) {
+        SmsNotification = smsNotification;
+    }
+}

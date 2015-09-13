@@ -1,0 +1,793 @@
+package com.verizontelematics.indrivemobile.utils.ui;
+
+import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.verizontelematics.indrivemobile.models.GestureMessage;
+import com.verizontelematics.indrivemobile.models.Point;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @author bijesh
+ */
+public class GestureDetection {
+
+
+    ArrayList<LatLng> mLatLngList = new ArrayList<LatLng>();
+
+
+
+    ArrayList<Point> lstPersistPoints = new ArrayList<Point>();
+    public void addGesturePoints(Point point){
+        lstPersistPoints.add(point);
+    }
+
+    public void addGestureLocations(LatLng latLng){
+        mLatLngList.add(latLng);
+    }
+
+    public ArrayList<Point> getGesturePoints(){
+        return lstPersistPoints;
+    }
+
+    public ArrayList<LatLng> getGestureLocations(){
+        return mLatLngList;
+    }
+
+    public void resetGestureLocations(){
+        mLatLngList = new ArrayList<LatLng>();
+    }
+
+    enum PointType{
+        X,
+        Y
+    }
+
+    /**
+     * this method is based on locations
+     * @return
+     */
+    public GestureMessage detectGestureForCircle1(float zoomLevel){
+         GestureMessage retMessage = new GestureMessage("",false);
+         boolean retFlag = false;
+
+        // get highest lat
+        LatLng highestLatitudeLocation = getHighestLowestLatitude("HIGHEST");
+        // get lowest lat
+        LatLng lowestLatitudeLocation = getHighestLowestLatitude("LOWEST");
+        // get highest lon
+        LatLng highestLongitudeLocation = getHighestLowestLongitude("HIGHEST");
+        // get lowest lon
+        LatLng lowestLongitudeLocation = getHighestLowestLongitude("LOWEST");
+
+        if((highestLatitudeLocation == null) || (lowestLatitudeLocation == null) || (highestLongitudeLocation == null)
+                || (lowestLongitudeLocation == null)){
+            return null;
+        }
+
+//        get center point
+         LatLng centerLatLng = getCenterPoint(highestLatitudeLocation,lowestLatitudeLocation,highestLongitudeLocation,lowestLongitudeLocation);
+//         System.out.println("$$$ center point "+centerLatLng);
+
+
+
+//         distance between center point and highest point
+         double distance = getDistanceBetweenLocations("",centerLatLng,highestLatitudeLocation);
+
+//        find all distance from center point
+         ArrayList<Double> lstOfAllDistance = getAllDistance(centerLatLng);
+
+         int positionOfHighestPoint = getHighestPointPosition(lstOfAllDistance);
+//         System.out.println("highest point  position "+positionOfHighestPoint);
+         double newDis = getDistanceBetweenLocations("",centerLatLng,mLatLngList.get(positionOfHighestPoint));
+
+//         find the distance diff in percentage from center point to all distance
+         ArrayList<Double> lstOfAllDiffsFromCenter = getDiffInPercentageFromCenter(lstOfAllDistance, newDis);
+
+         int diffCount = getThresholdDiff(lstOfAllDiffsFromCenter);
+
+         double actualDiff = findPercentage(lstOfAllDiffsFromCenter.size(),diffCount);
+//         System.out.println("actual diff "+actualDiff);
+         // hardcoded from 85 to 0 as per the requirement
+         // find the appropriate circle with the given user points.
+         retFlag = (actualDiff < 85);
+         retMessage.setFlag(retFlag);
+         boolean hasInterception = findIntersections(mLatLngList);
+
+        // Hardcode as we should draw circle as possible as user input
+        retMessage.setCenterLatLng(centerLatLng);
+        retMessage.setHighestLatLng(getHighestLatLng(positionOfHighestPoint));
+        retMessage.setRadius((float)newDis);
+
+         if(retFlag){
+//             if(hasInterception){
+//                 System.out.println("has interception");
+//                 retFlag = false;
+//                 retMessage.setFlag(retFlag);
+//                 retMessage.setMessage("Not a circle,interception detected");
+//             }
+             boolean isInComplete = isInCompleteCircle(zoomLevel);
+             if(isInComplete){
+//                 System.out.println("is incomplete");
+                 retFlag = false;
+                 retMessage.setFlag(retFlag);
+                 retMessage.setMessage("Not a Circle, Incomplete circle detected");
+
+             }
+         }
+
+         if(retMessage.isFlag()){
+//             TODO: set center lat lng, center point , all points to message
+              retMessage.setCenterLatLng(centerLatLng);
+              retMessage.setHighestLatLng(getHighestLatLng(positionOfHighestPoint));
+              retMessage.setRadius((float)newDis);
+         }
+
+         return retMessage;
+    }
+
+    private LatLng getHighestLatLng(int pos){
+        return mLatLngList.get(pos);
+    }
+
+    private Point getCenterPoint(LatLng centerLatLng){
+        Point centerPoint = null;
+        if(lstPersistPoints != null && mLatLngList != null){
+
+        }
+        return centerPoint;
+    }
+
+
+
+    private int getHighestPointPosition(ArrayList<Double> lstOfAllDistance){
+        int highestValPosition = 0;
+        double highestVal = lstOfAllDistance.get(0);
+        for(int i=1;i<lstOfAllDistance.size();i++){
+            double val = lstOfAllDistance.get(i);
+            if(val > highestVal){
+                highestVal = val;
+                highestValPosition = i;
+            }
+        }
+        return highestValPosition;
+    }
+
+    private boolean isInCompleteCircle(float zoomLevel){
+        boolean retFlag = false;
+        LatLng firstPosition = mLatLngList.get(0);
+        LatLng lastPosition = mLatLngList.get(mLatLngList.size()-1);
+        double distanceBetweenFirstAndLst = (getDistanceBetweenLocations("",firstPosition,lastPosition)) * 0.001;
+//        System.out.println("distance between first and last kms "+distanceBetweenFirstAndLst);
+        retFlag = validateWithZoomLevel(zoomLevel,distanceBetweenFirstAndLst);
+
+        return retFlag;
+    }
+
+    private boolean findIntersections(ArrayList<LatLng> lstAllLatLng){
+        Set<LatLng> sets = new HashSet<LatLng>(lstAllLatLng);
+//        System.out.println("list size "+lstAllLatLng.size()+" set size "+sets.size());
+        int diff = lstAllLatLng.size() - sets.size();
+        return diff >= 2;
+    }
+
+    private int getThresholdDiff(ArrayList<Double> lst){
+        int retVal = 0;
+        for(double d:lst){
+            if(d < 15){
+                retVal++;
+            }
+        }
+        return retVal;
+    }
+
+    private boolean validateWithZoomLevel(float zoomLevel,double distanceBetweenFirstAndLst){
+        if(zoomLevel == 2) {
+            if (distanceBetweenFirstAndLst > 1800)
+                return true;
+        }
+        if(zoomLevel == 3) {
+            if (distanceBetweenFirstAndLst > 1100)
+                return true;
+        }
+        if(zoomLevel == 4) {
+            if (distanceBetweenFirstAndLst > 700)
+                return true;
+        }
+        if(zoomLevel == 5) {
+            if (distanceBetweenFirstAndLst > 250)
+                return true;
+        }
+        if(zoomLevel == 6) {
+            if (distanceBetweenFirstAndLst > 120)
+                return true;
+        }
+        if(zoomLevel == 7) {
+            if (distanceBetweenFirstAndLst > 60)
+                return true;
+        }
+        if(zoomLevel == 8) {
+            if (distanceBetweenFirstAndLst > 30)
+                return true;
+        }
+        if(zoomLevel == 9) {
+            if (distanceBetweenFirstAndLst > 12.5)
+                return true;
+        }
+        if(zoomLevel == 10) {
+            if (distanceBetweenFirstAndLst > 6.4)
+                return true;
+        }
+        if(zoomLevel == 11) {
+            if (distanceBetweenFirstAndLst > 4.2)
+                return true;
+        }
+        if(zoomLevel == 12) {
+            if (distanceBetweenFirstAndLst > 3)
+                return true;
+        }
+        else if(zoomLevel == 13){
+            if(distanceBetweenFirstAndLst > 1.4)
+                return true;
+        }else if(zoomLevel == 14){
+            if(distanceBetweenFirstAndLst > 0.5)
+                return true;
+        }
+        else if(zoomLevel == 15){
+            if(distanceBetweenFirstAndLst > 0.25)
+                return true;
+        }else if(zoomLevel == 16){
+            if(distanceBetweenFirstAndLst > 0.20){
+                return true;
+            }
+        }else if(zoomLevel == 17){
+            if(distanceBetweenFirstAndLst > 0.13){
+                return true;
+            }
+        }else if(zoomLevel == 18){
+            if(distanceBetweenFirstAndLst > 0.10){
+                return true;
+            }
+        }else if(zoomLevel == 19){
+            if(distanceBetweenFirstAndLst > 0.5){
+                return true;
+            }
+        }else if(zoomLevel == 20){
+            if(distanceBetweenFirstAndLst > 0.2){
+                return true;
+            }
+        }else if(zoomLevel == 21){
+            if(distanceBetweenFirstAndLst > 0.1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ArrayList<Double> getDiffInPercentageFromCenter(ArrayList<Double> lst,double distance){
+        ArrayList<Double> retList = new ArrayList<Double>();
+        for(double d:lst){
+            retList.add(findPercentage(distance,d));
+        }
+//        System.out.println("diff in percentage "+retList);
+        return retList;
+    }
+
+
+
+    private ArrayList<Double> getAllDistance(LatLng centerPoint){
+        ArrayList<Double> retList = new ArrayList<Double>();
+        for(LatLng latLng:mLatLngList){
+            retList.add(getDistanceBetweenLocations("",latLng,centerPoint));
+        }
+//        for log
+//        for(Double distance:retList)
+//           System.out.println("distance list in kms from center point "+(distance * 0.001));
+        return retList;
+    }
+
+    private double getDistanceBetweenLocations(String type,LatLng loc1,LatLng loc2){
+        Location location1 = new Location("loc1");
+        Location location2 = new Location("loc2");
+
+        location1.setLatitude(loc1.latitude);
+        location1.setLongitude(loc1.longitude);
+
+        location2.setLatitude(loc2.latitude);
+        location2.setLongitude(loc2.longitude);
+
+        double distance = location1.distanceTo(location2);
+        return distance;
+    }
+
+    private LatLng getDistanceBetweenLocations1(String type,LatLng highestLatLon,LatLng lowestLatLon){
+        LatLng retLatLng = null;
+        double lat1 = highestLatLon.latitude / 2;
+        double lon1 = highestLatLon.longitude / 2;
+        retLatLng = new LatLng(lat1,lon1);
+        return retLatLng;
+    }
+
+    private LatLng getCenterLatLon(LatLng highestLat,LatLng lowestLat){
+        double newLat = (highestLat.latitude + lowestLat.latitude) / 2;
+        double newLon = (highestLat.longitude + lowestLat.longitude) / 2;
+        return new LatLng(newLat,newLon);
+    }
+
+    private LatLng getCenterPoint(LatLng highestLat,LatLng lowestLat,LatLng highestLon,LatLng lowestLon){
+        double newLat = (highestLat.latitude + lowestLat.latitude) / 2;
+        double newLon = (highestLon.longitude + lowestLon.longitude) / 2;
+        return new LatLng(newLat,newLon);
+    }
+
+//    private LatLng getCenterLon(LatLng highestLon,LatLng lowestLon){
+//
+//    }
+
+    /**
+     * this method is based on points
+     * @return
+     */
+    public boolean detectGestureForCircle(){
+        boolean retValue;
+
+        Point highestXPoint = getHighestPoint(PointType.X);
+        Point highestYPoint = getHighestPoint(PointType.Y);
+
+
+
+        Point lowestXPoint = getLowestPoint(PointType.X);
+        Point lowestYPoint = getLowestPoint(PointType.Y);
+
+//        System.out.println("$$ highest x "+highestXPoint.getX()+" lowest x "+lowestXPoint.getX());
+//        System.out.println("highest y "+highestYPoint.getY()+" lowest y "+lowestYPoint.getY());
+
+        double distanceBetweenX = highestXPoint.getX() - lowestXPoint.getX();//getDistanceBetweenPoints(highestXPoint,lowestXPoint);
+        double distanceBetweenY = highestYPoint.getY() - lowestYPoint.getY();//getDistanceBetweenPoints(lowestYPoint,highestYPoint);//getDistanceBetweenPoints(highestYPoint,lowestYPoint);
+
+//        System.out.println("distanceBetweenX "+distanceBetweenX);
+//        System.out.println("distanceBetweenY "+distanceBetweenY);
+
+        double diameter = (distanceBetweenX + distanceBetweenY) / 2;
+        double radius = (diameter / 2);
+//        System.out.println("diameter of circle "+diameter+" and radius of circle "+radius);
+
+        Point centerOfCircle = getCenterOfCircle(lowestXPoint,lowestYPoint);//getCenterOfCircle(highestXPoint);
+//        System.out.println("center of circle "+centerOfCircle);
+
+        retValue = isValidCircle(centerOfCircle,radius);
+
+        return retValue;
+    }
+
+    private boolean isValidCircle(Point centerPoint,double radius){
+        boolean retValue = false;
+        int marker = 0;
+
+        for(Point point:lstPersistPoints){
+            double distanceBetweenPoints = getDistanceBetweenPoints(point,centerPoint);//getDistanceBetweenPoints(centerPoint,point);//
+//            System.out.println("distanceBetweenPoints "+distanceBetweenPoints+" point "+point);
+            double diffPercent = findPercentage(radius,distanceBetweenPoints);
+//            System.out.println("diffPercent "+diffPercent);
+            if(diffPercent < 25){
+//                System.out.println("adding 1 to marker");
+                marker++;
+            }
+        }
+//        System.out.println("marker is "+marker+" number of points "+lstPersistPoints.size());
+        double diffPercentageWithSize = findPercentage(lstPersistPoints.size(),marker);
+//        System.out.println(" diffPercentageWithSize "+diffPercentageWithSize);
+        boolean isDiffWithSize = diffPercentageWithSize < 85;
+
+        retValue = isDiffWithSize;
+//        System.out.println("diffPercentage "+retValue);
+        return retValue;
+    }
+
+    private boolean hasInterSectionPoints(){
+        boolean retValue = false;
+
+        for(int i=0;i<lstPersistPoints.size();i++){
+            Point iPoint = lstPersistPoints.get(i);
+            for(int j=0;j<lstPersistPoints.size();j++){
+                Point jPoint = lstPersistPoints.get(j);
+                if(iPoint.equals(jPoint)){
+                    return true;
+                }
+            }
+        }
+
+        return retValue;
+    }
+
+    @Deprecated
+    private boolean isStraightLine(){
+        double firstX = 0;
+        int subMarker = 0;
+//        System.out.println("first "+lstPersistPoints.get(0)+" last point "+lstPersistPoints.get(lstPersistPoints.size()-1));
+        Point firstPoint = lstPersistPoints.get(0);
+        Point lastPoint = lstPersistPoints.get(lstPersistPoints.size()-1);
+        double xDiff = Math.abs(firstPoint.getX() - lastPoint.getX());
+        double yDiff = firstPoint.getY() - lastPoint.getY();
+        if(xDiff < 100)
+            return true;
+//        for(int i=0;i<lstPersistPoints.size();i++){
+//            if(i == 0)
+//                firstX = lstPersistPoints.get(i).getX();
+//            double diff = Math.abs(firstX - lstPersistPoints.get(i).getX());
+//            if(diff < 100){
+//                subMarker++;
+//            }
+//        }
+//        double percentage = findPercentage(lstPersistPoints.size(),subMarker);
+//        System.out.println("$$$ straight line percentage "+percentage+" subMarker "+subMarker+" number of points "+lstPersistPoints.size());
+//        if(percentage > 60){
+//            return true;
+//        }
+        return false;
+    }
+
+    private double findPercentage(double valCenter,double val){
+        double returnValue = ((valCenter - val) / ((valCenter + val) / 2)) * 100;
+        if(returnValue < 0)
+            returnValue = Math.abs(returnValue);
+        return returnValue;
+    }
+//    private double findPercentage(double radius,double val){
+//        return  ((radius - val) / ((radius + val) / 2)) * 100;
+//    }
+
+    private Point getCenterOfCircle(Point point){
+//       X: 791.679443359375,Y:806.2569580078125}
+        double actualX = point.getX();
+        double actualY = point.getY();
+
+        double centerX = actualX / 2.0;
+        double centerY = actualY / 2.0;
+
+        Point centerPoint = new Point(centerX,centerY);
+
+        return centerPoint;
+    }
+    private Point getCenterOfCircle(Point hPoint,Point lPoint){
+        double x1 = hPoint.getX();
+        double x2 = lPoint.getX();
+        double y1 = hPoint.getY();
+        double y2 = lPoint.getY();
+        double cx = x1 + x2 / 2.0;
+        double cy = y1 + y2 / 2.0;
+        return  new Point(cx,cy);
+    }
+
+
+    private double getDistanceBetweenPoints(Point p1,Point p2){
+        return Math.sqrt(
+                (p1.getX() - p2.getX()) *  (p1.getX() - p2.getX()) +
+                        (p1.getY() - p2.getY()) *  (p1.getY() - p2.getY())
+        );
+    }
+
+    private Point getHighestPoint(PointType type){
+        Point retPoint = null;
+        switch (type){
+            case X:
+                retPoint = getHighX();
+                break;
+            case Y:
+                retPoint = getHighY();
+                break;
+        }
+        return retPoint;
+    }
+
+    private Point getLowestPoint(PointType type){
+        Point retPoint = null;
+        switch (type){
+            case X:
+                retPoint = getLowX();
+                break;
+            case Y:
+                retPoint = getLowY();
+                break;
+        }
+        return retPoint;
+    }
+
+    private Point getHighX(){
+        double highestX = 0.0;
+        Point retPoint = null;
+        int listSize = lstPersistPoints.size();
+        for(int i=0;i<listSize;i++){
+            Point iPoint = lstPersistPoints.get(i);
+            highestX = iPoint.getX();
+
+            for(int j=0;j<listSize;j++){
+                Point jPoint = lstPersistPoints.get(j);
+                double jX = jPoint.getX();
+                if(jX > highestX){
+                    highestX = jX;
+                    retPoint = jPoint;
+                }
+            }
+        }
+//        System.out.println("$$$ highestX "+highestX+" highest point "+retPoint);
+        return retPoint;
+    }
+
+    private LatLng getHighestLowestLatitude(String type){
+        LatLng retLatLng = null;
+        double highLowLat = 0;//mLatLngList.get(0).latitude;
+        int size = mLatLngList.size();
+//        System.out.println("$$$$ in getHighestLowestLatitude "+mLatLngList);
+        for(int i=0;i<size;i++){
+            LatLng iLatLng = mLatLngList.get(i);
+            highLowLat = iLatLng.latitude;
+            for(int j=0;j<size;j++){
+                LatLng jLatLng = mLatLngList.get(j);
+                double jLat = jLatLng.latitude;
+                if(type.equals("HIGHEST")){
+//                    System.out.println("$$ type is highest jLat "+jLat+" highLowLat "+highLowLat);
+                if(jLat > highLowLat){
+                    highLowLat = jLat;
+                    retLatLng = jLatLng;
+                  }
+                }else{
+                    if(jLat < highLowLat){
+                        highLowLat = jLat;
+                        retLatLng = jLatLng;
+                    }
+                }
+            }
+        }
+//        System.out.println("highest/Lowest lat is "+retLatLng);
+        return retLatLng;
+    }
+
+    private LatLng getHighestLowestLongitude(String type){
+        LatLng retLatLng = null;
+        double highLowLon = 0;//mLatLngList.get(0).latitude;
+        int size = mLatLngList.size();
+        for(int i=0;i<size;i++){
+            LatLng iLatLng = mLatLngList.get(i);
+            highLowLon = iLatLng.longitude;
+            for(int j=0;j<size;j++){
+                LatLng jLatLng = mLatLngList.get(j);
+                double jLon = jLatLng.longitude;
+                if(type.equals("HIGHEST")){
+                    if(jLon > highLowLon){
+                        highLowLon = jLon;
+                        retLatLng = jLatLng;
+                    }
+                }else{
+                    if(jLon < highLowLon){
+                        highLowLon = jLon;
+                        retLatLng = jLatLng;
+                    }
+                }
+            }
+        }
+//        System.out.println("highest/Lowest lat is "+retLatLng);
+        return retLatLng;
+    }
+
+
+    private Point getLowX(){
+        double lowestX = 0.0;
+        Point retPoint = null;
+        int listSize = lstPersistPoints.size();
+        for(int i=0;i<listSize;i++){
+            Point iPoint = lstPersistPoints.get(i);
+            lowestX = iPoint.getX();
+
+            for(int j=0;j<listSize;j++){
+                Point jPoint = lstPersistPoints.get(j);
+                double jX = jPoint.getX();
+                if(jX < lowestX){
+                    lowestX = jX;
+                    retPoint = jPoint;
+                }
+            }
+        }
+//        System.out.println("$$$ lowestX "+lowestX+" lowest point "+retPoint);
+        return retPoint;
+    }
+
+    private Point getHighY(){
+        double highestY = 0.0;
+        Point retPoint = null;
+        int listSize = lstPersistPoints.size();
+        for(int i=0;i<listSize;i++){
+            Point iPoint = lstPersistPoints.get(i);
+            highestY = iPoint.getY();
+            for(int j=0;j<listSize;j++){
+                Point jPoint = lstPersistPoints.get(j);
+                double jY = jPoint.getY();
+                if(jY > highestY){
+                    highestY = jY;
+                    retPoint = jPoint;
+                }
+            }
+        }
+//        System.out.println("$$$ highestY "+highestY+" highest point "+retPoint);
+        return retPoint;
+    }
+
+    private Point getLowY(){
+        double lowestY = 0.0;
+        Point retPoint = null;
+        int listSize = lstPersistPoints.size();
+        for(int i=0;i<listSize;i++){
+            Point iPoint = lstPersistPoints.get(i);
+            lowestY = iPoint.getY();
+            for(int j=0;j<listSize;j++){
+                Point jPoint = lstPersistPoints.get(j);
+                double jY = jPoint.getY();
+                if(jY < lowestY){
+                    lowestY = jY;
+                    retPoint = jPoint;
+                }
+            }
+        }
+//        System.out.println("$$$ lowestY "+lowestY+" lowest point "+retPoint);
+        return retPoint;
+    }
+
+	public boolean detectGesture(ArrayList<Point> lstPoints) {
+		boolean returnValue = false;
+		// getting the first and the last point
+		ArrayList<Point> firstAndLastPoint = null;
+		boolean isYGreater = false;
+		boolean isMarginGreater = false;
+		boolean isValidGesturePath = false;
+		if (lstPoints != null) {
+
+			firstAndLastPoint = getFirstAndLastPoint(lstPoints);
+
+			// valid gesture path
+
+			isValidGesturePath = isValidGesturePath(firstAndLastPoint);
+			if (!isValidGesturePath) {
+//				System.out.println("Failed because pattern drawn from right to left");
+				return false;
+			}
+
+			// validate Y points greater than first point
+			isYGreater = validateYPointsLesserThanFirstPoint(firstAndLastPoint,
+                    lstPoints);
+			if (isYGreater) {
+				// Y greater valid gesture
+				// System.out.println("$$$ isYGreater "+isYGreater);
+			} else {
+				// System.out.println("$$$ isYGreater else "+isYGreater);
+				System.out.println("Failed because pattern is like U and not like ^");
+				return false;
+			}
+			// get the highest Point from the list of points
+			// highestPoint = getHighestPoint(lstPoints);
+
+			isMarginGreater = isFirstAndLastYPointsGreater(firstAndLastPoint);
+			if (!isMarginGreater) {
+				System.out.println("Failed because Not complete gesture");
+			}
+			returnValue = isMarginGreater;
+		}
+		return returnValue;
+	}
+
+	private boolean isValidGesturePath(ArrayList<Point> firstLastPoints) {
+		boolean retVal = false;
+		Point firstPoint = firstLastPoints.get(0);
+		Point lastPoint = firstLastPoints.get(1);
+		double firstX = firstPoint.getX();
+		double lastX = lastPoint.getX();
+        retVal = !(firstX == lastX || firstX > lastX);
+
+		return retVal;
+	}
+
+	private boolean isFirstAndLastYPointsGreater(
+            ArrayList<Point> firstLastPoints) {
+		boolean retVal = false;
+		Point firstPoint = firstLastPoints.get(0);
+		Point lastPoint = firstLastPoints.get(1);
+		double firstY = firstPoint.getY();
+		double lastY = lastPoint.getY();
+		// System.out.println("$$$ firstY "+firstY+" lastY "+lastY);
+		// change this logic old logic
+		// if((lastY == firstY) || (lastY+1.0 == firstY) || (lastY - 1.0 ==
+		// firstY)){
+		// retVal = true;
+		// }
+		if (firstY == lastY || diffOfPlusOrMinus100(firstY, lastY)) {
+			retVal = true;
+		}
+
+		// System.out.println("$$$ isMarginGreater "+retVal);
+		return retVal;
+	}
+
+	private boolean diffOfPlusOrMinus100(double first, double last) {
+		double diff = first - last;
+		// System.out.println("$$$ diff "+diff);
+        return (diff > 0 && diff < 100.0) || (diff < 0) && (diff > -100.0);
+	}
+
+	private boolean validateYPointsLesserThanFirstPoint(
+            ArrayList<Point> firstPoints, ArrayList<Point> allPoints) {
+//		System.out.println("$$$ first points " + firstPoints);
+//		System.out.println("$$$ all  points " + allPoints);
+		boolean isXHasMoreSpace = false;
+		boolean retVal = false;
+		Point firstPoint = firstPoints.get(0);
+//		System.out.println("$$$ first Point " + firstPoint);
+		int iteration = 0;
+		for (Point point : allPoints) {
+			if (point.getY() <= firstPoint.getY()) {
+				retVal = true;
+			} else {
+//				System.out.println(" iteration " + iteration + " firstPoint.getY() "
+//						+ firstPoint.getY() + " point.getY() " + point.getY());
+				retVal = false;
+				isXHasMoreSpace = true;
+				break;
+			}
+			iteration++;
+		}
+		// validating if there are 100 points difference between first point x
+		// and lst point x
+		if (isXHasMoreSpace) {
+			double firstPointX = 0;
+			double lastPointX = 0;
+			firstPointX = firstPoints.get(0).getX();
+			lastPointX = firstPoints.get(1).getX();
+			if ((lastPointX - firstPointX > 100.0)) {
+				retVal = true;
+			}
+		}
+		return retVal;
+	}
+
+
+	private ArrayList<Point> getFirstAndLastPoint(ArrayList<Point> points) {
+		ArrayList<Point> firstAndLastPoint = new ArrayList<Point>();
+		int size = points.size();
+		for (int i = 0; i < size; i++) {
+			if (i == 0) {
+				Point point = points.get(i);
+				firstAndLastPoint.add(point);
+				continue;
+			}
+			if (i == size - 1) {
+				Point point = points.get(i);
+				firstAndLastPoint.add(point);
+			}
+		}
+		// System.out.println("$$$ firstAndLastPoint "+firstAndLastPoint);
+		return firstAndLastPoint;
+	}
+}
+
+
+
+//scraps
+
+//        //get distance between highest and lowest latitude
+//        double distanceBetweenLats = getDistanceBetweenLocations("lat",highestLatitudeLocation,lowestLatitudeLocation);
+//
+////        get distance between highest and lowest longitude
+//        double distanceBetweenLongs = getDistanceBetweenLocations("lon",highestLongitudeLocation,lowestLongitudeLocation);
+//
+////        find the diameter and radius
+//        double diameter = (distanceBetweenLats + distanceBetweenLongs) / 2;
+//        double radius = (diameter / 2);
+//        System.out.println("diameter of circle "+diameter+" and radius of circle "+radius);
+
+//        get the center of highest and lowest Latitude's
+//          LatLng centerLatitude = getCenterLatLon(highestLatitudeLocation, lowestLatitudeLocation);//getDistanceBetweenLocations1(highestLatitudeLocation);
+//          System.out.println("center latitude "+centerLatitude);
+////        get the center of highest and lowest latitude's
+//          LatLng centerLongitude = getCenterLatLon(highestLongitudeLocation,lowestLongitudeLocation);//getDistanceBetweenLocations1(highestLongitudeLocation);
+//          System.out.println("center longitude "+centerLongitude);

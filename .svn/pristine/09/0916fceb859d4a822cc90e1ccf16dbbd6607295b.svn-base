@@ -1,0 +1,29 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.annotation.SuppressLint;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.widget.TextView;
+
+/**
+ * Created by bijesh on 8/21/2014.
+ */
+@SuppressLint("Registered")
+public class BaseFragmentActivity extends ActionBarActivity {
+
+    private static final String TAG = BaseFragmentActivity.class.getCanonicalName();
+    protected void setActionBarTextColor() {
+
+        int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
+        if (actionBarTitleId > 0) {
+            TextView titleTV = (TextView) findViewById(actionBarTitleId);
+            if (titleTV != null) {
+                titleTV.setTextColor(Color.WHITE);
+            }
+        }
+    }
+
+
+}

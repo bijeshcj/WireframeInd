@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nested_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
+
+
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1">
+
+
+            <RelativeLayout
+                android:id="@+id/geofenceIV"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_alignParentStart="true"
+
+                android:layout_marginStart="20dp"
+                android:background="@drawable/menu_border">
+
+
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/geofence_alerts" />
+
+</RelativeLayout>
+    <TextView
+        android:id="@+id/textViewGeofence"
+        android:layout_width="40dip"
+        android:layout_height="40dip"
+        android:text="@string/dummy_no"
+        android:singleLine="true"
+        android:layout_marginLeft="140dp"
+        android:layout_marginStart="140dp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:padding="2sp"
+        android:gravity="center"
+
+
+        android:background="@drawable/circle"
+
+        />
+
+
+
+            <RelativeLayout
+                android:id="@+id/speedAlertsIV"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/menu_border">
+
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/speed_alerts" />
+            </RelativeLayout>
+    <TextView
+        android:id="@+id/textViewSpeed"
+        android:layout_width="40dip"
+        android:layout_height="40dip"
+        android:text="@string/dummy_no"
+        android:singleLine="true"
+
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:padding="2sp"
+        android:gravity="center"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/circle"
+        android:layout_alignParentRight="true"
+        />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1">
+
+
+            <RelativeLayout
+                android:id="@+id/diagnosticsAlertsIV"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/menu_border">
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/diagnostics" />
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/textViewDiagnostics"
+                android:layout_width="40dip"
+                android:layout_height="40dip"
+                android:text="@string/dummy_no"
+                android:singleLine="true"
+
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="2sp"
+                android:gravity="center"
+                android:layout_marginStart="140dp"
+                android:background="@drawable/circle"
+                android:layout_marginLeft="140dp" />
+
+            <RelativeLayout
+                android:id="@+id/maintenanceAlertsIV"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/menu_border">
+
+
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/maintenance" />
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/textViewMaintenance"
+                android:layout_width="40dip"
+                android:layout_height="40dip"
+                android:text="@string/dummy_no"
+                android:singleLine="true"
+
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="2sp"
+                android:gravity="center"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/circle"
+                android:layout_alignParentRight="true"
+                />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1">
+
+            <RelativeLayout
+                android:id="@+id/valetAlertsIV"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="20dp"
+                android:background="@drawable/menu_border">
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/valet" />
+
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/textViewValet"
+                android:layout_width="40dip"
+                android:layout_height="40dip"
+                android:text="@string/dummy_no"
+                android:singleLine="true"
+
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="2sp"
+                android:gravity="center"
+                android:layout_marginStart="140dp"
+                android:background="@drawable/circle"
+                android:layout_marginLeft="140dp"
+                />
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

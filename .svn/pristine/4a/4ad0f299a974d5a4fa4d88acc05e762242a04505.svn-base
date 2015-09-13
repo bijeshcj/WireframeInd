@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal"
+              android:id="@+id/maintenance_reminder_log_container"
+              android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+
+        <LinearLayout
+            android:id="@+id/maintenance_alerts_header_container"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_height="@dimen/maintenance_log_header_height"
+            android:background="@color/gray">
+
+            <TextView
+                android:id="@+id/maintenanceAlertTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingLeft="10dp"
+                android:layout_weight="1.4"
+                android:text="@string/maintenance_reminders"
+                android:textColor="@color/white"
+                android:textSize="@dimen/header_text_size_landscape"
+                />
+
+            <ImageView
+                android:id="@+id/btn_info_maintenance_alert"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:contentDescription="@string/info_img_cd"
+                android:src="@drawable/information_button"/>
+
+            <ImageView
+                android:id="@+id/btn_create_alert"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:contentDescription="@string/add_btn_cd"
+                android:src="@drawable/add_button"/>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/firstRL"
+            android:layout_below="@id/maintenance_alerts_header_container">
+
+            <TextView
+                android:id="@+id/emptyAlertTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:ellipsize="end"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:visibility="invisible"
+                android:hint="@string/empty_reminder_text"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                />
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:id="@+id/maintenance_alerts_list_swipe_refresh">
+
+
+                <ListView
+                    android:id="@+id/maintenance_alerts_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@color/gray"
+                    android:dividerHeight="1px"
+                    android:fadeScrollbars="false"
+                    />
+            </android.support.v4.widget.SwipeRefreshLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="1dp"
+        android:src="@color/gray_separator"
+        android:contentDescription="@string/separator_cd"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:id="@+id/maintenance_log_header_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/maintenance_log_header_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:background="@color/gray"
+            >
+
+            <TextView
+                android:id="@+id/maintenanceLogTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingLeft="10dp"
+                android:layout_weight="1.4"
+                android:text="@string/maintenance_log"
+                android:textColor="@color/white"
+                android:textSize="@dimen/header_text_size_landscape"
+                />
+
+            <ImageView
+                android:id="@+id/btn_info_maintenance_log"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:contentDescription="@string/info_img_cd"
+                android:src="@drawable/information_button"/>
+
+            <ImageView
+                android:id="@+id/btn_create_log"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:contentDescription="@string/add_btn_cd"
+                android:src="@drawable/add_button"/>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/secondRL"
+            android:layout_below="@id/maintenance_log_header_container">
+
+            <TextView
+                android:id="@+id/emptyLogTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:ellipsize="end"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:visibility="invisible"
+                android:hint="@string/empty_log_text"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                />
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:id="@+id/maintenance_alert_log_list_swipe_refresh">
+
+
+                <ListView
+                    android:id="@+id/maintenanceLogLV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@color/gray"
+                    android:dividerHeight="1px">
+
+                </ListView>
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+</LinearLayout>

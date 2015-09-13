@@ -1,0 +1,13 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 1/12/15.
+ */
+public class AppStateData extends BaseData {
+    public static final String VEHICLE_TYPE = "vehicle-type";
+    public static final String MOBILE_USER_ID = "vehicle-account";
+    public static final String SETTING_STAY_LOGGED = "setting-stay-logged";
+    public static final String SETTING_REMEMBER_ME = "setting-remember-me";
+    public static final String PASSWORD = "password";
+    public static final String VEHICLE_ID = "vehicle-id";
+}

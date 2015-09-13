@@ -1,0 +1,118 @@
+package com.verizontelematics.indrivemobile.adapters;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.models.data.HealthStatus;
+import com.verizontelematics.indrivemobile.models.data.VehiclePartData;
+
+import java.util.ArrayList;
+
+/**
+ * Created by Priyanga on 8/27/2014.
+ */
+public class VehicleHealthAdapter extends ArrayAdapter<HealthStatus> {
+    private static String TAG = VehicleHealthAdapter.class.getSimpleName();
+    private int textViewResourceId;
+    private ArrayList<HealthStatus> itemList;
+    private Context context;
+
+    public VehicleHealthAdapter(Context context, int textViewResourceId, ArrayList<HealthStatus> itemList) {
+
+        super(context, textViewResourceId, itemList);
+        this.itemList = itemList;
+        this.context = context;
+        this.textViewResourceId = textViewResourceId;
+    }
+
+    @Override
+    public int getCount() {
+        return this.itemList.size();
+    }
+
+
+    public HealthStatus getItemData(int position) {
+        return itemList.get(position);
+    }
+
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View row = convertView;
+
+        try {
+            ListHolder holder = null;
+            if (row == null) {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
+                        Context.LAYOUT_INFLATER_SERVICE);
+                row = inflater.inflate(textViewResourceId, parent, false);
+                holder = new ListHolder();
+                holder.txtTitle = (TextView) row.findViewById(R.id.txt_title);
+                holder.txtStatus = (TextView) row.findViewById(R.id.txt_status);
+                holder.txtDTCCode = (TextView) row.findViewById(R.id.txt_dtc_code);
+                holder.lblDTCCode = (TextView) row.findViewById(R.id.label_dtc_code);
+                holder.detailView=(ImageView)row.findViewById(R.id.service_type_arrow_btn_list);
+                row.setTag(holder);
+
+            } else {
+                holder = (ListHolder) row.getTag();
+            }
+            HealthStatus list_Obj = itemList.get(position);
+            if (list_Obj != null) {
+                // Title
+                holder.txtTitle.setText(list_Obj.getServiceArea());
+                // Status
+                String status = list_Obj.getServiceAreaStatus();
+                if (status.equals(VehiclePartData.STATUS_OK)) {
+                    holder.txtStatus.setTextColor(context.getResources().getColor(R.color.success_green));
+                    holder.txtStatus.setText(VehiclePartData.TEXT_OK);
+                } else if (status.equals(VehiclePartData.STATUS_ERROR)){
+                    holder.txtStatus.setTextColor(context.getResources().getColor(R.color.failure_red));
+                    holder.txtStatus.setText(context.getResources().getString(R.string.service_required));
+                }
+                else {
+                    holder.txtStatus.setTextColor(context.getResources().getColor(R.color.sc_yellowLightFill));
+                    holder.txtStatus.setText(context.getResources().getString(R.string.warning));
+                }
+//                holder.txtStatus.setText(status);
+                // DTC Code
+                /*String dtcCode = (String)data.get(VehiclePartData.DTC_CODE);
+                if(dtcCode!=null)
+                {
+                    holder.txtDTCCode.setText(dtcCode);
+                }else
+                {
+                    holder.txtDTCCode.setText(context.getString(R.string.not_activated));
+                }*/
+                holder.txtDTCCode.setText("Diagnostic Code :");
+                // Populating DTC in the list item for only the status of WARNING and ERROR.
+                //holder.txtDTCCode.setVisibility(status.equals(VehiclePartData.STATUS_OK) ? View.GONE : View.VISIBLE);
+                holder.lblDTCCode.setVisibility(status.equals(VehiclePartData.STATUS_OK)? View.GONE : View.VISIBLE);
+                holder.detailView.setVisibility(status.equals(VehiclePartData.STATUS_OK) ? View.INVISIBLE : View.VISIBLE);
+//                holder.txtDTCCode.setVisibility(dtcCode.isEmpty() || status.equals(VehiclePartData.STATUS_OK) ? View.GONE : View.VISIBLE);
+//                holder.lblDTCCode.setVisibility(dtcCode.isEmpty() || status.equals(VehiclePartData.STATUS_OK)? View.GONE : View.VISIBLE);
+                // Disabling the detailed view if status is OK, only going to detailed view on status of WARNING and ERROR.
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return row;
+    }
+
+
+    // static Holder class to increase the performance of the list view
+    static class ListHolder {
+        TextView txtTitle = null;
+        TextView txtStatus = null;
+        TextView txtDTCCode = null;
+        TextView lblDTCCode = null;
+        ImageView detailView = null;
+    }
+}

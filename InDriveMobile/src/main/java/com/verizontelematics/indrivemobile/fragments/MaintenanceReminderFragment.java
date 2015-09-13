@@ -1,0 +1,730 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.IndriveApplication;
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.CreateMaintenanceReminderActivity;
+import com.verizontelematics.indrivemobile.activity.HomeActivity;
+import com.verizontelematics.indrivemobile.activity.MaintenanceReminderDetailActivity;
+import com.verizontelematics.indrivemobile.adapters.cursoradapters.MaintenanceLogCursorAdapter;
+import com.verizontelematics.indrivemobile.adapters.cursoradapters.MaintenanceReminderCursorAdapter;
+import com.verizontelematics.indrivemobile.controllers.AppController;
+import com.verizontelematics.indrivemobile.controllers.DiagnosticController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.database.StorageTransaction;
+import com.verizontelematics.indrivemobile.database.tables.MaintenanceReminderTable;
+import com.verizontelematics.indrivemobile.models.MaintenanceRemindersModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.MaintenanceReminderData;
+import com.verizontelematics.indrivemobile.userprofile.UserFactory;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.userprofile.utils.UserUtils;
+import com.verizontelematics.indrivemobile.utils.GoogleAnalyticsUtil;
+import com.verizontelematics.indrivemobile.utils.ui.DBUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+
+
+/**
+ * Created by Z681639 on 8/28/2014.
+ */
+
+public class MaintenanceReminderFragment extends BaseSubUIFragment implements UIInterface, Observer,HomeActivity.CustomTopBarItemsClickListener, UserRoleConstants {
+
+    private ListView mMaintenanceAlertList;
+    private String TAG = MaintenanceInformationFragment.class.getCanonicalName();
+    private int mContainerId = R.id.container_id_diagnostics;
+    public static MaintenanceLogCursorAdapter mCursorAdapter;
+    private static MaintenanceReminderCursorAdapter mAlertsCursorAdapter;
+    private ImageView mAlertInfoIV;
+    private static ImageView imgBtnAddRemainder;
+    public static ImageView imgBtnAddLog;
+    private TextView empty_Alert_TV;
+    private int logs_Count;
+    private String lMessage;
+    private SwipeRefreshLayout mLogsRefreshLayout;
+    private boolean isAddRemainderActiveInConfig = true;
+    private boolean isEditActiveInConfig = true;
+    private TextView mTxtViewAddRemainder;
+
+    public static final String PRE_EXISTS_SERVICE_TYPE ="PRE_EXISTS_SERVICE_TYPE";
+
+
+
+    ArrayList<Integer> lstDisableServiceTypes;
+    private SwipeRefreshLayout mAlertsRefreshLayout;
+    private boolean mProgress = false;
+
+
+    public MaintenanceReminderFragment(){
+//        Empty constructor
+    }
+
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+
+           // getActivity().setTitle(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[1]);
+            //getActivity().setTitle("Edit Log Entry");
+
+        }
+        else {
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //getActivity().setTitle(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[1]);
+
+        //Getting the list item counts to show the visibility accordingly
+        int alerts_Count = mMaintenanceAlertList.getCount();
+        if (alerts_Count == 0) {
+            empty_Alert_TV.setVisibility(TextView.VISIBLE);
+        } else {
+            empty_Alert_TV.setVisibility(TextView.INVISIBLE);
+        }
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+
+
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = null;
+       /* if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            rootView = inflater.inflate(R.layout.fragment_maintenancelog_alert_land, container, false);
+        } else {*/
+            rootView = inflater.inflate(R.layout.fragment_maintenance_reminders, container, false);
+        //}
+        init(rootView);
+        setListenersForSaveCancel();
+
+        // Hack to not propagate touch events to fragment.
+        rootView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+        new GoogleAnalyticsUtil().trackScreens(IndriveApplication.getInstance(),getResources().getString(R.string.screen_maintenance_remainder));
+        return rootView;
+
+    }
+
+    private void init(View rootView) {
+
+        empty_Alert_TV= (TextView)rootView.findViewById(R.id.emptyAlertTV);
+        TextView empty_Log_TV = (TextView) rootView.findViewById(R.id.emptyLogTV);
+        mTxtViewAddRemainder = (TextView) rootView.findViewById(R.id.maintenanceAlertTV);
+
+        lMessage = getResources().getString(R.string.error_occurred);
+
+        if (getArguments() != null) {
+            initUserRoleConfigs();
+
+            mContainerId = getArguments().getInt("container", R.id.container_id_diagnostics);
+        }
+
+
+
+        // Maintenance Alert Logs list
+        ListView maintenanceListView = (ListView) rootView.findViewById(R.id.maintenanceLogLV);
+        ImageView mLogInfoIV = (ImageView) rootView.findViewById(R.id.btn_info_maintenance_log);
+        mAlertInfoIV = (ImageView)rootView.findViewById(R.id.btn_info_maintenance_alert);
+        populateMaintenanceLogs();
+        mMaintenanceAlertList = (ListView) rootView.findViewById(R.id.maintenance_alerts_list);
+        setListClickListener();
+        setClickListeners();
+
+        mMaintenanceAlertList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                if (mAlertsCursorAdapter == null)
+                    return;
+                Cursor cursor =(Cursor) mAlertsCursorAdapter.getItem(position);
+                if (cursor == null)
+                    return;
+
+                StorageTransaction transaction = new StorageTransaction(getActivity().getApplicationContext());
+                MaintenanceReminderData reminderData = transaction.getMaintenanceReminder(cursor);
+                if (reminderData == null)
+                    return;
+
+
+                launchActivity(MaintenanceReminderDetailActivity.class,"maintenanceRemaindersViewEditButton",reminderData);
+
+//                Intent detailIntent = new Intent(getActivity(), MaintenanceReminderDetailActivity.class);
+//                detailIntent.putExtra("selected_data",reminderData);
+//                startActivity(detailIntent);
+
+
+                //Prepare parcel with selected reminder.
+                /*Bundle reminderDetailedArguments = new Bundle();
+                reminderDetailedArguments.putParcelable("selected_data", reminderData);
+
+
+                // Edit Alert
+                android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+
+                MaintenanceReminderDetailedFragment fragment = new MaintenanceReminderDetailedFragment();
+                fragment.setHomeFragment(getHomeFragment());
+
+                fragment.setArguments(reminderDetailedArguments);
+                // launch fragment.
+                ft.addToBackStack("MaintenanceReminderDetailedFragment");
+                ft.replace(mContainerId, fragment, "MaintenanceReminderDetailedFragment");
+                ft.commit();
+                getHomeFragment().pushFragmentStack("MaintenanceReminderDetailedFragment");*/
+            }
+        });
+
+
+        imgBtnAddLog = (ImageView)rootView.findViewById(R.id.btn_create_log);
+
+        // add alert Button click listener
+        imgBtnAddRemainder = (ImageView)rootView.findViewById(R.id.btn_create_alert);
+        imgBtnAddRemainder.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+               /* Log.d(TAG,"$$$ onClicked remainder button...");
+                if(!imgBtnAddRemainder.isEnabled()){
+                    Log.d(TAG,"$$$ remainder button not enabled ");
+                    return;
+                }
+                //imgBtnAddLog.setEnabled(false);
+                Log.d(TAG,"$$$ log button disabled");
+                // add geofence fragment.
+                android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                //ft.setCustomAnimations(R.anim.abc_slide_in_bottom, R.anim.abc_slide_out_bottom, R.anim.abc_slide_in_bottom, R.anim.abc_slide_out_bottom);
+                ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+
+                CreateMaintenanceReminderFragment createMaintenanceReminderFragment = new CreateMaintenanceReminderFragment();
+                createMaintenanceReminderFragment.setHomeFragment(getHomeFragment());
+
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(PRE_EXISTS_SERVICE_TYPE, lstDisableServiceTypes);
+                createMaintenanceReminderFragment.setArguments(bundle);
+                ft.addToBackStack("CreateMaintenanceAlert");
+                ft.replace(mContainerId, createMaintenanceReminderFragment, "CreateMaintenanceAlert");
+                ft.commit();
+                getHomeFragment().pushFragmentStack("CreateMaintenanceAlert");*/
+                if (mProgress)
+                    return;
+
+                new GoogleAnalyticsUtil().trackEvents(IndriveApplication.getInstance(),getResources().getString(R.string.category_diagnostics),
+                        "DiagnosticsAddReminder");
+
+//                Intent createReminderIntent = new Intent( getActivity(),CreateMaintenanceReminderActivity.class);
+//                createReminderIntent.putIntegerArrayListExtra(PRE_EXISTS_SERVICE_TYPE,lstDisableServiceTypes);
+//                startActivity(createReminderIntent);
+                if(UserUtils.isUserInactive(getActivity(),UserRoleConstants.inactiveMessage)){
+                    return;
+                }
+                launchActivity(CreateMaintenanceReminderActivity.class,"maintenanceRemainderAdd");
+            }
+        });
+
+        mTxtViewAddRemainder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mProgress)
+                    return;
+                launchActivity(CreateMaintenanceReminderActivity.class,"maintenanceRemainderAdd");
+            }
+        });
+
+
+
+       // getActivity().setTitle(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[1]);
+
+        mAlertsRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.maintenance_alerts_list_swipe_refresh);
+        mAlertsRefreshLayout.setColorSchemeResources(R.color.diagnostics_code, R.color.sub_header_color, R.color.diagnostics_code, R.color.sub_header_color);
+        mAlertsRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d(TAG, "onRefresh() maintenance reminders ");
+                // once job done setRefresh to false.
+                mAlertsRefreshLayout.setRefreshing(true);
+                // perform controller refresh operation
+                DiagnosticController.instance().getMaintenanceLogs(getActivity());
+
+            }
+        });
+
+        // by default in initial state views will be in refreshing state.
+        if (mAlertsRefreshLayout != null)
+            mAlertsRefreshLayout.setRefreshing(true);
+        /*if (mLogsRefreshLayout != null)
+            mLogsRefreshLayout.setRefreshing(true);*/
+
+        setupCallbacks();
+
+
+        // work around to smooth the animation.
+        // But code need to be removed
+        // Actual fix : perform on animation end.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                DiagnosticController.instance().getMaintenanceLogs(getActivity());
+
+            }
+        }, 1000);
+        // work around end.
+
+    }
+
+    private void initUserRoleConfigs(){
+        Log.d(TAG," user  from server "+UserFactory.getCurrentUser()+" user role from server "+UserFactory.getCurrentUserRole());
+
+    }
+
+
+    private void launchActivity(Class activity,String subModule){
+//        activity = UserFactory.getInstance(getActivity()).getActivityView(activity,subModule);
+//        if(UserUtils.isUserInactive(getActivity(),inactiveMessage)){
+//            return;
+//        }
+        Intent intent = UserFactory.getInstance(getActivity()).getActivityViewIntent(getActivity(),
+                activity,subModule);//new Intent(getActivity(),activity);
+        intent.putIntegerArrayListExtra(PRE_EXISTS_SERVICE_TYPE,lstDisableServiceTypes);
+        startActivity(intent);
+    }
+
+    private void launchActivity(Class activity,String subModule,MaintenanceReminderData reminderData){
+
+//        if(UserUtils.isUserInactive(getActivity(),inactiveMessage)){
+//            return;
+//        }
+
+        Intent intent = UserFactory.getInstance(getActivity()).getActivityViewIntent(getActivity(),
+                activity,subModule);
+        intent.putExtra("selected_data",reminderData);
+        startActivity(intent);
+//        Intent detailIntent = new Intent(getActivity(), MaintenanceReminderDetailActivity.class);
+//        detailIntent.putExtra("selected_data",reminderData);
+//        startActivity(detailIntent);
+    }
+
+
+
+
+
+
+    private void setListClickListener(){
+
+        mMaintenanceAlertList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if(UserUtils.isUserInactive(getActivity(),inactiveMessage)){
+                    return true;
+                }
+                showConfirmation(position,"reminder");
+                return true;
+            }
+        });
+
+
+    }
+
+    private void showConfirmation(final int position, final String type){
+        if(type.equals("log")) {
+
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getResources().getString(R.string.maintenance_log))
+                    .setMessage(getResources().getString(R.string.alert_delete))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                            //removeLogEntry(position);
+
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
+        }
+        else{
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getResources().getString(R.string.delete_maintenance_reminder_header)) //maintenance_reminders
+                    .setMessage(getResources().getString(R.string.alert_delete))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                            deleteReminderEntry(position);
+                            addButtonVisibility();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
+        }
+    }
+
+    private void addButtonVisibility(){
+        StorageTransaction transaction = new StorageTransaction(getActivity().getApplicationContext());
+        boolean showAddButton = makeMaintenanceAddVisibility(transaction);
+        if(!showAddButton){
+            imgBtnAddRemainder.setVisibility(View.INVISIBLE);
+            mTxtViewAddRemainder.setVisibility(View.INVISIBLE);
+        }else{
+            imgBtnAddRemainder.setVisibility(View.VISIBLE);
+            mTxtViewAddRemainder.setVisibility(View.VISIBLE);
+        }
+//        lstDisableServiceTypes = new ArrayList<Integer>();
+    }
+
+    private void setClickListeners(){
+
+        mAlertInfoIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new GoogleAnalyticsUtil().trackEvents(IndriveApplication.getInstance(),getResources().getString(R.string.category_help),
+                        "DiagnosticsReminderHelp");
+                showTerms("REMINDERS");
+            }
+        });
+    }
+
+    private void showTerms(String title){
+        DBUtils.pullDbFromLocalStorageToSDCard();
+        ToBeDecidedDialog dialog = new ToBeDecidedDialog(getActivity(),getActivity().getResources().getString(R.string.info_reminder));
+        if (title.equals("LOGS"))
+            dialog.setTitle(getResources().getString(R.string.about_logs));
+        else if (title.equals("REMINDERS"))
+            dialog.setTitle(getResources().getString(R.string.about_reminders));
+
+        dialog.show();
+    }
+
+    // this should not be position it should be id.
+
+
+    private void deleteReminderEntry(int position){
+        Log.d(TAG,"$$$ deleteReminderEntry "+position);
+        /*StorageTransaction transaction = new StorageTransaction(getActivity().getApplicationContext());
+        transaction.removeRowForIdAndColumn(position,MaintenanceReminderTable.TABLE_NAME_MAINTENANCE_REMINDER, MaintenanceReminderTable.COLUMN_MAINTENANCE_Id);
+        mAlertsCursorAdapter.changeCursor(new StorageTransaction(getActivity()).getAllData(MaintenanceReminderTable.TABLE_NAME_MAINTENANCE_REMINDER, new boolean[]{false,true}, MaintenanceReminderTable.COLUMN_REMINDER_DATE, MaintenanceReminderTable.COLUMN_REMINDER_NAME));
+*/
+//      CHECK WITH THE SERVICES
+        Cursor cursor = (Cursor) mAlertsCursorAdapter.getItem(position);
+
+        if (cursor == null) {
+            return;
+        }
+        Log.d(TAG, " delete reminder id "+cursor.getString(cursor.getColumnIndex(MaintenanceReminderTable.COLUMN_REMINDER_ID)));
+        ArrayList<String> serviceIds = new ArrayList<String>();
+        serviceIds.add(cursor.getString(cursor.getColumnIndex(MaintenanceReminderTable.COLUMN_REMINDER_ID)));
+        DiagnosticController.instance().deleteMaintenanceReminders(getActivity(), serviceIds);
+    }
+
+
+    private void showEditMode(int aIndex) {
+        // not allowed to launch when status is in pending.
+        if (mLogsRefreshLayout.isRefreshing())
+            return;
+        android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+        CreateMaintenanceLogFragment fragment = new CreateMaintenanceLogFragment();
+
+        // pass arguments with selected index and edit mode
+        Bundle editAlertArguments = new Bundle();
+        // edit_mode is true
+        editAlertArguments.putBoolean("edit_mode", true);
+        // selected index
+        editAlertArguments.putInt("selected_index", aIndex);
+        //editAlertArguments.putString("title", "edit");
+        fragment.setArguments(editAlertArguments);
+        // launch fragment.
+        ft.addToBackStack("EditMaintenanceLog");
+        ft.replace(mContainerId, fragment,"EditMaintenanceLog");
+        ft.commit();
+        getHomeFragment().pushFragmentStack("EditMaintenanceLog");
+    }
+
+    private void  populateMaintenanceLogs(){
+
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+
+
+                StorageTransaction transaction = new StorageTransaction(getActivity().getApplicationContext());
+
+                mAlertsCursorAdapter = new MaintenanceReminderCursorAdapter(getActivity().getApplicationContext(),transaction.getAllData(MaintenanceReminderTable.TABLE_NAME_MAINTENANCE_REMINDER,new boolean[]{false,true},MaintenanceReminderTable.COLUMN_REMINDER_DATE,MaintenanceReminderTable.COLUMN_SERVICE_NAME),false);
+                mMaintenanceAlertList.setAdapter(mAlertsCursorAdapter);
+                boolean showAddButton = makeMaintenanceAddVisibility(transaction);
+                if(!showAddButton){
+                    imgBtnAddRemainder.setVisibility(View.INVISIBLE);
+                    mTxtViewAddRemainder.setVisibility(View.INVISIBLE);
+                }
+                mAlertsCursorAdapter.registerDataSetObserver(new DataSetObserver() {
+                    @Override
+                    public void onChanged() {
+                        if( mAlertsCursorAdapter.getCount() == 0){
+                            empty_Alert_TV.setVisibility(TextView.VISIBLE);
+                        }else{
+                            empty_Alert_TV.setVisibility(TextView.INVISIBLE);
+                        }
+                        if (mAlertsCursorAdapter.getCount() == 3){
+                            imgBtnAddRemainder.setVisibility(View.INVISIBLE);
+                            mTxtViewAddRemainder.setVisibility(View.INVISIBLE);
+                        }
+                        else{
+                            imgBtnAddRemainder.setVisibility(View.VISIBLE);
+                            mTxtViewAddRemainder.setVisibility(View.VISIBLE);
+                        }
+
+                    }
+                });
+
+                // give a start call.
+
+                mAlertsCursorAdapter.notifyDataSetChanged();
+
+            }
+        });
+    }
+
+    private boolean makeMaintenanceAddVisibility(StorageTransaction transaction){
+        lstDisableServiceTypes = new ArrayList<Integer>();
+
+        ArrayList<MaintenanceReminderData> lstAlerts = transaction.getAllMaintenanceReminders();
+        boolean retFlag = true;
+        String[] predefinedServiceTypes = getActivity().getResources().getStringArray(R.array.maintenance_service_types);
+        int alreadyExist = 0;
+        if(lstAlerts != null) {
+            for (int i = 0; i < predefinedServiceTypes.length; i++) {
+                String predefinedServiceType = predefinedServiceTypes[i];
+
+                for (MaintenanceReminderData maintenanceReminderData : lstAlerts) {
+                    String serviceType = maintenanceReminderData.getServiceType();
+
+                    if (serviceType.trim().equalsIgnoreCase(predefinedServiceType)) {
+
+                        lstDisableServiceTypes.add(i);
+                        alreadyExist++;
+                        break;
+                    }
+                }
+            }
+            if (alreadyExist == 3) {
+                retFlag = false;
+            }
+        }
+
+        return retFlag;
+    }
+
+
+    @Override
+    public void onProgress(Operation opr) {
+        if (opr.getId() ==  Operation.OperationCode.GET_MAINTENANCE_REMINDERS.ordinal()
+                || opr.getId() == Operation.OperationCode.GET_MAINTENANCE_LOGS.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_REMINDERS.ordinal()) {
+            if (mAlertsRefreshLayout != null && !mAlertsRefreshLayout.isRefreshing())
+                mAlertsRefreshLayout.setRefreshing(true);
+            mProgress = true;
+        }
+    }
+
+    @Override
+    public void onError(Operation opr) {
+
+        if (opr.getId() ==  Operation.OperationCode.GET_MAINTENANCE_REMINDERS.ordinal()
+                || opr.getId() == Operation.OperationCode.GET_MAINTENANCE_LOGS.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_REMINDERS.ordinal()) {
+            mProgress = false;
+            if (mAlertsRefreshLayout != null && mAlertsRefreshLayout.isRefreshing())
+                mAlertsRefreshLayout.setRefreshing(false);
+//            if (mLogsRefreshLayout != null && mLogsRefreshLayout.isRefreshing())
+//                mLogsRefreshLayout.setRefreshing(false);
+
+//            String lMessage = getResources().getString(R.string.error_occured);//"Error occured  ";
+            if (opr != null && opr.getInformation() != null) {
+                lMessage += opr.getInformation();
+            }
+            if (getActivity() != null) {
+                Toast.makeText(getActivity(),  lMessage, Toast.LENGTH_SHORT).show();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        populateMaintenanceLogs();
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_MAINTENANCE_REMINDERS.ordinal()
+                || opr.getId() == Operation.OperationCode.GET_MAINTENANCE_LOGS.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_REMINDERS.ordinal()) {
+            mProgress = false;
+            if (mAlertsRefreshLayout != null && mAlertsRefreshLayout.isRefreshing())
+                mAlertsRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        cleanup();
+        ((HomeActivity)getActivity()).hideCustomActionBar("Diagnostics");
+    }
+
+    @Override
+    public void update(final Observable observable, final Object o) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(MaintenanceRemindersModel.class.isInstance(observable)){
+                    // we have got new logs.
+                    StorageTransaction transaction = new StorageTransaction(getActivity());
+                    transaction.deleteAllDataForTable(MaintenanceReminderTable.TABLE_NAME_MAINTENANCE_REMINDER);
+                    if (o != null) {
+                        List<MaintenanceReminderData> reminders = (List<MaintenanceReminderData>) o;
+                        transaction.insertBulkMaintenanceReminders(reminders);
+                    }
+                }
+                populateMaintenanceLogs();
+            }
+        });
+    }
+
+    /*@Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (getActivity() == null)
+            return;
+
+        LayoutInflater inflater = (LayoutInflater) getActivity().getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        if (inflater == null) {
+            return;
+        }
+
+        View newView = null;
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            newView = inflater.inflate(R.layout.fragment_maintenancelog_alert_land, null);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            newView = inflater.inflate(R.layout.fragment_maintenancelog_alert, null);
+        }
+
+        if (newView == null)
+            return;
+
+        ViewGroup rootView = (ViewGroup) getView();
+        rootView.removeAllViews();
+        // Temp fix
+        // It supposed to be in onPause or onDestroyView
+
+        rootView.addView(newView);
+        cleanup();
+        // setup
+        init(rootView);
+    }*/
+
+    private void setupCallbacks() {
+        DiagnosticController.instance().register(this);
+        //DiagnosticController.instance().getMaintenanceLogsModel().addObserver(this);
+        DiagnosticController.instance().getMaintenanceRemindersModel().addObserver(this);
+    }
+
+    private void cleanup() {
+        DiagnosticController.instance().unregister(this);
+        //DiagnosticController.instance().getMaintenanceLogsModel().deleteObserver(this);
+        DiagnosticController.instance().getMaintenanceRemindersModel().deleteObserver(this);
+    }
+    @Override
+    public void onTopBarItemClick(View aView) {
+        if (aView.getId() == HomeActivity.LEFT_ARROW_ID) {
+//            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+//            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+//            DiagnosticsFragment diagnosticsHome = new DiagnosticsFragment();
+//            transaction.replace(R.id.mainRemindersLL, diagnosticsHome);
+//            transaction.commit();
+            //getFragmentManager().popBackStack();
+            removeFragment();
+            ((HomeActivity) getActivity()).removeFromDoneButtonHandlers(this);
+            ((HomeActivity) getActivity()).removeFromLeftArrowHandlers(this);
+            ((HomeActivity) getActivity()).setCustomActionBarView(getActivity().getResources().getString(R.string.create_log_entry), false, true, true,false);
+        }
+    }
+
+    private void removeFragment() {
+        getHomeFragment().popFragmentStack();
+    }
+
+    private void setListenersForSaveCancel() {
+        ((HomeActivity) getActivity()).addToDoneButtonClickHandlers(this);
+        ((HomeActivity) getActivity()).addToLeftArrowClickHandlers(this);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        ((HomeActivity) activity).setCustomActionBarView(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[1],
+                true, false, false,false);
+
+    }
+
+}

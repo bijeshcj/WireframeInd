@@ -1,0 +1,71 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 2/25/15.
+ */
+public class UserAccountData extends BaseData {
+
+    private String FirstName;
+    private String LastName;
+    private String AccountID;
+    private String MobileUserID;
+    private String Email;
+    private String Phone;
+
+    public UserAccountData() {
+        super();
+    }
+    public String getFirstName() {
+        return FirstName;
+    }
+
+    public void setFirstName(String firstName) {
+        FirstName = firstName;
+    }
+
+    public String getLastName() {
+        return LastName;
+    }
+
+    public void setLastName(String lastName) {
+        LastName = lastName;
+    }
+
+    public String getAccountID() {
+        return AccountID;
+    }
+
+    public void setAccountID(String accountID) {
+        AccountID = accountID;
+    }
+
+    public String getMobileUserID() {
+        return MobileUserID;
+    }
+
+    public void setMobileUserID(String mobileUserID) {
+        MobileUserID = mobileUserID;
+    }
+
+    public String getEmail() {
+        return Email;
+    }
+
+    public void setEmail(String email) {
+        Email = email;
+    }
+
+    public String getPhone() {
+        return Phone;
+    }
+
+    public void setPhone(String phone) {
+        Phone = phone;
+    }
+
+
+    @Override
+    public String toString() {
+        return UserAccountData.class.getSimpleName()+" email : "+Email;
+    }
+}

@@ -1,0 +1,109 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/time_period"
+                tools:context="com.verizontelematics.indrivemobile.activity.CustomerSupportActivity">
+
+    <include
+        android:id="@+id/headerRL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <LinearLayout
+        android:id="@+id/supportCenterRL"
+        android:layout_below="@id/headerRL"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/supportCenterHeaderTV"
+            android:text="@string/support_center"
+            android:textColor="@color/diagnostics_text_color"
+            android:textSize="@dimen/header_text_size"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/list_item_top_margin"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/supportCenterDetailTV"
+            android:layout_width="wrap_content"
+            android:textColor="@color/diagnostics_text_color"
+            android:layout_margin="@dimen/list_item_top_margin"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/list_item_top_margin"
+            android:contentDescription="@string/separator_cd"
+            android:src="@color/diagnostics_text_color"
+            android:layout_height="0.5dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/accountCenterRL"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_below="@id/supportCenterRL"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/accountCenterHeaderTV"
+            android:text="@string/account_center"
+            android:textColor="@color/diagnostics_text_color"
+            android:textSize="@dimen/header_text_size"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/list_item_top_margin"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/accountCenterDetailTV"
+            android:layout_width="wrap_content"
+            android:textColor="@color/diagnostics_text_color"
+            android:layout_margin="@dimen/list_item_top_margin"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/list_item_top_margin"
+            android:contentDescription="@string/separator_cd"
+            android:src="@color/diagnostics_text_color"
+            android:layout_height="0.5dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/stolenVehicleAssistRL"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_below="@id/accountCenterRL"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/stolenVehicleHeaderTV"
+            android:text="@string/stolen_vehicle_assistance"
+            android:textColor="@color/diagnostics_text_color"
+            android:textSize="@dimen/header_text_size"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/list_item_top_margin"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/stolenVehicleDetailTV"
+            android:layout_width="wrap_content"
+            android:textColor="@color/diagnostics_text_color"
+            android:layout_margin="@dimen/list_item_top_margin"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/list_item_top_margin"
+            android:src="@color/diagnostics_text_color"
+            android:contentDescription="@string/separator_cd"
+            android:layout_height="0.5dp"/>
+    </LinearLayout>
+</RelativeLayout>

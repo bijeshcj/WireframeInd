@@ -1,0 +1,147 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.verizontelematics.indrivemobile.activity.LocationAddAlertsActivity">
+
+    <include
+        android:id="@+id/headerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
+
+        >
+
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/addLocationMapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <com.verizontelematics.indrivemobile.customViews.CustomDrawer1
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+
+            android:id="@+id/customDrawer"
+            android:visibility="invisible"
+            android:layout_margin="0dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:orientation="vertical"
+            android:layout_margin="@dimen/list_item_left_margin"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="2"
+                android:gravity="center"
+                >
+
+                <EditText
+                    android:id="@+id/findLocationET"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.95"
+                    android:background="@color/semi_black"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:layout_marginTop="@dimen/search_address_top_margin"
+                    android:layout_marginBottom="@dimen/search_address_top_margin"
+                    android:layout_marginRight="@dimen/search_address_top_margin"
+                    android:layout_marginEnd="@dimen/search_address_top_margin"
+                    />
+
+                <ImageButton
+                    android:id="@+id/locateIV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/locate_icon"
+                    android:contentDescription="@string/locate_cd"
+                    />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:id="@+id/mapDrawControllers"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/radius"
+                    android:id="@+id/btnRadius"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/draw"
+                    android:id="@+id/btnDraw"
+                    tools:ignore="ButtonStyle"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/list_item_top_margin"
+            android:layout_marginRight="@dimen/list_item_right_margin"
+            android:layout_marginEnd="@dimen/list_item_right_margin"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.75"
+                android:text="@string/map_locked"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/info_location_alerts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/info_button"
+                android:contentDescription="@string/info_img_cd"
+                />
+        </LinearLayout>
+    </FrameLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnDone"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/clear"
+        android:layout_marginBottom="@dimen/list_item_top_margin"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:layout_marginRight="@dimen/list_item_right_margin"
+        android:layout_marginEnd="@dimen/list_item_right_margin"
+        android:visibility="gone"/>
+</RelativeLayout>

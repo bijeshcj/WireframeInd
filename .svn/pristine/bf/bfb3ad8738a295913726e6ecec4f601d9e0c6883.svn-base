@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_bg"
+                tools:context="com.verizontelematics.indrivemobile.activity.TermsConditionsActivity">
+
+    <RelativeLayout
+        android:id="@+id/privacyPolicyRL"
+        android:layout_width="300dp"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/privacyPolicyHeaderTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            android:text="@string/privacy_policy"/>
+
+        <CheckBox
+            android:id="@+id/policyCB"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/privacyPolicyHeaderTV"
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/header_text_size"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/privacyPolicyConditionsTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/privacyPolicyHeaderTV"
+            android:layout_toRightOf="@id/policyCB"
+            android:layout_toEndOf="@id/policyCB"
+            android:layout_height="wrap_content"
+            android:text="@string/privacy_policy_conditions"/>
+
+        <TextView
+            android:id="@+id/privacyPolicyTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/privacyPolicyConditionsTV"
+            android:layout_height="wrap_content"
+            android:text="@string/privacy_policy_text"/>
+
+        <TextView
+            android:id="@+id/customerAgreementTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/privacyPolicyTV"
+            android:layout_height="wrap_content"
+            android:text="@string/customer_agreement_text"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:text="@string/submit"
+            android:id="@+id/submitBTN"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/customerAgreementTV"
+            android:layout_marginTop="@dimen/form_labels_text_height"/>
+
+    </RelativeLayout>
+</RelativeLayout>

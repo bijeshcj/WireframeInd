@@ -1,0 +1,14 @@
+package com.verizontelematics.indrivemobile.httpwrapper;
+
+
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonRestClient;
+
+public class RestClientFactory {
+    private RestClientFactory() {
+
+    }
+
+    public static synchronized RestClient getDefaultRestClient() {
+        return VerizonRestClient.getInstance();
+    }
+}

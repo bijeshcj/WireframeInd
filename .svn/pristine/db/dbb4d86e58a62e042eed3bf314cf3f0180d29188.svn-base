@@ -1,0 +1,172 @@
+
+package com.verizontelematics.indrivemobile.models.data;
+
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class LocationAlert implements Parcelable,Comparable<LocationAlert> {
+
+
+    private String AlertName;
+
+    private Integer AlertId;
+
+    private String AlertTrigger;
+
+    private ShapeType Shape;
+
+    private ScheduleType Schedule;
+
+    private String Status;
+
+
+    @Override
+    public int compareTo(LocationAlert compareObj) {
+        String compareAlertName =compareObj.getAlertName();
+        /* For Ascending order*/
+        return this.AlertName.compareTo(compareAlertName);
+    }
+
+    @Override
+    public String toString() {
+        double radius = 0;
+        int vertices = 0;
+        if(Shape != null){
+            if(Shape.getCircle() != null)
+                radius = Shape.getCircle().getRadius();
+            if(Shape.getPolygon() != null)
+                if(Shape.getPolygon().getVertices() != null)
+                vertices = Shape.getPolygon().getVertices().size();
+        }
+        return "LocationAlert: Alert Name "+AlertName+" Status "+Status+" Shape Type: Circle radius  "+radius+
+        " Polygon "+vertices;
+    }
+
+    /**
+     * 
+     * @return
+     *     The AlertName
+     */
+    public String getAlertName() {
+        return AlertName;
+    }
+
+    /**
+     * 
+     * @param AlertName
+     *     The AlertName
+     */
+    public void setAlertName(String AlertName) {
+        this.AlertName = AlertName;
+    }
+
+    /**
+     * 
+     * @return
+     *     The AlertId
+     */
+    public Integer getAlertId() {
+        return AlertId;
+    }
+
+    /**
+     * 
+     * @param AlertId
+     *     The AlertId
+     */
+    public void setAlertId(Integer AlertId) {
+        this.AlertId = AlertId;
+    }
+
+    /**
+     * 
+     * @return
+     *     The Status
+     */
+    public String getStatus() {
+        return Status;
+    }
+
+    /**
+     *
+     * @param Status
+     *     The Status
+     */
+    public void setStatus(String Status) {
+        this.Status = Status;
+    }
+
+    public String getAlertTrigger() {
+        return AlertTrigger;
+    }
+
+    public void setAlertTrigger(String alertTrigger) {
+        AlertTrigger = alertTrigger;
+    }
+
+    public ShapeType getShape() {
+        return Shape;
+    }
+
+    public void setShape(ShapeType shape) {
+        Shape = shape;
+    }
+
+    public ScheduleType getSchedule() {
+        return Schedule;
+    }
+
+    public void setSchedule(ScheduleType schedule) {
+        Schedule = schedule;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public LocationAlert() {
+    }
+
+    public LocationAlert(String alertName, Integer alertId, String alertTrigger, ShapeType shape, ScheduleType schedule, String status) {
+        AlertName = alertName;
+        AlertId = alertId;
+        AlertTrigger = alertTrigger;
+        Shape = shape;
+        Schedule = schedule;
+        Status = status;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(AlertName);
+        parcel.writeInt(AlertId);
+        parcel.writeString(AlertTrigger);
+        parcel.writeParcelable(Shape, i);
+        parcel.writeParcelable(Schedule, i);
+        parcel.writeString(Status);
+    }
+
+    public LocationAlert(Parcel in) {
+        AlertName = in.readString();
+        AlertId = in.readInt();
+        AlertTrigger = in.readString();
+        Shape = in.readParcelable(ShapeType.class.getClassLoader());
+        Schedule = in.readParcelable(ScheduleType.class.getClassLoader());
+        Status = in.readString();
+    }
+
+    public static Creator<LocationAlert> CREATOR = new Creator<LocationAlert>() {
+        @Override
+        public LocationAlert createFromParcel(Parcel parcel) {
+            return (new LocationAlert(parcel));
+        }
+
+        @Override
+        public LocationAlert[] newArray(int size) {
+            return new LocationAlert[size];
+        }
+    };
+
+}

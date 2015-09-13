@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/alert_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/alert_history"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:background="@color/gray"
+        android:paddingLeft="20dp"
+        android:paddingEnd="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@id/alert_title"
+            android:id="@+id/geoHistoryListView"/>
+
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="@string/view_all"
+        android:textSize="20sp"
+        android:id="@+id/btn_viewAll"
+        android:layout_below="@+id/geoHistoryListView"
+        android:layout_centerInParent="true"
+        android:background="@drawable/curved_gray_button"
+        />
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_settings"
+        android:layout_below="@+id/btn_viewAll"
+        >
+
+        <TextView
+            android:id="@+id/alert_settings_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/alert_settings"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:background="@color/gray"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imgBtn_add"
+            android:contentDescription="@string/add_btn_cd"
+            android:layout_centerVertical="true"
+            android:src="@android:drawable/ic_input_add"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            />
+
+        </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_settings"
+        android:id="@+id/geo_settings_alert"
+        >
+
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:id="@+id/geoAlertSettingsListView"/>
+
+    </RelativeLayout>
+
+
+
+
+
+
+
+    </RelativeLayout>
+
+</ScrollView>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="1.7" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/InDriveMobile" />
+            <option value="$PROJECT_DIR$/MPChartLib" />
+            <option value="$PROJECT_DIR$/NumberPickerLib" />
+            <option value="$PROJECT_DIR$/android-volley-master" />
+            <option value="$PROJECT_DIR$/captureActivity" />
+            <option value="$PROJECT_DIR$/google-play-services_lib" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

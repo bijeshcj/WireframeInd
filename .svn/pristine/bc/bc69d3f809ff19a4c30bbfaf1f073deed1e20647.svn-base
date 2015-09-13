@@ -1,0 +1,331 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.AlertHistoryActivity;
+import com.verizontelematics.indrivemobile.activity.AlertsSettingsActivity;
+import com.verizontelematics.indrivemobile.activity.HomeActivity;
+import com.verizontelematics.indrivemobile.adapters.HomeMenuAdapter;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.models.AlertsDataModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.Alert;
+
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Created by bijesh on 8/20/2014.
+ */
+public class AlertsFragment extends BaseUIScreenFragment implements Observer,UIInterface{
+
+    private static final String TAG = AlertsFragment.class.getSimpleName();
+    private ListView alertsLV;
+    /*private final String mFragmentLabels[] = new String[]{
+            "Alert Settings"
+            , "Alert History"
+    };*/
+
+    public AlertsFragment() {
+        super();
+        BaseUIScreenFragment mHomeFragment = this;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.fragment_alert, container, false);
+        alertsLV = (ListView) rootView.findViewById(R.id.alertsLV);
+        setHeaderFooterDivider();
+        mActivity.setTitle(getResources().getStringArray(R.array.alerts_option_list_array)[0]);
+        mActivity.setTitleColor(getResources().getColor(R.color.white));
+        mOptionMenuItems = mActivity.getResources().getStringArray(R.array.alerts_option_list_array);
+        BaseAdapter mMenuOptionListAdapter = new HomeMenuAdapter(mActivity, mOptionMenuItems);
+        alertsLV.setAdapter(mMenuOptionListAdapter);
+        setListClickListener();
+//        AlertsController.instance().getAlertsDataModel().addObserver(this);
+//        AlertsController.instance().register(this);
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                AlertsController.instance().getAlertsData(getActivity());
+//            }
+//        },700);
+
+        return rootView;
+    }
+
+
+
+    private void setHeaderFooterDivider() {
+
+        ImageView headerDividerView = new ImageView(getActivity());
+        headerDividerView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 1));
+        headerDividerView.setImageResource(R.color.gray);
+        ImageView footerDividerView = new ImageView(getActivity());
+        footerDividerView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 1));
+        footerDividerView.setImageResource(R.color.gray);
+        alertsLV.addHeaderView(headerDividerView);
+        alertsLV.addFooterView(footerDividerView);
+    }
+
+    private void setListClickListener() {
+        alertsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+                BaseSubUIFragment fragment = null;
+                switch (position) {
+
+                    case 1:
+//                        fragment = new AlertSettingsFragment();
+                        launchActivity(AlertsSettingsActivity.class);
+                        break;
+
+                    case 2:
+//                        fragment = new AlertHistoryFragment();
+                        launchActivity(AlertHistoryActivity.class);
+                        break;
+
+
+                    default:
+                        break;
+                }
+//                if (fragment != null) {
+//                    fragment.setHomeFragment(mHomeFragment);
+//                    transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+//                    transaction.addToBackStack(mFragmentLabels[position-1]);
+//                    transaction.add(R.id.container_id, fragment, mFragmentLabels[position-1]);
+//                    transaction.commit();
+//                    mTitle = getActivity().getResources().getStringArray(R.array.alerts_option_list_array)[position-1];
+//                    pushFragmentStack(mFragmentLabels[position-1]);
+//                }
+            }
+        });
+    }
+
+    private void launchActivity(Class<? extends Activity> activityTypeClass){
+        Intent intent = new Intent(getActivity(),activityTypeClass);
+        startActivity(intent);
+    }
+
+    @Override
+    public void setBackgroundColor() {
+
+        mColorCode = getActivity().getResources().getColor(R.color.alert_module_code);
+    }
+
+    @Override
+    public void setupTitle() {
+        // setup title for this UIScreen
+        if (((BaseUI)mActivity).getModuleNames().length > 0)
+            mTitle = ((BaseUI)mActivity).getModuleNames()[0];
+
+    }
+
+    @Override
+    void setupOptionItemNames() {
+        // setup option item names
+        mOptionMenuItems = mActivity.getResources().getStringArray(R.array.slide_menu_array);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        //Close the drawer
+       ((HomeActivity)getActivity()).getDrawerLayout().closeDrawers();
+        //Create the instance of fragment transaction
+       /* FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_left);
+
+        //Remove all views from Content Layout
+        RelativeLayout contentLayout = (RelativeLayout)getActivity().findViewById(R.id.container_id);
+        if (contentLayout == null)
+            return;
+        contentLayout.removeAllViews();
+
+        mIndex = position;
+        Bundle args = new Bundle();
+        switch (position) {
+
+            case 0:
+                //AlertsMenu Fragment
+                mTitle=getResources().getStringArray(R.array.alerts_array)[0];
+
+                Fragment alertsHomeFragment = new AlertsHomeFragment();
+
+                // we get the 'childFragmentManager' for our transaction
+                // make the back button return to the main screen
+                // and supply the tag 'left' to the back stack
+                transaction.addToBackStack("AlertsHome");
+                // add our new nested fragment
+                transaction.replace(R.id.container_id, alertsHomeFragment, "AlertsHome");
+
+                // commit the transaction
+                transaction.commit();
+
+
+
+
+                break;
+            case 1:
+//                Log.d(TAG, "AlertsGeoFence Fragment");
+                //AlertsGeoFence Fragment
+                 mTitle=getResources().getStringArray(R.array.alerts_array)[1];
+
+                Fragment alertsGeoFragment = new AlertsGeoFenceFragment();
+                transaction.addToBackStack("GeoFenceAlerts");
+                transaction.replace(R.id.container_id, alertsGeoFragment, "GeoFenceAlerts");
+                transaction.commit();
+                break;
+            case 2:
+//                Log.d(TAG, "Valet alert Fragment");
+                //Valet alert Fragment
+                mTitle=getResources().getStringArray(R.array.alerts_array)[2];
+
+                Fragment alertValetFragment = new AlertValetFragment();
+                transaction.addToBackStack("ValetAlerts");
+                transaction.replace(R.id.container_id, alertValetFragment, "ValetAlerts");
+                transaction.commit();
+                break;
+            case 3:
+//                Log.d(TAG, "Speed Alert Fragment");
+                //Speed Alert Fragment
+                mTitle=getResources().getStringArray(R.array.alerts_array)[3];
+
+                Fragment alertsSpeedFragment = new SpeedAlertFragment();
+                transaction.addToBackStack("SpeedAlert");
+                transaction.replace(R.id.container_id, alertsSpeedFragment, "SpeedAlert");
+                transaction.commit();
+                break;
+            case 4:
+//                Log.d(TAG, "Diagnostics alert Fragment");
+                //Diagnostics alert Fragment
+                mTitle=getResources().getStringArray(R.array.alerts_array)[4];
+
+                Fragment alertsDiagnosticsFragment = new DiagnosticsAlertFragment();
+                transaction.addToBackStack("DiagnosticsAlert");
+                transaction.replace(R.id.container_id, alertsDiagnosticsFragment, "DiagnosticsAlert");
+                transaction.commit();
+                break;
+            case 5:
+//                Log.d(TAG, "Maintenance alert Fragment");
+                //Maintenance alert Fragment
+                mTitle=getResources().getStringArray(R.array.diagnosis_data_option_list_array)[1];
+
+                Fragment alertsMaintenanceFragment = new MaintenanceInformationFragment();
+                args.putInt("container", R.id.container_id);
+                alertsMaintenanceFragment.setArguments(args);
+                transaction.addToBackStack("MaintenanceAlert");
+                transaction.replace(R.id.container_id, alertsMaintenanceFragment, "MaintenanceAlert");
+                transaction.commit();
+                break;
+            case 6:
+//                Log.d(TAG, "Recall alert Fragment");
+                //Recall alert Fragment
+                mTitle=getResources().getStringArray(R.array.alerts_array)[6];
+
+                Fragment alertsRecallFragment = new RecallAlertFragment();
+                args.putInt("container", R.id.container_id);
+                alertsRecallFragment.setArguments(args);
+                transaction.addToBackStack("RecallAlert");
+                transaction.replace(R.id.container_id, alertsRecallFragment, "RecallAlert");
+                transaction.commit();
+                break;
+            case 7:
+//                Log.d(TAG, "Alert History Fragment");
+                //Alert History Fragment
+                mTitle=getResources().getStringArray(R.array.alerts_array)[7];
+
+                Fragment alertsHistoryFragment = new AlertHistoryFragment();
+                transaction.addToBackStack("AlertHistory");
+                transaction.replace(R.id.container_id, alertsHistoryFragment, "AlertHistory");
+                transaction.commit();
+                break;
+            case 8:
+//                Log.d(TAG, "Logout");
+                ((HomeActivity) getActivity()).logOut();
+                break;
+            default:
+                break;
+        }*/
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+       // ((HomeActivity)getActivity()).hideCustomActionBar("Alerts");
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onPageSelectionLost() {
+        ((HomeActivity) getActivity()).showActionToggleButton();
+        ((HomeActivity)getActivity()).setCustomActionBarView("",
+                false, false, false,false);
+    }
+
+    @Override
+    public void onPageSelected() {
+
+        String fragmentName = getCurrentSubFragmentTag();
+        if (fragmentName.equals("")) {
+            ((HomeActivity)getActivity()).setCustomActionBarView("",
+                    false, false, false,false);
+            ((HomeActivity) getActivity()).setTitle("Alerts");
+            ((HomeActivity) getActivity()).showActionToggleButton();
+        }
+    }
+
+    @Override
+    public void update(final Observable observable, final Object data) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+//                  update UI
+                if (AlertsDataModel.class.isInstance(observable)) {
+                    Alert alert = (Alert)data;
+
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+
+    }
+
+    @Override
+    public void onError(Operation opr) {
+
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+
+    }
+}

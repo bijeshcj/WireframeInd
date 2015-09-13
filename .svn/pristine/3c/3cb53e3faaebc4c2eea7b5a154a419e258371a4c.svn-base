@@ -1,0 +1,59 @@
+package com.verizontelematics.indrivemobile.httpwrapper.Impl;
+
+import android.util.Log;
+
+import com.android.volley.toolbox.HurlStack;
+
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+/**
+ * Created by z688522 on 2/16/15.
+ */
+public class VerizonHttpStack extends HurlStack {
+    private static final String TAG = "VerizonHttpStack";
+
+    public VerizonHttpStack(SSLSocketFactory socketFactory) {
+        super(null, socketFactory);
+    }
+
+    /**
+     * Create an {@link java.net.HttpURLConnection} for the specified {@code url}.
+     */
+    protected HttpURLConnection createConnection(URL url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        ((HttpsURLConnection)connection).setHostnameVerifier(new X509HostnameVerifier() {
+            @Override
+            public boolean verify(String s, SSLSession sslSession) {
+                Log.d(TAG, "verify hostname " + s);
+                return true;
+            }
+
+            @Override
+            public void verify(String s, SSLSocket sslSocket) throws IOException {
+
+            }
+
+            @Override
+            public void verify(String s, X509Certificate x509Certificate) throws SSLException {
+
+            }
+
+            @Override
+            public void verify(String s, String[] strings, String[] strings2) throws SSLException {
+
+            }
+        });
+        return connection;
+    }
+}

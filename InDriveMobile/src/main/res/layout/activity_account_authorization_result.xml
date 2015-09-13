@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_bg"
+                tools:context="com.verizontelematics.indrivemobile.activity.AccountAuthorizationResultActivity">
+
+   <ImageView
+        android:id="@+id/infoIV"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/list_item_top_margin"
+        android:layout_marginEnd="@dimen/list_item_top_margin"
+        android:contentDescription="@string/info_img_cd"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:src="@drawable/info_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+    <TextView
+        android:id="@+id/account_setup_codeTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/authorization_sent"
+        android:textSize="@dimen/header_text_size"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/graph_margin_left"
+        android:layout_marginLeft="@dimen/list_item_top_margin"
+        android:layout_marginRight="@dimen/list_item_top_margin"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/white"
+        />
+
+    <Button
+        android:layout_width="300dp"
+        android:layout_height="@dimen/list_item_height"
+        android:text="@string/continue_text"
+        android:id="@+id/continueBTN"
+        android:textColor="@color/white"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/account_setup_codeTV"
+        android:layout_marginTop="@dimen/form_labels_text_height"/>
+
+</RelativeLayout>

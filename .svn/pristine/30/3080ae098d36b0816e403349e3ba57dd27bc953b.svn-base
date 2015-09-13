@@ -1,0 +1,136 @@
+package com.verizontelematics.indrivemobile.userprofile.utils;
+
+import android.content.Context;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.userprofile.UserFactory;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.userprofile.UserType;
+
+/**
+ * Created by bijesh on 3/11/2015.
+ */
+public class UserUtils {
+
+    public void initRolesAndResponsibility(Context context) {
+        UserFactory.getInstance(context);
+        UserType userType = UserFactory.getUserType();
+
+    }
+
+
+    public static boolean compareUserWithConfig() {
+        return false;
+    }
+
+    public static void showInActiveMessage(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    }
+
+    public static boolean isUserInactive(Context context, String inactiveMessage) {
+        if (UserFactory.getCurrentUserRole().equalsIgnoreCase(UserRoleConstants.INACTIVE_ROLE)) {
+            showInActiveMessage(context, inactiveMessage);
+            return true;
+        }
+        return false;
+    }
+
+    /*public static UpSellData getUpSellData(String moduleName){
+        if(moduleName == null)
+            return null;
+        UpSellData upSellData = new UpSellData();
+//        String header = getUpSellHeader(moduleName);
+//        String message = getUpSellMessage(moduleName);
+//        String imageId = getUpSellImageId(moduleName);
+        if(moduleName.equalsIgnoreCase("diagnosticsAlert") || moduleName.equalsIgnoreCase("valetAlert")||
+                moduleName.equalsIgnoreCase("speedAlert") || moduleName.equalsIgnoreCase("locationAlert")){
+            upSellData.setHeader("Enhance Alerts");
+            upSellData.setMessage("Currently, this service is not activated. With In-Drive® Co-Pilot, you can get Speed Alerts that notify you via text or email when family drivers exceed the speed limit you have designated.\n" +
+                    "To learn more about In-Drive Co-Pilot, call 1-888-270-0267");
+            if(moduleName.equalsIgnoreCase("speedAlert")) {
+                upSellData.setMessage("Currently, this service is not activated. With In-Drive® Co-Pilot, you can get Speed Alerts that notify you via text or email when family drivers exceed the speed limit you have designated.\n" +
+                        "To learn more about In-Drive Co-Pilot, call 1-888-270-0267");
+            }
+
+            if(moduleName.equalsIgnoreCase("")){
+                upSellData.setMessage("Currently, this service is not activated. With In-Drive® Co-Pilot, you get Speed Alerts and Location Alerts – giving you peace of mind that your loved ones are driving safely and where you expect them to be.\n" +
+                        "To learn more about In-Drive Co-Pilot, call 1-888-270-0267");
+            }
+
+            upSellData.setImageId(R.drawable.alerts_background);
+        }else if(moduleName.equalsIgnoreCase("LocateVehicle") || moduleName.equalsIgnoreCase("LocationAlerts")
+                || moduleName.equalsIgnoreCase("LocationHistory")){
+            upSellData.setHeader("Enhance Location");
+            upSellData.setMessage("This is message for Location upsell");
+            upSellData.setImageId(R.drawable.location_background);
+        }else if(moduleName.equalsIgnoreCase("DrivingData")){
+            upSellData.setHeader("Enhance DrivingData");
+            upSellData.setMessage("This is message for DrivingData upsell");
+            upSellData.setImageId(R.drawable.driving_data_home_background);
+        }else if(moduleName.equalsIgnoreCase("vehicleHealthShowServiceNotEnabled") || moduleName.equalsIgnoreCase("vehicleHealthDiagnosticsDetailsPage")||
+                moduleName.equalsIgnoreCase("maintenanceRemaindersView") || moduleName.equalsIgnoreCase("maintenanceRemaindersViewEditButton") ||
+                moduleName.equalsIgnoreCase("maintenanceRemainderAdd") || moduleName.equalsIgnoreCase("maintenanceRemainderEditDelete")||
+                moduleName.equalsIgnoreCase("maintenanceLogsView") || moduleName.equalsIgnoreCase("maintenanceLogsViewEditButton")||
+                moduleName.equalsIgnoreCase("maintenanceLogsAdd") || moduleName.equalsIgnoreCase("maintenanceLogsEditDelete") ||
+                moduleName.equalsIgnoreCase("recallInformationCurrentAndCompleted") || moduleName.equalsIgnoreCase("recallInformationDetailsView")||
+                moduleName.equalsIgnoreCase("recallInformationDetailsViewCompletedOrNot")){
+            upSellData.setHeader("Diagnostics");
+            upSellData.setMessage("Currently, this service is not activated. With In-Drive® Guardian, you can get Diagnostic Trouble Codes (DTCs) that help you identify specific vehicle problems – without having to pay a mechanic to diagnose them. \n" +
+                    "To learn more about In-Drive Guardian, call 1-888-270-0267");
+            upSellData.setImageId(R.drawable.menu_background);
+        }else if(moduleName.equalsIgnoreCase("EmergencyServices") || moduleName.equalsIgnoreCase("Stolen_Vehicle_Location_Assistance") ||
+                moduleName.equalsIgnoreCase("RoadsideAssistance")){
+            upSellData.setHeader("Enhance Emergency");
+            upSellData.setMessage("This is message for Emergency upsell");
+            upSellData.setImageId(R.drawable.emergency_background);
+        }
+
+        return upSellData;
+    }*/
+
+
+    public static UpSellData getUpSellData(String moduleName, Context context) {
+        if (moduleName == null)
+            return null;
+        UpSellData upSellData = new UpSellData();
+        if (moduleName.equalsIgnoreCase("diagnosticsAlert")) {
+            upSellData.setHeader(context.getResources().getString(R.string.about_diagnostics_alerts));
+            upSellData.setMessage(context.getResources().getString(R.string.vehicle_health_upsell_text));
+            upSellData.setImageId(R.drawable.alerts_background);
+        } else if (moduleName.equalsIgnoreCase("speedAlert")) {
+            upSellData.setHeader(context.getResources().getString(R.string.about_speed_alert));
+            upSellData.setMessage(context.getResources().getString(R.string.speed_alert_upsell_text));
+            upSellData.setImageId(R.drawable.alerts_background);
+        } else if (moduleName.equalsIgnoreCase("locationAlert")) {
+            upSellData.setHeader(context.getResources().getString(R.string.about_boundary_alerts));
+            upSellData.setMessage(context.getResources().getString(R.string.location_services_upsell_text));
+            upSellData.setImageId(R.drawable.alerts_background);
+        } else if (moduleName.equalsIgnoreCase("LocateVehicle") || moduleName.equalsIgnoreCase("LocationAlerts")
+                || moduleName.equalsIgnoreCase("LocationHistory")) {
+            upSellData.setHeader(context.getResources().getString(R.string.vehicle_location_services_header));
+            upSellData.setMessage(context.getResources().getString(R.string.location_services_upsell_text));
+            upSellData.setImageId(R.drawable.location_background);
+        } else if (moduleName.equalsIgnoreCase("vehicleHealthShowServiceNotEnabled") || moduleName.equalsIgnoreCase("maintenanceRemaindersView")
+               || moduleName.equalsIgnoreCase("maintenanceLogsView") || moduleName.equalsIgnoreCase("recallInformationCurrentAndCompleted")
+                || moduleName.equalsIgnoreCase("vehicleHealthDiagnosticsDetailsPage")
+                ) {
+            upSellData.setHeader(context.getResources().getString(R.string.about_diagnostics));
+            upSellData.setMessage(context.getResources().getString(R.string.vehicle_health_upsell_text));
+            upSellData.setImageId(R.drawable.menu_background);
+        }
+
+        return upSellData;
+    }
+
+
+    private static String getUpSellHeader(String moduleName) {
+        return null;
+    }
+
+    private static String getUpSellMessage(String moduleMessage) {
+        return null;
+    }
+
+
+}

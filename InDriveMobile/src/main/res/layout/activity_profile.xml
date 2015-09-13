@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container_id_profile"
+    android:background="@color/time_period"
+    tools:context="com.verizontelematics.indrivemobile.activity.ProfileActivity">
+
+
+
+    <include
+        android:id="@+id/headerRL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profileHeaderList"
+        android:layout_marginLeft="10dp"
+        android:visibility="visible"
+        android:layout_marginStart="10dp"
+        android:layout_below="@id/headerRL"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/gray_separator"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_below="@id/profileHeaderList"
+        android:id="@+id/line1"
+        />
+
+   <ListView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/profileOptionsList"
+       android:layout_below="@id/line1"
+       android:layout_marginLeft="10dp"
+       android:layout_marginStart="10dp"
+       />
+
+
+</RelativeLayout>

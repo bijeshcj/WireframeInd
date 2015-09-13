@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/actionBarLL"
+              android:layout_width="match_parent"
+              android:orientation="horizontal"
+              android:layout_height="@dimen/abc_action_bar_default_height">
+
+    <RelativeLayout
+
+        android:layout_width="80dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_height="40dp">
+    <Button
+        android:id="@+id/ab_back_arrow"
+        android:text="@string/cancel"
+        android:layout_gravity="start|center_vertical"
+        android:layout_width="80dp"
+        android:textSize="16sp"
+        android:layout_centerInParent="true"
+        android:layout_height="40dp"/>
+        <Button
+            android:id="@+id/ab_back_arrow_nav"
+            android:text="@string/back"
+            android:layout_gravity="start|center_vertical"
+            android:layout_width="80dp"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            android:layout_centerInParent="true"
+            android:layout_height="40dp"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/action_bar_titleTV"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/ab_save_btn"
+        android:text="@string/done"
+        android:textSize="16sp"
+        android:layout_width="80dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_height="40dp"/>
+</LinearLayout>

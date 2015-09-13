@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.verizontelematics.indrivemobile.activity.LocateVehicleActivity">
+
+    <include
+        android:id="@+id/headerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <com.google.android.gms.maps.MapView
+        android:layout_below="@id/headerLayout"
+        android:id="@+id/locateVehicleMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <Button
+        android:id="@+id/google_maps_get_direction_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="@dimen/form_labels_text_size"
+        android:textColor="@color/white"
+        android:background="@drawable/button_press"
+        android:layout_marginBottom="10dp"
+        android:text="@string/get_directions"
+        android:visibility="gone"/>
+
+</RelativeLayout>

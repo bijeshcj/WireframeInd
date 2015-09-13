@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootViewForMaintenanceAlert"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <LinearLayout
+        android:id="@+id/maintenance_alerts_header_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/maintenance_log_header_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="@drawable/gradient_gray_bar">
+
+        <ImageView
+            android:id="@+id/btn_info"
+            android:layout_width="wrap_content"
+            android:contentDescription="@string/info_img_cd"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/info_button"/>
+    </LinearLayout>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/time_period">
+
+        <RelativeLayout
+            android:id="@+id/mainRL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/et_border"
+                android:id="@+id/service_type_container"
+                android:orientation="horizontal"
+                android:layout_margin="10dp"
+                >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="@dimen/form_labels_text_height"
+                    android:id="@+id/serviceType"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:hint="@string/maintenance_prompt"/>
+
+                <ImageButton
+                    android:id="@+id/service_type_arrow_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/service_type_arrow_cd"
+                    android:background="@drawable/forward_arrow_gray"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/alertNameET"
+                android:layout_margin="10dp"
+                android:paddingLeft="10dp"
+                android:hint="@string/custom_reminder_name"
+                android:maxLength="50"
+                android:inputType="textCapSentences"
+                android:background="@drawable/et_border"
+                android:layout_below="@id/service_type_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/form_labels_text_height"
+                android:textColor="@color/diagnostics_text_color"
+                android:textSize="@dimen/form_labels_text_size"/>
+
+            <EditText
+                android:id="@+id/alertDescET"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:hint="@string/alert_desc"
+                android:maxLength="255"
+                android:background="@drawable/et_border"
+                android:layout_below="@id/alertNameET"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:textColor="@color/diagnostics_text_color"
+                android:inputType="textCapSentences|textMultiLine"
+                android:textSize="@dimen/form_labels_text_size"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/alertDescET"
+                android:id="@+id/alertDetailDiv"
+                android:background="@color/gray"/>
+
+
+            <LinearLayout
+                android:id="@+id/btnLL"
+                android:layout_below="@id/alertDescET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/dateBTN"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:background="@drawable/button_press"
+                    android:text="@string/date"
+                    android:textColor="@color/gray_separator"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:id="@+id/mileageIntervalBTN"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/bg_button_selected"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:textColor="@color/gray_separator"
+                    android:text="@string/mileage_interval"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:id="@+id/dayMonthBTN"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:text="@string/day_month"
+                    android:visibility="gone"
+                    tools:ignore="ButtonStyle"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/dateRL"
+                android:background="@drawable/et_border"
+                android:layout_below="@id/btnLL"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/form_labels_text_height">
+
+                <TextView
+                    android:id="@+id/dateTV"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/date"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <TextView
+                    android:id="@+id/dateDetailTV"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/dummy_date"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/mileageRL"
+                android:background="@drawable/et_border"
+                android:layout_below="@id/btnLL"
+                android:layout_margin="10dp"
+                android:visibility="invisible"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/form_labels_text_height">
+
+                <TextView
+                    android:id="@+id/mileageTV"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/mileage_interval"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/textMiles"
+                    android:text="@string/miles"
+                    android:background="@color/white"
+                    android:textColor="@color/gray"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignBaseline="@+id/mileageDetailTextView"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    />
+
+                <EditText
+                    android:id="@+id/mileageDetailTextView"
+                    android:layout_centerVertical="true"
+                    android:singleLine="true"
+                    android:maxLength="6"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:layout_toLeftOf="@id/textMiles"
+                    android:layout_toStartOf="@id/textMiles"
+                    android:textSize="@dimen/form_labels_text_size"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/dayMonthRL"
+                android:background="@drawable/et_border"
+                android:layout_below="@id/btnLL"
+                android:layout_margin="10dp"
+                android:visibility="invisible"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/form_labels_text_height">
+
+                <TextView
+                    android:id="@+id/dayMonthTV"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/day_month"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <TextView
+                    android:id="@+id/dayMonthDetailTV"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/dummy_date"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_below="@id/dateRL"
+                android:layout_width="match_parent"
+                android:id="@+id/repeatLayout"
+                android:background="@drawable/et_border"
+                android:layout_margin="10dp"
+                android:layout_height="@dimen/form_labels_text_height">
+
+                <TextView
+                    android:id="@+id/txtViewRepeat"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/repeat"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/textMonths"
+                    android:text="@string/months"
+                    android:background="@color/white"
+                    android:textColor="@color/gray"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignBaseline="@+id/txtViewRepeatOptions"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    />
+
+                <EditText
+                    android:id="@+id/txtViewRepeatOptions"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="2dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/textMonths"
+                    android:layout_toStartOf="@id/textMonths"
+                    android:layout_marginEnd="2dp"
+                    android:inputType="number"
+                    android:text="@string/default_freq_month"
+                    android:gravity="center"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+
+            </RelativeLayout>
+
+            <!--<RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/repeatLayout"
+                android:layout_margin="10dp"
+                android:background="@drawable/et_border"
+                android:id="@+id/notifyMeRL">
+
+                <TextView
+                    android:id="@+id/txtViewNotifyMe"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/notify_me"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:id="@+id/emailLayout"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toRightOf="@+id/txtViewNotifyMe"
+                    android:layout_toEndOf="@+id/txtViewNotifyMe"
+                    android:layout_marginLeft="120dp"
+                    android:layout_marginStart="120dp"
+                    android:layout_height="@dimen/form_labels_text_height">
+
+                    <TextView
+                        android:id="@+id/emailET"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="10dp"
+                        android:text="@string/email"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/form_labels_text_size"/>
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/emailSwitch"
+                        android:layout_centerVertical="true"
+                        android:background="@android:color/transparent"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_alignRight="@+id/emailET"
+                        android:layout_alignEnd="@+id/emailET"
+                        android:layout_toRightOf="@+id/emailET"
+                        android:layout_toEndOf="@+id/emailET"
+                        >
+
+                        <ImageView
+                            android:id="@+id/onState"
+                            android:src="@drawable/toggle_button_on"
+                            android:contentDescription="@string/on_state_cd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <ImageView
+                            android:id="@+id/offState"
+                            android:src="@drawable/toggle_button_off"
+                            android:contentDescription="@string/off_state_cd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_below="@id/emailLayout"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/textLayout"
+                    android:layout_marginLeft="120dp"
+                    android:layout_toRightOf="@id/txtViewNotifyMe"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@id/txtViewNotifyMe"
+                    android:layout_marginStart="120dp"
+                    android:layout_height="@dimen/form_labels_text_height"
+                    >
+
+                    <TextView
+                        android:id="@+id/textET"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="10dp"
+                        android:text="@string/text"
+                        android:layout_width="wrap_content"
+                        android:textColor="@color/diagnostics_text_color"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/form_labels_text_size"/>
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textSwitch"
+                        android:background="@android:color/transparent"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_alignEnd="@+id/textET"
+                        android:layout_alignRight="@+id/textET"
+                        android:layout_toRightOf="@+id/textET"
+                        android:layout_toEndOf="@+id/textET"
+
+                        >
+
+                        <ImageView
+                            android:id="@+id/onStateText"
+                            android:src="@drawable/toggle_button_on"
+                            android:contentDescription="@string/on_state_cd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <ImageView
+                            android:id="@+id/offStateText"
+                            android:src="@drawable/toggle_button_off"
+                            android:contentDescription="@string/off_state_cd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                    </RelativeLayout>
+                </RelativeLayout>
+            </RelativeLayout>-->
+
+            <LinearLayout
+                android:layout_below="@id/repeatLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/list_item_top_margin">
+
+                <Button
+                    android:layout_margin="5dp"
+                    android:id="@+id/addCalenderBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_to_calendar"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:textColor="@color/white"
+                    android:background="@drawable/button_press"
+                    android:layout_weight="1"
+                    tools:ignore="ButtonStyle"/>
+
+                <Button
+                    android:layout_margin="5dp"
+                    android:id="@+id/deleteAlertBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/delete_maintenance_log"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:textColor="@color/white"
+                    android:background="@drawable/button_press"
+                    android:layout_weight="1"
+                    tools:ignore="ButtonStyle"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>

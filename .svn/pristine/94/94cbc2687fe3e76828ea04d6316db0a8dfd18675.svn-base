@@ -1,0 +1,107 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_bg"
+                tools:context="com.verizontelematics.indrivemobile.activity.ForgotPwdAuthorizationActivity">
+
+    <RelativeLayout
+        android:id="@+id/enterCodeRL"
+        android:layout_width="300dp"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/enterCodePwdTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_authorization_code"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/authorizationCodeET"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/enterCodePwdTV"
+            android:paddingLeft="@dimen/list_item_top_margin"
+            android:maxLength="8"
+            android:inputType="number"
+            android:background="@color/white"
+            />
+
+        <TextView
+            android:id="@+id/authorizationCodeTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/authorizationCodeET"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/authorization_code"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/newPwdET"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/authorizationCodeTV"
+            android:paddingLeft="@dimen/list_item_top_margin"
+            android:inputType="textPassword"
+            android:maxLength="30"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+            android:background="@color/white"
+            />
+
+        <TextView
+            android:id="@+id/newPwdTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/newPwdET"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:maxLength="30"
+            android:text="@string/new_password"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/confirmPwdET"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/newPwdTV"
+            android:paddingLeft="@dimen/list_item_top_margin"
+            android:inputType="textPassword"
+            android:maxLength="30"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+            android:background="@color/white"
+            />
+
+        <TextView
+            android:id="@+id/confirmPwdTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/confirmPwdET"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/confirm_password"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:text="@string/submit"
+            android:id="@+id/submitBTN"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/confirmPwdTV"
+            android:layout_marginTop="@dimen/form_labels_text_height"/>
+    </RelativeLayout>
+
+</RelativeLayout>

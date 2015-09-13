@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container_id"
+    android:layout_width="match_parent"
+    android:background="@drawable/alerts_background"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/alertsIntroTV"
+        android:layout_width="250dp"
+        android:text="@string/alerts_home_text"
+        android:textColor="@color/white"
+        android:textSize="10pt"
+        android:textStyle="bold"
+        android:layout_margin="20dp"
+        android:gravity="start"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/alertsLV"
+        android:layout_below="@id/alertsIntroTV"
+        android:divider="@color/gray"
+        android:dividerHeight="1dp"
+        android:footerDividersEnabled="true"
+        android:headerDividersEnabled="true"
+        android:background="@color/transparent"/>
+
+</RelativeLayout>

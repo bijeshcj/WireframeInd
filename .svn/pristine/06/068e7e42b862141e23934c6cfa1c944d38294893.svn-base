@@ -1,0 +1,278 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.adapters.BoundaryAlertAdapter;
+import com.verizontelematics.indrivemobile.controllers.AlertsController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.AlertsDataModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.Alert;
+import com.verizontelematics.indrivemobile.models.data.LocationAlert;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.userprofile.utils.UserUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+
+/**
+ * Created by Priyanga on 12/31/2014.
+ */
+public class BoundaryAlertFragment extends BaseSubUIFragment implements UIInterface, Observer,UserRoleConstants {
+    private static final String TAG = "BoundaryAlertFragment";
+    private ListView boundaryAlertLV;
+    private ArrayList<LocationAlert> mLocationAlerts;
+    private SwipeRefreshLayout mRefreshLayout;
+    private BoundaryAlertAdapter mBoundaryAdapter = null;
+    private TextView noLocationAlertsTV;
+
+    public BoundaryAlertFragment() {
+//        Empty constructor
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.fragment_boundary_alert, container, false);
+
+        ImageView infoView = (ImageView) rootView.findViewById(R.id.btn_info_boundary_alert);
+
+        infoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToBeDecidedDialog dialog = new ToBeDecidedDialog(getActivity(), getActivity().getResources().getString(R.string.info_location_alerts));
+                dialog.setTitle(getResources().getString(R.string.about_boundary_alerts));
+                dialog.show();
+            }
+        });
+
+        boundaryAlertLV =(ListView)rootView.findViewById(R.id.boundaryHistoryListView);
+
+        noLocationAlertsTV = (TextView)rootView.findViewById(R.id.no_location_alerts_TV);
+
+        AlertsDataModel mAlertsDataModel = (AlertsDataModel) AlertsController.instance().getAlertsDataModel();
+        Alert alert = (Alert) mAlertsDataModel.getData();
+        populateUI(alert);
+        rootView.findViewById(R.id.boundaryHistoryHeaderRL).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+
+        mRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.refresh_layout_id);
+        mRefreshLayout.setColorSchemeResources(R.color.sub_header_color, R.color.alert_module_swipe_refresh, R.color.sub_header_color, R.color.alert_module_swipe_refresh);
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                AlertsController.instance().getAlertsData(getActivity());
+            }
+        });
+        setupListeners();
+        return rootView;
+    }
+
+    private void setupListeners() {
+        // add observer for alerts
+        AlertsController.instance().getAlertsDataModel().addObserver(this);
+        // register ui callbacks for AlertsController.
+        AlertsController.instance().register(this);
+
+    }
+    
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(getActivity().getResources().getStringArray(R.array.alerts_array)[3]);
+    }
+
+
+    @Override
+    public void update(final Observable observable, final Object data) {
+        Log.d(TAG, "update received on UI ");
+
+        if(getActivity() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+//                  update UI
+                    if (AlertsDataModel.class.isInstance(observable)) {
+                        Alert alert = (Alert) data;
+                        // populate UI
+                        populateUI(alert);
+                        // Store in database
+                    }
+                }
+            });
+        }
+    }
+
+    private void populateUI(Alert alert) {
+
+        if (alert == null)
+                return;
+
+        List<LocationAlert> lstLocationAlert = (ArrayList)alert.getLocationAlerts();
+
+
+        if (lstLocationAlert != null) {
+            if (mLocationAlerts == null)
+                mLocationAlerts = new ArrayList<LocationAlert>(lstLocationAlert);
+            else {
+                mLocationAlerts.clear();
+                mLocationAlerts.addAll(lstLocationAlert);
+            }
+            if (mBoundaryAdapter == null) {
+                mBoundaryAdapter = new BoundaryAlertAdapter(getActivity(), R.layout.boundary_alert_lv_item, mLocationAlerts);
+                boundaryAlertLV.setAdapter(mBoundaryAdapter);
+                boundaryAlertLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,
+                                            int position, long id) {
+//                    boolean status = mBoundaryAdapter.updateView(view);
+//                    updateBoundary(position, status);
+//                    AlertsController.instance().updateLocationAlerts(getActivity(), mLocationAlerts);
+                        // Launch Detailed View of Location Alert.
+                        // Edit Alert
+
+                        if(UserUtils.isUserInactive(getActivity(), inactiveMessage)){
+                            return;
+                        }
+
+                        android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+
+                        LocationAlertSettingDetailedFragment fragment = new LocationAlertSettingDetailedFragment();
+                        Bundle locationAlertArgs = new Bundle();
+                        locationAlertArgs.putParcelable("location-alert", mLocationAlerts.get(position));
+                        fragment.setArguments(locationAlertArgs);
+
+                        ft.addToBackStack("LocationAlertSettingDetailedFragment");
+                        ft.add(R.id.location_alert_setting_container_id, fragment, "LocationAlertSettingDetailedFragment");
+                        ft.commit();
+                    }
+                });
+            } else {
+                mBoundaryAdapter.updateData(mLocationAlerts);
+            }
+
+            if (mBoundaryAdapter.getCount() == 0) {
+                noLocationAlertsTV.setVisibility(TextView.VISIBLE);
+            } else {
+                noLocationAlertsTV.setVisibility(TextView.INVISIBLE);
+            }
+
+        }
+
+    }
+
+    private void updateBoundary(int position, boolean status) {
+        if (position < 0)
+            return;
+        if (mLocationAlerts == null)
+            return;
+        if (mLocationAlerts.isEmpty())
+            return;
+        mLocationAlerts.get(position).setStatus(status ? "Active" : "InActive");
+    }
+
+    @Override
+    public void onSubFragmentResume() {
+        Log.d(TAG, "onSubFragmentResume");
+        super.onSubFragmentResume();
+    }
+
+    @Override
+    public void onSubFragmentPause() {
+        Log.d(TAG, "onSubFragmentPause");
+        super.onSubFragmentPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    private void cleanup() {
+        // un register with controller.
+        AlertsController.instance().unregister(this);
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+        /*if (opr.getId() == Operation.OperationCode.GET_ALERTS.ordinal()
+                || opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal() ) {*/
+        if (opr.getId() == Operation.OperationCode.GET_ALERTS.ordinal()
+                 ) {
+            if (mRefreshLayout != null && !mRefreshLayout.isRefreshing()) {
+                mRefreshLayout.setRefreshing(true);
+            }
+        }
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        /*if (opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()) {
+            Toast.makeText(getActivity(), getResources().getString(R.string.error_update_boundary_alerts), Toast.LENGTH_SHORT).show();
+            revertUI();
+        } else {
+            Toast lToast = Toast.makeText(getActivity(), getResources().getString(R.string.alert_settings_error), Toast.LENGTH_SHORT);
+            lToast.show();
+        }*/
+
+        if (opr.getId() == Operation.OperationCode.GET_ALERTS.ordinal()) {
+            Toast lToast = Toast.makeText(getActivity(), getResources().getString(R.string.alert_settings_error), Toast.LENGTH_SHORT);
+            lToast.show();
+        }
+        if (mRefreshLayout != null && mRefreshLayout.isRefreshing()) {
+            mRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    private void revertUI() {
+        // Need to restore data with previous.
+        // Need to update UI with previous data.
+        AlertsController.instance().getAlertsData(getActivity());
+//    getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mAlertsDataModel = (AlertsDataModel) AlertsController.instance().getAlertsDataModel();
+//                Alert alert = (Alert)mAlertsDataModel.getData();
+//                populateUI(alert);
+//            }
+//    });
+
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        /*if (opr.getId() == Operation.OperationCode.GET_ALERTS.ordinal()
+                || opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()) {*/
+        if (opr.getId() == Operation.OperationCode.GET_ALERTS.ordinal()) {
+            if (mRefreshLayout != null && mRefreshLayout.isRefreshing()) {
+                mRefreshLayout.setRefreshing(false);
+            }
+        }
+    }
+}
+

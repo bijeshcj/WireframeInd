@@ -1,0 +1,18 @@
+package com.verizontelematics.indrivemobile.models;
+
+import com.verizontelematics.indrivemobile.models.data.HealthStatus;
+import com.verizontelematics.indrivemobile.models.data.VehiclePartData;
+
+/**
+ * Created by z688522 on 11/14/14.
+ */
+public class VehiclePartModel extends BaseModel {
+    public static VehiclePartModel createPartModel(HealthStatus healthStatus) {
+        VehiclePartModel pm = new VehiclePartModel();
+        VehiclePartData pd = new VehiclePartData();
+        pd.set(VehiclePartData.PART_TITLE, healthStatus.getServiceArea());
+        pd.set(VehiclePartData.STATUS, healthStatus.getServiceAreaStatus());
+        pm.setData(pd);
+        return pm;
+    }
+}

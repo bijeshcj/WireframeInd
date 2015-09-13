@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/topView_timePeriod"
+        layout="@layout/actionbar_header"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/header"
+        android:layout_below="@id/topView_timePeriod"
+        android:background="@drawable/select_time_period_background_header"
+        >
+
+    <TextView
+        android:paddingTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/select_time_periods"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:paddingBottom="10dp"
+        />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/time_period"
+        android:layout_below="@id/header"
+        >
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/lstTypes"
+
+            />
+    </LinearLayout>
+
+
+</RelativeLayout>

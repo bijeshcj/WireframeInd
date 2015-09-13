@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/pop_up_iv"
+        android:src="@drawable/serial_number_pop_up"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"/>
+
+    <TextView
+        android:text="@string/serial_number_help"
+        android:layout_alignBottom="@id/pop_up_iv"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="@dimen/scroll_top_margin"
+        android:layout_marginBottom="@dimen/form_labels_text_height"
+        android:layout_alignRight="@id/pop_up_iv"
+        android:layout_alignLeft="@id/pop_up_iv"
+        android:layout_alignStart="@id/pop_up_iv"
+        android:layout_alignEnd="@id/pop_up_iv"/>
+
+
+</RelativeLayout>

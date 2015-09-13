@@ -1,0 +1,71 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+
+public class StolenVehicleActivity extends FragmentActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_stolen_vehicle);
+        setupHeaderView();
+        setup();
+    }
+
+    private void setup() {
+        TextView tv = (TextView)findViewById(R.id.content_id);
+        tv.setText( Html.fromHtml(getString(R.string.stolen_vehicle_text_1)
+                        + "<br><br><br>"
+                        + getString(R.string.stolen_vehicle_text_2)
+                        +" <a href='tel:"+getString(R.string.stolen_vehicle_contact_number) + "'>"
+                        + getString(R.string.stolen_vehicle_contact_number) + "</a> "
+                        + getString(R.string.dot_char))
+                );
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private void setupHeaderView() {
+
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerLayout);
+        headerRL.setBackgroundResource(R.drawable.help_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        headerTitleTV.setText(getResources().getStringArray(R.array.emergency_option_list_array)[1]);
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        headerBtn.setVisibility(View.GONE);
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_stolen_vehicle, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+}

@@ -1,0 +1,20 @@
+package com.verizontelematics.indrivemobile.userprofile;
+
+/**
+ * Created by bijesh on 3/11/2015.
+ */
+public interface UserRoleConstants {
+    public static final String maintenanceRemainderAdd = "maintenanceRemainderAdd";
+    public String maintenanceRemaindersViewEditButton = "maintenanceRemaindersViewEditButton";
+
+    String maintenanceLogsAdd = "maintenanceLogsAdd";
+
+
+
+    public static final String ACTIVE_ROLE = "activeRole";
+    public static final String INACTIVE_ROLE = "inactiveRole";
+
+
+    public String inactiveMessage = "User is inactive";
+
+}

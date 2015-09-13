@@ -1,0 +1,170 @@
+package com.verizontelematics.indrivemobile.utils.security;
+
+/**
+ * Created by Sony on 25-04-2015.
+ */
+import android.util.Log;
+
+import com.verizontelematics.indrivemobile.utils.FileUtils;
+import com.verizontelematics.indrivemobile.utils.config.InDrivePreference;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.io.File;
+//import javax.xml.bind.DatatypeConverter;
+import java.util.Collection;
+
+import java.security.cert.CertificateFactory;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.security.KeyStore;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+public class CreatePKCS12{
+
+    private static final String TAG = CreatePKCS12.class.getCanonicalName();
+    //Just for test purpose, I used fixed values here.
+    public static final String PRIVAKE_KEY_FILE = "privateKey.key";
+    public static final String PKCS7_CERTIFICATE_FILE = "RA-Certificate_20130809.p7b";
+
+    public static final String PKCS12_CERTIFICATE_FILE = "client-cert.p12";//"myTestPKCS12.cer";
+
+    private static Provider provider = new BouncyCastleProvider();
+    static {
+        Security.addProvider(provider); //Initializes bouncy castle
+    }
+
+
+    public static void createPKCS12(){
+        Log.d(TAG,"layer7 createPKCS12");
+        try
+        {
+            //Read private key from pem file.
+
+//            String privKeyPEM = new String();
+//            privKeyPEM = new Scanner(new File(PRIVAKE_KEY_FILE)).useDelimiter("\n").next();
+//
+//            //Base64 decode the data
+//            byte[] encoded = DatatypeConverter.parseBase64Binary(privKeyPEM);
+//            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+//            KeyFactory kf = KeyFactory.getInstance("RSA");
+//            PrivateKey privKey = kf.generatePrivate(keySpec);
+
+            //Read PKCS#7 certificate from PEM file
+//            FileInputStream pkcsFile = new FileInputStream("PKCS7_CERTIFICATE_FILE");
+
+//            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+//            Collection<? extends Certificate> c = cf.generateCertificates(pkcsFile);
+//            Iterator<? extends Certificate> i = c.iterator();
+//
+//            //To be stored in PKCS#12 keystore
+//
+//            Certificate[] chain = new Certificate[2];
+//
+//            while (i.hasNext()) {
+//                Certificate cert = (Certificate)i.next();
+//                if(cert instanceof X509Certificate){
+//                    if( ((X509Certificate)cert).getBasicConstraints() < 0)
+//                    {
+//                        //Check value of BasicConstraints to see if it is an End Entity cert or //CA certificate.
+//
+//                        chain[0] = cert;
+//                    } else {
+//                        //For test purpose only, You may have more than one CA certificate in your //PKCS#7 file.
+//                        chain[1] = cert;
+//                    }
+//                }
+//            }
+
+            Certificate[] chain = new Certificate[1];
+            Certificate certificate = getCertificate(InDrivePreference.getInstance().getStringData("cert", ""));
+            chain[0] = certificate;
+
+            //PKCS#12 Key Store
+            KeyStore pkcs12KeyStore;
+            pkcs12KeyStore = KeyStore.getInstance("PKCS12","BC");
+            pkcs12KeyStore.load( null, null );
+
+            pkcs12KeyStore.setKeyEntry("userid", PKCS12Attributes.getInstance().getPrivateKey(), "password".toCharArray(), chain);
+
+            //Output to PEM file.
+            FileOutputStream fos;
+//            File pkcs12File = new File(PKCS12_CERTIFICATE_FILE);
+            fos = FileUtils.getAppInternalFileOutputStream(PKCS12_CERTIFICATE_FILE);//new FileOutputStream( pkcs12File );
+            pkcs12KeyStore.store( fos, "password".toCharArray() );
+            fos.flush();
+            fos.close();
+
+            Log.d(TAG,"layer7 created pkcs12 file");
+
+            FileUtils.printInternalFileDir();
+        } catch (Exception e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+    }
+
+
+
+
+
+    private static KeyStore getKeyStore(String signed_cert){
+        KeyStore keyStore = null;
+        try {
+            String keyStoreType = KeyStore.getDefaultType();
+            keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            X509Certificate x509Certificate = (X509Certificate) getCertificate(signed_cert);
+            keyStore.setCertificateEntry(x509Certificate.getSubjectX500Principal().getName(), x509Certificate);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return keyStore;
+    }
+
+    private static Certificate getCertificate(String mServerSignedCertificate) {
+        Log.d(TAG, "layer7 $$ getCertificate " + mServerSignedCertificate);
+        CertificateFactory cf = null;
+        InputStream caInput = null;
+        try {
+            cf = CertificateFactory.getInstance("X.509","BC");
+        }catch (CertificateException e){
+            e.printStackTrace();
+        }catch (NoSuchProviderException e){
+            e.printStackTrace();
+        }
+        Certificate ca = null;
+        caInput = new BufferedInputStream(new ByteArrayInputStream(mServerSignedCertificate.getBytes()));
+        try {
+            Log.d(TAG,"layer7 before generating certificate");
+            ca = cf.generateCertificate(caInput);
+            if(ca != null) {
+                Log.d(TAG, "layer7 ca=" + ((X509Certificate) ca).getSubjectDN());
+                Log.d(TAG, "layer7 public key " + ((X509Certificate) ca).getPublicKey());
+            }
+        }catch (CertificateException e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                caInput.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return ca;
+    }
+
+}

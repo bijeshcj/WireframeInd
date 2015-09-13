@@ -1,0 +1,18 @@
+package com.verizontelematics.indrivemobile.utils.errormanagement;
+
+import android.content.Context;
+
+import com.verizontelematics.indrivemobile.models.Operation;
+
+/**
+ * Created by bijesh on 3/27/2015.
+ *
+ * Error Manager follows Strategy Pattern
+ *
+ */
+public interface ErrorManager {
+    int SUCCESS_RESPONSE_CODE = 2000;
+    int FAILURE_RESPONSE_CODE = 1002;
+    int INVALID_USER_NAME_PASSWORD = 4230001;
+    String getResponseDescription(Context context,int responseCode,Operation.OperationCode operationCode,String exceptionMessage);
+}

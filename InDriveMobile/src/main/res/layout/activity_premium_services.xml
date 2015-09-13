@@ -1,0 +1,88 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                tools:context="com.verizontelematics.indrivemobile.activity.PremiumServicesActivity"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/headerRL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <ScrollView
+        android:id="@+id/premiumServicesSV"
+        android:layout_below="@id/headerRL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/premiumServicesRL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            >
+
+
+            <ImageView
+                android:id="@+id/premiumServicesIV"
+                android:layout_width="match_parent"
+                android:src="@drawable/premium_services_img"
+                android:contentDescription="@string/premium_services_cd"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/premiumServicesIntroTV"
+                android:layout_margin="@dimen/list_item_top_margin"
+                android:layout_below="@id/premiumServicesIV"
+                android:layout_width="match_parent"
+                android:textSize="@dimen/form_labels_text_size"
+                android:text="@string/premium_services_intro_text"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:background="@drawable/help_header_background"
+                android:id="@+id/guardianHeaderTV"
+                android:layout_below="@id/premiumServicesIntroTV"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/list_item_top_margin"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textSize="@dimen/header_text_size"
+                android:text="@string/inDrive_guardian_header"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/guardianTV"
+                android:layout_margin="@dimen/list_item_top_margin"
+                android:layout_below="@id/guardianHeaderTV"
+                android:layout_width="match_parent"
+                android:textSize="@dimen/form_labels_text_size"
+                android:text="@string/inDrive_guardian_text"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:background="@drawable/help_header_background"
+                android:id="@+id/pilotHeaderTV"
+                android:layout_below="@id/guardianTV"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/list_item_top_margin"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textSize="@dimen/header_text_size"
+                android:text="@string/inDrive_pilot_header"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/pilotTV"
+                android:layout_margin="@dimen/list_item_top_margin"
+                android:layout_below="@id/pilotHeaderTV"
+                android:layout_width="match_parent"
+                android:textSize="@dimen/form_labels_text_size"
+                android:text="@string/inDrive_pilot_text"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

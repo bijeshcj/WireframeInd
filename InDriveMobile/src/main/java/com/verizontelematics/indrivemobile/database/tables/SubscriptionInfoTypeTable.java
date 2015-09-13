@@ -1,0 +1,39 @@
+package com.verizontelematics.indrivemobile.database.tables;
+
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+/**
+ * Created by Bijesh on 19-03-2015.
+ */
+public class SubscriptionInfoTypeTable extends BaseTable {
+
+    private static final String TAG = SubscriptionInfoTypeTable.class.getCanonicalName();
+
+    public static final String TABLE_NAME_SUBSCRIPTION_INFO_TYPE = "SubscriptionInfoType";
+
+    public static final String COLUMN_SUBSCRIPTION_INFO_ID = "_id";
+    public static final String COLUMN_ACCOUNTID = "accountID";
+    public static final String COLUMN_PACKAGE_NAME = "packageName";
+    public static final String COLUMN_PART_NUMBER = "partNumber";
+
+    public static final String SUBSCRIPTION_INFO_TYPE_TABLE_CREATE = "create table if not exists "+ TABLE_NAME_SUBSCRIPTION_INFO_TYPE+"("+
+            COLUMN_SUBSCRIPTION_INFO_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+            COLUMN_ACCOUNTID+" TEXT, "+
+            COLUMN_PACKAGE_NAME+" TEXT, "+
+            COLUMN_PART_NUMBER+" TEXT"+
+            ")";
+
+
+    @Override
+    public void onCreate(SQLiteDatabase database) {
+        database.execSQL(SUBSCRIPTION_INFO_TYPE_TABLE_CREATE);
+        Log.d(TAG, "created table " + TABLE_NAME_SUBSCRIPTION_INFO_TYPE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_SUBSCRIPTION_INFO_TYPE);
+        onCreate(database);
+    }
+}

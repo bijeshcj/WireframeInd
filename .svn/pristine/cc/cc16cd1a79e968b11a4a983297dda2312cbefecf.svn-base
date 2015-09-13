@@ -1,0 +1,108 @@
+package com.verizontelematics.indrivemobile.adapters;
+
+import android.content.Context;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.utils.ui.UiStateHelper;
+
+/**
+ * Created by z688522 on 11/19/14.
+ */
+public class DashBoardTabsAdapter extends BaseAdapter {
+
+
+    private String[] mItems;
+    private Context mContext;
+    private int[] mTabIcons = {
+            R.drawable.alerts_icon,
+            R.drawable.location_icon,
+            R.drawable.data_icon,
+            R.drawable.diagnostics_icon,
+            R.drawable.emergency_icon
+    };
+   /* private int[] mTabIconColors = {
+            R.color.alert_module_code,
+            R.color.location_module_code,
+            R.color.driving_module_code,
+            R.color.diagnostics_code,
+            R.color.emergency_code
+    };*/
+    private String[] mSubtitles = {
+            "Manage your automated alerts",
+            "Manage boundaries and Locations",
+            "View mileage, speed and fuel costs",
+            "Maximize your car's potential",
+            "Get the help you need"
+    };
+
+    public DashBoardTabsAdapter(Context ctx, String[] items) {
+        mItems = items;
+        mContext = ctx;
+
+    }
+
+    @Override
+    public int getCount() {
+        return mItems.length;
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return mItems[i];
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int i, View convertView, ViewGroup parent) {
+        TextView title;
+        ImageView imageButton;
+        TextView sub_title;
+        LinearLayout backgroundLL;
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.dashboard_tab_list_item, parent, false);
+        }
+        title = (TextView)convertView.findViewById(R.id.tab_title);
+        sub_title = (TextView)convertView.findViewById(R.id.tab_sub_title);
+        imageButton = (ImageView) convertView.findViewById(R.id.tab_button);
+        backgroundLL =(LinearLayout)convertView.findViewById(R.id.imageLL);
+
+
+        backgroundLL.setLayoutParams(new RelativeLayout.LayoutParams((int) mContext.getResources().getDimension(R.dimen.dashboard_width)
+                , UiStateHelper.getListHeight(mContext)));
+
+        title.setText(mItems[i]);
+        sub_title.setText(mSubtitles[i]);
+
+        title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,UiStateHelper.getListTitleSize(mContext));
+        sub_title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,UiStateHelper.getListSubTitleSize(mContext));
+        if(i==0)
+            backgroundLL.setBackgroundResource(R.drawable.alerts_bg_img);
+        if(i==1)
+            backgroundLL.setBackgroundResource(R.drawable.location_bg_img);
+        if(i==2)
+            backgroundLL.setBackgroundResource(R.drawable.driving_data_bg_img);
+        if(i==3)
+            backgroundLL.setBackgroundResource(R.drawable.diagnostics_bg_img);
+        if (i==4)
+        backgroundLL.setBackgroundResource(R.drawable.emergency_bg_img);
+        imageButton.setImageResource(mTabIcons[i]);
+        return convertView;
+    }
+
+
+}

@@ -1,0 +1,508 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.HomeActivity;
+import com.verizontelematics.indrivemobile.activity.RecallDetailsActivity;
+import com.verizontelematics.indrivemobile.adapters.RecallAlertsAdapter;
+import com.verizontelematics.indrivemobile.controllers.DiagnosticController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.database.StorageTransaction;
+import com.verizontelematics.indrivemobile.database.tables.RecallTable;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.RecallsModel;
+import com.verizontelematics.indrivemobile.models.data.RecallData;
+import com.verizontelematics.indrivemobile.userprofile.UserFactory;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.userprofile.utils.UserUtils;
+
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Created by Priyanga on 8/28/2014.
+ */
+public class RecallInformationFragment extends BaseSubUIFragment implements UIInterface, Observer, HomeActivity.CustomTopBarItemsClickListener
+,UserRoleConstants{
+    private static final String TAG = RecallInformationFragment.class.getSimpleName();
+    private ListView mCurrentRecallsLV;
+    private ListView mCompletedRecallsLV;
+    private TextView noCurrentRecallsTV;
+    private TextView noCompletedRecallsTV;
+    private SwipeRefreshLayout mCurrentRecallsRefreshLayout,mCompleteRecallsRefreshLayout;
+    private RecallAlertsAdapter mCurrentCursorAdapter;
+    private RecallAlertsAdapter mCompletedCursorAdapter;
+    private ImageView mImgVwInfo;
+
+    public RecallInformationFragment() {
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = null;
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            rootView = inflater.inflate(R.layout.fragment_recalls_land, container, false);
+        } else {
+            rootView = inflater.inflate(R.layout.fragment_recalls, container, false);
+        }
+        init(rootView);
+        populateRecallsList();
+        setListenersForSaveCancel();
+        RelativeLayout mCompletedRecallsDescription = (RelativeLayout) rootView.findViewById(R.id.header_completed_recalls_list_1);
+        mCompletedRecallsDescription.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+
+        RelativeLayout mCompletedRecallsHeader = (RelativeLayout) rootView.findViewById(R.id.header_completed_recalls_list);
+        mCompletedRecallsHeader.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+        return rootView;
+    }
+
+    private void populateRecallsList() {
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                String initialQuery =  "SELECT * FROM 'recall' WHERE date_completed <= 0 ";   //
+                StorageTransaction transaction = new StorageTransaction(getActivity().getApplicationContext());
+                mCurrentCursorAdapter = new RecallAlertsAdapter(getActivity().getApplicationContext(),transaction.getAllData(RecallTable.TABLE_NAME_RECALL, initialQuery,new boolean[]{false, false}, RecallTable.COLUMN_ComponentName, RecallTable.COLUMN_DateIssued), false);//transaction.getAllData(RecallTable.TABLE_NAME_RECALL, new boolean[]{false, true}, RecallTable.COLUMN_ComponentName, RecallTable.COLUMN_DateIssued), false);// transaction.getCursorForUnCompletedRecalls()
+                mCurrentRecallsLV.setAdapter(mCurrentCursorAdapter);
+                mCurrentCursorAdapter.registerDataSetObserver(new DataSetObserver() {
+                    @Override
+                    public void onChanged() {
+                        if (mCurrentCursorAdapter.getCount() == 0) {
+                            noCurrentRecallsTV.setVisibility(TextView.VISIBLE);
+                        } else {
+                            noCurrentRecallsTV.setVisibility(TextView.INVISIBLE);
+                        }
+                    }
+                });
+                initialQuery = "SELECT * FROM 'recall' WHERE date_completed > 0 ";
+                mCompletedCursorAdapter = new RecallAlertsAdapter(getActivity().getApplicationContext(),transaction.getAllData(RecallTable.TABLE_NAME_RECALL, initialQuery,new boolean[]{false, false}, RecallTable.COLUMN_ComponentName, RecallTable.COLUMN_DateIssued) , false);//transaction.getAllData(RecallTable.TABLE_NAME_RECALL, new boolean[]{false, true}, RecallTable.COLUMN_ComponentName, RecallTable.COLUMN_DateIssued), false); //transaction.getCursorForCompletedRecalls()
+                mCompletedRecallsLV.setAdapter(mCompletedCursorAdapter);
+                mCompletedCursorAdapter.registerDataSetObserver(new DataSetObserver() {
+                    @Override
+                    public void onChanged() {
+                        if (mCompletedCursorAdapter.getCount() == 0) {
+                            noCompletedRecallsTV.setVisibility(TextView.VISIBLE);
+                        } else {
+                            noCompletedRecallsTV.setVisibility(TextView.INVISIBLE);
+                        }
+                    }
+                });
+
+                // give a start call.
+                mCurrentCursorAdapter.notifyDataSetChanged();
+                mCompletedCursorAdapter.notifyDataSetChanged();
+
+            }
+        });
+
+
+    }
+
+    private void init(View rootView) {
+
+        if (getArguments() != null) {
+            int mContainerId = getArguments().getInt("container", R.id.container_id_diagnostics);
+        }
+
+        mCurrentRecallsLV = (ListView) rootView.findViewById(R.id.list_current_recalls);
+        mCompletedRecallsLV = (ListView) rootView.findViewById(R.id.list_completed_recalls);
+
+        mImgVwInfo = (ImageView) rootView.findViewById(R.id.btn_info_maintenance_log);
+        mImgVwInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    ToBeDecidedDialog dialog = new ToBeDecidedDialog(getActivity(),getActivity().getResources().getString(R.string.info_recall));
+                    dialog.setTitle(getResources().getString(R.string.about_recalls));
+                    dialog.show();
+            }
+        });
+
+        noCurrentRecallsTV = (TextView) rootView.findViewById(R.id.noCurrentRecallsTV);
+        noCompletedRecallsTV = (TextView) rootView.findViewById(R.id.noCompletedRecallsTV);
+
+        mCurrentRecallsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                // get the cursor
+                if (mCurrentCursorAdapter == null)
+                    return;
+                // get data from selected index
+                Cursor cursor =(Cursor) mCurrentCursorAdapter.getItem(position);
+                if (cursor == null)
+                    return;
+                StorageTransaction transaction = new StorageTransaction(getActivity().getApplicationContext());
+                RecallData recallData = transaction.getRecall(cursor);
+                if (recallData == null)
+                    return;
+
+               /* // prepare parcel with selected log
+                Bundle recallDetailedArguments = new Bundle();
+                recallDetailedArguments.putParcelable("selected_data", recallData);
+
+                // launch detailed view of log
+                android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+                RecallInfoDetailFragment fragment = new RecallInfoDetailFragment();
+                fragment.setHomeFragment(getHomeFragment());
+                // pass arguments with selected index and edit mode
+                fragment.setArguments(recallDetailedArguments);
+                // launch fragment.
+                ft.addToBackStack("recall_alert_detailed_fragment");
+                ft.replace(mContainerId, fragment, "recall_alert_detailed_fragment");
+                ft.commit();
+                getHomeFragment().pushFragmentStack("recall_alert_detailed_fragment");*/
+
+                launchActivity(RecallDetailsActivity.class,"recallInformationDetailsView",recallData);
+//                Intent recallDetailIntent = new Intent(getActivity(), RecallDetailsActivity.class);
+//                recallDetailIntent.putExtra("selected_data", recallData);
+//                startActivity(recallDetailIntent);
+
+            }
+        });
+
+        mCompletedRecallsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                // get the cursor
+                if (mCompletedCursorAdapter == null)
+                    return;
+                // get data from selected index
+                Cursor cursor =(Cursor) mCompletedCursorAdapter.getItem(position);
+                if (cursor == null)
+                    return;
+                StorageTransaction transaction = new StorageTransaction(getActivity().getApplicationContext());
+                RecallData recallData = transaction.getRecall(cursor);
+                if (recallData == null)
+                    return;
+
+                /*// prepare parcel with selected log
+                Bundle recallDetailedArguments = new Bundle();
+                recallDetailedArguments.putParcelable("selected_data", recallData);
+
+                // launch detailed view of log
+                android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+                RecallInfoDetailFragment fragment = new RecallInfoDetailFragment();
+                fragment.setHomeFragment(getHomeFragment());
+                // pass arguments with selected index and edit mode
+                fragment.setArguments(recallDetailedArguments);
+                // launch fragment.
+                ft.addToBackStack("recall_alert_detailed_fragment");
+                ft.replace(mContainerId, fragment, "recall_alert_detailed_fragment");
+                ft.commit();
+                getHomeFragment().pushFragmentStack("recall_alert_detailed_fragment");*/
+                launchActivity(RecallDetailsActivity.class,"recallInformationDetailsViewCompletedOrNot",recallData);
+//                Intent recallDetailIntent = new Intent(getActivity(), RecallDetailsActivity.class);
+//                recallDetailIntent.putExtra("selected_data", recallData);
+//                startActivity(recallDetailIntent);
+
+            }
+        });
+//        populateData();
+        getActivity().setTitle(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[3]);
+
+        mCurrentRecallsRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.current_recalls_list_swipe_refresh);
+        mCurrentRecallsRefreshLayout.setColorSchemeResources(R.color.diagnostics_code, R.color.sub_header_color, R.color.diagnostics_code, R.color.sub_header_color);
+        mCurrentRecallsRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d(TAG, "onRefresh() maintenance reminders ");
+                // once job done setRefresh to false.
+                //mCurrentRecallsRefreshLayout.setRefreshing(false);
+                // perform controller refresh operation
+                DiagnosticController.instance().getRecalls(getActivity());
+
+
+            }
+        });
+        //mAlertsRefreshLayout.setColorSchemeResources(R.color.red, R.color.sc_blueDark, R.color.goldenrod_yellow, R.color.sc_financialGreen);
+
+        mCompleteRecallsRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.completed_recalls_list_swipe_refresh);
+        mCompleteRecallsRefreshLayout.setColorSchemeResources(R.color.diagnostics_code, R.color.sub_header_color, R.color.diagnostics_code, R.color.sub_header_color);
+        mCompleteRecallsRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d(TAG, "onRefresh() maintenance logs  ");
+                // once job done setRefresh to false.
+                mCompleteRecallsRefreshLayout.setRefreshing(false);
+                // perform controller refresh operation
+                DiagnosticController.instance().getRecalls(getActivity());
+
+
+            }
+        });
+
+        if (mCurrentRecallsRefreshLayout != null)
+            mCurrentRecallsRefreshLayout.setRefreshing(true);
+        if (mCompleteRecallsRefreshLayout != null)
+            mCompleteRecallsRefreshLayout.setRefreshing(true);
+
+        setupCallbacks();
+        // work around to smooth the animation.
+        // But code need to be removed
+        // Actual fix : perform on animation end.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                DiagnosticController.instance().getRecalls(getActivity());
+
+            }
+        }, 1000);
+        // work around end.
+    }
+
+
+    private void launchActivity(Class activity,String subModule,RecallData recallData){
+//        activity = UserFactory.getInstance(getActivity()).getActivityView(activity,subModule);
+//        if(UserUtils.isUserInactive(getActivity(), inactiveMessage)){
+//            return;
+//        }
+        Intent intent = UserFactory.getInstance(getActivity()).getActivityViewIntent(getActivity(),
+                activity,subModule);//new Intent(getActivity(),activity);
+        intent.putExtra("selected_data", recallData);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getActivity().setTitle(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[3]);
+        checkListCount();
+    }
+
+    private void checkListCount() {
+
+        int currentCount = mCurrentRecallsLV.getCount();
+        if (currentCount == 0) {
+            noCurrentRecallsTV.setVisibility(TextView.VISIBLE);
+        } else {
+            noCurrentRecallsTV.setVisibility(TextView.INVISIBLE);
+        }
+        int completedCount = mCompletedRecallsLV.getCount();
+        if (completedCount == 0) {
+            noCompletedRecallsTV.setVisibility(TextView.VISIBLE);
+        } else {
+            noCompletedRecallsTV.setVisibility(TextView.INVISIBLE);
+        }
+    }
+
+    // Stub started
+    /*private void populateData() {
+
+
+        RecallAlertModel recallAlertModel1 = new RecallAlertModel();
+        recallAlertModel1.setData("RecallAlert", "Engine Issue", "", Calendar.getInstance().getTimeInMillis(), "");
+
+        RecallAlertModel recallAlertModel2 = new RecallAlertModel();
+        recallAlertModel2.setData("RecallAlert", "Brake Issue", "", Calendar.getInstance().getTimeInMillis(), "");
+
+        ((AlertsModel) AppController.instance().getRecallAlertsModel()).clear();
+
+        ((AlertsModel) AppController.instance().getRecallAlertsModel()).add(recallAlertModel1);
+        ((AlertsModel) AppController.instance().getRecallAlertsModel()).add(recallAlertModel2);
+    }*/
+
+
+    // Stub ended.
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (getActivity() == null)
+            return;
+
+        LayoutInflater inflater = (LayoutInflater) getActivity().getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        if (inflater == null) {
+            return;
+        }
+
+        View newView = null;
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            newView = inflater.inflate(R.layout.fragment_recalls_land, null);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            newView = inflater.inflate(R.layout.fragment_recalls, null);
+        }
+
+        if (newView == null)
+            return;
+
+        ViewGroup rootView = (ViewGroup) getView();
+        rootView.removeAllViews();
+        // Temp fix
+        // It supposed to be in onPause or onDestroyView
+
+        rootView.addView(newView);
+
+        // setup
+        init(rootView);
+    }
+
+    private void setupCallbacks() {
+        DiagnosticController.instance().register(this);
+        DiagnosticController.instance().getRecallsModel().addObserver(this);
+    }
+
+    private void cleanup() {
+        DiagnosticController.instance().unregister(this);
+        DiagnosticController.instance().getRecallsModel().deleteObserver(this);
+    }
+
+
+    @Override
+    public void update(final Observable observable, final Object data) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(RecallsModel.class.isInstance(observable)){
+                    // we have got new logs.
+                    StorageTransaction transaction = new StorageTransaction(getActivity());
+                    transaction.deleteAllDataForTable(RecallTable.TABLE_NAME_RECALL);
+                    if (data != null) {
+                        List<RecallData> lRecalls = (List<RecallData>) data;
+                        transaction.insertBulkRecalls(lRecalls);
+                    }
+                }
+                populateRecallsList();
+            }
+        });
+
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+        Log.d(TAG, "Progress "+opr.getInformation());
+        if (opr.getId() == Operation.OperationCode.GET_RECALLS.ordinal()) {
+            //if (mCurrentRecallsRefreshLayout != null) {
+                //mCurrentRecallsRefreshLayout.setRefreshing(true);
+            //}
+        }
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        Log.d(TAG, "Error "+opr.getInformation());
+
+        if (opr.getId() == Operation.OperationCode.GET_RECALLS.ordinal()) {
+
+            if (mCurrentRecallsRefreshLayout != null && mCurrentRecallsRefreshLayout.isRefreshing()) {
+                mCurrentRecallsRefreshLayout.setRefreshing(false);
+            }
+            if (mCompleteRecallsRefreshLayout != null && mCompleteRecallsRefreshLayout.isRefreshing()) {
+                mCompleteRecallsRefreshLayout.setRefreshing(false);
+            }
+            if (getActivity() != null) {
+                Toast toast = Toast.makeText(getActivity(), getResources().getString(R.string.error_occurred) + opr.getInformation(), Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        Log.d(TAG, "Success "+opr.getInformation());
+        if (opr.getId() == Operation.OperationCode.GET_RECALLS.ordinal()) {
+            if (mCurrentRecallsRefreshLayout != null && mCurrentRecallsRefreshLayout.isRefreshing()) {
+                mCurrentRecallsRefreshLayout.setRefreshing(false);
+            }
+            if (mCompleteRecallsRefreshLayout != null && mCompleteRecallsRefreshLayout.isRefreshing()) {
+                mCompleteRecallsRefreshLayout.setRefreshing(false);
+            }
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        cleanup();
+        ((HomeActivity)getActivity()).hideCustomActionBar("Diagnostics");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    @Override
+    public void onTopBarItemClick(View aView) {
+        if (aView.getId() == HomeActivity.LEFT_ARROW_ID) {
+//            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+//            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+//            DiagnosticsFragment diagnosticsHome = new DiagnosticsFragment();
+//            transaction.replace(R.id.mainRecallLL, diagnosticsHome);
+//            transaction.commit();
+            removeFragment();
+        }
+    }
+
+    private void removeFragment() {
+        getHomeFragment().popFragmentStack();
+    }
+
+    private void setListenersForSaveCancel() {
+        ((HomeActivity) getActivity()).addToDoneButtonClickHandlers(this);
+        ((HomeActivity) getActivity()).addToLeftArrowClickHandlers(this);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        ((HomeActivity) activity).setCustomActionBarView(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[3],
+                true, false, false,false);
+
+    }
+
+
+}

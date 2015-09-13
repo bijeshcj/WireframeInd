@@ -1,0 +1,231 @@
+package com.verizontelematics.indrivemobile.models;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.IndriveApplication;
+import com.verizontelematics.indrivemobile.database.StorageTransaction;
+import com.verizontelematics.indrivemobile.models.data.DiagnosticInfo;
+import com.verizontelematics.indrivemobile.models.data.HealthStatus;
+import com.verizontelematics.indrivemobile.models.data.VehiclePartData;
+import com.verizontelematics.indrivemobile.utils.ui.DBUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
+/**
+ * Created by z688522 on 9/26/14.
+ */
+public class VehicleHealthModel extends BaseModel {
+
+    private static final String TAG = VehiclePartModel.class.getSimpleName();
+    ArrayList<com.verizontelematics.indrivemobile.models.data.HealthStatus> HealthStatus;
+
+
+    public VehicleHealthModel() {
+        super();
+        mData = new ArrayList<HealthStatus>();
+    }
+
+    public void setData(JSONObject inData) throws JSONException {
+
+        Gson gson = new GsonBuilder().create();
+        Type listType = new TypeToken<ArrayList<HealthStatus>>() {
+        }.getType();
+        String strData = inData.get("HealthStatus").toString();
+        if (strData != null && !strData.isEmpty() && !strData.equalsIgnoreCase("null")) {
+
+            //Clear tables if exists
+            DBUtils.clearVehicleHealthData(IndriveApplication.getInstance());
+
+            //Create storage transaction instance
+            StorageTransaction storageTransaction = new StorageTransaction(IndriveApplication.getInstance());
+
+            HealthStatus = new ArrayList<HealthStatus>();
+
+            JSONArray healthStatusJSONArray = inData.getJSONArray("HealthStatus");
+            for (int i = 0; i < healthStatusJSONArray.length(); i++) {
+                HealthStatus healthStatus = new HealthStatus();
+                JSONObject healthStatusObject = (JSONObject) healthStatusJSONArray.get(i);
+                Type listDiagnosticInfoType = new TypeToken<ArrayList<DiagnosticInfo>>() {
+                }.getType();
+                String diagnosticListData = healthStatusObject.get("DiagnosticInfo").toString();
+                if (diagnosticListData != null && !diagnosticListData.isEmpty() && !diagnosticListData.equalsIgnoreCase("null")) {
+                    ArrayList<DiagnosticInfo> diagnosticInfo = gson.fromJson(healthStatusObject.getJSONArray("DiagnosticInfo").toString(), listDiagnosticInfoType);
+                    healthStatus.setDiagnosticInfo(diagnosticInfo);
+                }
+
+                healthStatus.setServiceArea(healthStatusObject.get("ServiceArea").toString());
+                healthStatus.setServiceAreaStatus(healthStatusObject.get("ServiceAreaStatus").toString());
+                HealthStatus.add(healthStatus);
+            }
+            storageTransaction.insertBulkHealthStatusRecords(HealthStatus);
+            mData = HealthStatus;
+
+        }
+
+        /*// stubbed code
+        if (!((ArrayList<VehiclePartModel>) mData).isEmpty()) {
+            ((ArrayList<VehiclePartModel>) mData).clear();
+        }
+        // stub ended.
+        for (HealthStatus healthStatus : HealthStatus) {
+            ((ArrayList<VehiclePartModel>) mData).add(VehiclePartModel.createPartModel(healthStatus));
+        }
+
+        Log.v("mData Size is ", "" + ((ArrayList<VehiclePartModel>) mData).size());*/
+
+        setChanged();
+        notifyObservers(HealthStatus);
+
+    }
+
+    public ArrayList<HealthStatus> getHealthStatus() {
+        return HealthStatus;
+    }
+
+    public void setHealthStatus(ArrayList<HealthStatus> healthStatus) {
+        HealthStatus = healthStatus;
+    }
+
+
+    public String getOverallHealthStatus() {
+        String status = VehiclePartData.STATUS_OK;
+        String pStatus = "";
+        ArrayList<HealthStatus> list = getHealthStatus();
+
+        for (HealthStatus partModel : list) {
+
+            pStatus=  partModel.getServiceAreaStatus();
+
+            if (pStatus.equals(VehiclePartData.STATUS_ERROR)) {
+                status = pStatus;
+                return status;
+            }
+            if (pStatus.equals(VehiclePartData.STATUS_WARNING)) {
+                status = pStatus;
+            }
+        }
+        return status;
+    }
+
+
+   /* public String getOverallHealthStatus() {
+        String status = VehiclePartData.STATUS_OK;
+        String pStatus = "";
+        ArrayList<VehiclePartModel> list = (ArrayList<VehiclePartModel>) mData;
+
+        for (VehiclePartModel partModel : list) {
+
+            pStatus = (String) ((VehiclePartData) partModel.getData()).get(VehiclePartData.STATUS);
+
+            if (pStatus.equals(VehiclePartData.STATUS_ERROR)) {
+                status = pStatus;
+                return status;
+            }
+            if (pStatus.equals(VehiclePartData.STATUS_WARNING)) {
+                status = pStatus;
+            }
+        }
+        return status;
+    }
+*/
+
+
+
+
+   /* public VehicleHealthModel() {
+        super();
+        mData = new ArrayList<VehiclePartModel>();
+    }
+
+    public void setData(List<HealthStatus> list) {
+        // stubbed code
+        if (!((ArrayList<VehiclePartModel>)mData).isEmpty()) {
+            ((ArrayList<VehiclePartModel>)mData).clear();
+        }
+        // stub ended.
+        for (HealthStatus healthStatus: list) {
+            ((ArrayList<VehiclePartModel>)mData).add(VehiclePartModel.createPartModel(healthStatus));
+        }
+        setChanged();
+        notifyObservers(list);
+    }
+
+    public void add(VehiclePartModel vehiclePartModel) {
+        ((ArrayList<VehiclePartModel>)mData).add(vehiclePartModel);
+        setChanged();
+        notifyObservers();
+    }
+
+    public void add(List<VehiclePartModel> vehiclePartModelList) {
+        if (mData == null) {
+            mData = new ArrayList<VehiclePartModel>();
+        }
+        ((ArrayList<VehiclePartModel>)mData).addAll(vehiclePartModelList);
+        setChanged();
+        notifyObservers();
+    }
+
+    public void remove(VehicleHealthModel alertModel) {
+        ArrayList<VehiclePartModel> list = (ArrayList<VehiclePartModel>)mData;
+        if (list.contains(alertModel)) {
+            list.remove(alertModel);
+            setChanged();
+            notifyObservers();
+        }
+    }
+
+    public void clear() {
+        if (((ArrayList<VehiclePartModel>)mData).isEmpty())
+            return;
+        ((ArrayList<VehiclePartModel>)mData).clear();
+        setChanged();
+        notifyObservers();
+    }
+
+    public Boolean update(int selectedIndex, VehiclePartModel vehiclePartModel) {
+        ArrayList<VehiclePartModel> list = (ArrayList<VehiclePartModel>)mData;
+        if (selectedIndex == -1 || list == null || selectedIndex >= list.size()) {
+            return false;
+        }
+        list.set(selectedIndex, vehiclePartModel);
+        setChanged();
+        notifyObservers();
+        return true;
+    }
+
+    public VehiclePartModel get(int index) {
+        ArrayList<VehiclePartModel> list = (ArrayList<VehiclePartModel>)mData;
+        if (index == -1 || list == null || index >= list.size()) {
+            return null;
+        }
+        return list.get(index);
+    }
+
+    // Stubbed code
+    public String getOverallHealthStatus() {
+        String status = VehiclePartData.STATUS_OK;
+        String pStatus = "";
+        ArrayList<VehiclePartModel> list = (ArrayList<VehiclePartModel>)mData;
+
+        for (VehiclePartModel partModel: list) {
+
+            pStatus = (String)((VehiclePartData)partModel.getData()).get(VehiclePartData.STATUS);
+
+            if (pStatus.equals(VehiclePartData.STATUS_ERROR)) {
+                status = pStatus;
+                return status;
+            }
+            if (pStatus.equals(VehiclePartData.STATUS_WARNING)) {
+                status = pStatus;
+            }
+        }
+        return status;
+    }
+    // Stub ended*/
+}

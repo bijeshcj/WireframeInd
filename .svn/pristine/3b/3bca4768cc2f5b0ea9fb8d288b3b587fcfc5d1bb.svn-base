@@ -1,0 +1,31 @@
+package com.verizontelematics.indrivemobile.userprofile.utils;
+
+import android.content.Context;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.userprofile.UserFactory;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+
+/**
+ * Created by bijesh on 3/11/2015.
+ */
+public class UserUtils {
+
+
+    public static boolean compareUserWithConfig(){
+        return false;
+    }
+
+    public static void showInActiveMessage(Context context,String message){
+        Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+    }
+
+    public static boolean isUserInactive(Context context,String inactiveMessage){
+        if(UserFactory.getCurrentUserRole().equalsIgnoreCase(UserRoleConstants.INACTIVE_ROLE)){
+            showInActiveMessage(context,inactiveMessage);
+            return true;
+        }
+        return false;
+    }
+
+}

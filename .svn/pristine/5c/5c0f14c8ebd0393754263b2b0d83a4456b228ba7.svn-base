@@ -1,0 +1,615 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.HomeActivity;
+import com.verizontelematics.indrivemobile.activity.VehicleHealthDTCListActivity;
+import com.verizontelematics.indrivemobile.activity.VehicleHealthDetailActivity;
+import com.verizontelematics.indrivemobile.adapters.VehicleHealthAdapter;
+import com.verizontelematics.indrivemobile.constants.WidgetConstants;
+import com.verizontelematics.indrivemobile.controllers.AppController;
+import com.verizontelematics.indrivemobile.controllers.DiagnosticController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.LayeredImageView;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.VehicleHealthModel;
+import com.verizontelematics.indrivemobile.models.VehiclePartModel;
+import com.verizontelematics.indrivemobile.models.data.VehiclePartData;
+import com.verizontelematics.indrivemobile.userprofile.UserFactory;
+import com.verizontelematics.indrivemobile.utils.ui.DBUtils;
+import com.verizontelematics.indrivemobile.utils.ui.VehiclePartView;
+
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Created by Priyanga on 8/27/2014.
+ */
+
+public class VehicleHealthFragment extends BaseSubUIFragment implements Observer, UIInterface, HomeActivity.CustomTopBarItemsClickListener {
+
+    public static final String TAG = "VehicleHealthFragment";
+    private ImageView showMenu;
+    private LayeredImageView mVehicleHealthContainer;
+    private RelativeLayout detailViewRL;
+    private ImageView backIV;
+    private SwipeRefreshLayout mRefreshLayout;
+    private VehicleHealthAdapter mVehiclePartsAdapter;
+    private TextView mOverAllHealthStatus;
+    private TextView mDiagnosticSummaryStatus;
+    private boolean animationStopped = false;
+    private ImageView statusInfoIV;
+
+    public VehicleHealthFragment() {
+        super();
+//        Empty constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+    }
+
+//    BroadcastReceiver widgetCommunicationReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//
+//        }
+//    };
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = null;
+// Below code is commented
+// As per the latest guideline the VehicleHealthScreen doesn't have Landscape mode.
+//        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            ((HomeActivity)getActivity()).hideSlidingMenus();
+//            rootView = inflater.inflate(R.layout.fragment_vehicle_health_land, container, false);
+//        } else {
+            ((HomeActivity)getActivity()).showSlidingMenus();
+            rootView = inflater.inflate(R.layout.fragment_vehicle_health, container, false);
+        //}
+        init(rootView);
+        //getActivity().setTitle(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[0]);
+        setListenersForSaveCancel();
+
+        // Hack can be removed.
+        TextView overallSummary = (TextView) rootView.findViewById(R.id.txt_vehicle_health_overall_status);
+        overallSummary.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+
+        rootView.findViewById(R.id.vehicleHealthIV).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+        // to avoid overlapped touch events
+        RelativeLayout mDiagnosticStatus = (RelativeLayout) rootView.findViewById(R.id.diagnosticSummaryHeader);
+        mDiagnosticStatus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+        return rootView;
+    }
+
+
+    private void init(View rootView) {
+
+        RelativeLayout mCarTypeLayout = (RelativeLayout) rootView.findViewById(R.id.car_type);
+        // hardcoded to compact once vehicle type integrated we will have to remove hardcoded.
+        VehiclePartView.setVehicleType(AppController.instance().getVehicleType());
+        mCarTypeLayout.setBackgroundResource(VehiclePartView.getCarBackground());
+
+        mOverAllHealthStatus = (TextView) rootView.findViewById(R.id.txt_vehicle_health_overall_status);
+        mOverAllHealthStatus.setVisibility(View.INVISIBLE);
+
+        mDiagnosticSummaryStatus = (TextView) rootView.findViewById(R.id.txt_vehicle_health_overall_status1);
+        mDiagnosticSummaryStatus.setVisibility(View.INVISIBLE);
+
+        statusInfoIV =(ImageView)rootView.findViewById(R.id.vehicle_health_overall_status_img);
+
+        // Get the VehicleHealthContainer
+        mVehicleHealthContainer = (LayeredImageView) rootView.findViewById(R.id.vehicleHealthIV);
+
+        // list view and attach with adapter
+        ListView vehiclePartsListView = (ListView) rootView.findViewById(R.id.vehicle_health_list);
+
+        vehiclePartsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // Temp fix :
+                // Not allow item clicks in landscape mode
+                if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    return;
+
+                VehiclePartModel vehiclePartModel = mVehiclePartsAdapter.getItemData(i);
+                VehiclePartData vehiclePartData = (VehiclePartData) vehiclePartModel.getData();
+                if (vehiclePartData != null && vehiclePartData.get(VehiclePartData.STATUS).equals(VehiclePartData.STATUS_OK))
+                    return;
+
+                /*final FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+
+                BaseSubUIFragment detailFragmentObject = new VehicleHealthDetailFragment();
+                detailFragmentObject.setHomeFragment(getHomeFragment());
+                Bundle selectedDetails = new Bundle();
+                selectedDetails.putString("title", (String) vehiclePartData.get(VehiclePartData.PART_TITLE));
+                selectedDetails.putString("status", (String) vehiclePartData.get(VehiclePartData.STATUS));
+                detailFragmentObject.setArguments(selectedDetails);
+
+
+                fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out, R.anim.slide_in_left, R.anim.slide_out);
+                fragmentTransaction.addToBackStack("VehicleHealthDetailed");
+                fragmentTransaction.add(R.id.container_fragment_vehicle_health, detailFragmentObject, "VehicleHealthDetailed");
+                fragmentTransaction.commit();
+                getHomeFragment().pushFragmentStack("VehicleHealthDetailed");*/
+
+                //  sendDataToWidgetService();
+//                for testing widget
+
+
+                Intent vehicleHealthDetailIntent = new Intent(getActivity(), VehicleHealthDetailActivity.class);
+                vehicleHealthDetailIntent.putExtra("title", (String) vehiclePartData.get(VehiclePartData.PART_TITLE));
+                vehicleHealthDetailIntent.putExtra("status", (String) vehiclePartData.get(VehiclePartData.STATUS));
+                //startActivity(vehicleHealthDetailIntent);
+
+
+//                Intent vehicleHealthDTCListActivity = new Intent(getActivity(), VehicleHealthDTCListActivity.class);
+//                startActivity(vehicleHealthDTCListActivity);
+                launchActivity(VehicleHealthDTCListActivity.class,"vehicleHealthDiagnosticsDetailsPage");
+
+            }
+        });
+
+        ArrayList<VehiclePartModel> mVehicleParts = (ArrayList<VehiclePartModel>) DiagnosticController.instance().getVehicleHealthModel().getData();
+
+        Log.d(TAG,"$$$ mVehicleParts "+ mVehicleParts);
+
+        if (mVehiclePartsAdapter == null)
+            mVehiclePartsAdapter = new VehicleHealthAdapter(getActivity(), R.layout.vehicle_part_list_item, mVehicleParts);
+
+        vehiclePartsListView.setAdapter(mVehiclePartsAdapter);
+
+        // Refresh Layout
+        mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.vehicle_health_list_swipe_refresh);
+        mRefreshLayout.setColorSchemeResources(R.color.diagnostics_code, R.color.sub_header_color, R.color.diagnostics_code, R.color.sub_header_color);
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d(TAG, "onRefresh() maintenance logs  ");
+                // once job done setRefresh to false.
+                mRefreshLayout.setRefreshing(true);
+                // perform controller refresh operation
+                DiagnosticController.instance().getVehicleHealth(getActivity());
+
+            }
+        });
+
+        // by default in initial state views will be in refreshing state.
+        if (mRefreshLayout != null)
+            mRefreshLayout.setRefreshing(true);
+
+        ImageView mInfoIV = (ImageView) rootView.findViewById(R.id.btn_info_vehicle_health);
+
+            mInfoIV.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showTerms();
+                }
+            });
+
+
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            showMenu = (ImageView) rootView.findViewById(R.id.showMenu);
+            detailViewRL = (RelativeLayout) rootView.findViewById(R.id.detailView);
+            backIV = (ImageView) rootView.findViewById(R.id.show_back);
+            showMenu.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("NewApi")
+                @Override
+                public void onClick(View v) {
+                    detailViewRL.setVisibility(View.VISIBLE);
+                    detailViewRL.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.slide_out_detail));
+                    showMenu.setVisibility(View.INVISIBLE);
+
+
+                }
+            });
+
+            backIV.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    detailViewRL.setVisibility(View.INVISIBLE);
+                    detailViewRL.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.slide_in_detail));
+                    backIV.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.slide_in_detail));
+                    showMenu.setVisibility(View.VISIBLE);
+
+
+                }
+            });
+        }
+
+        setupCallBacks();
+
+        populateUIElements();
+
+        // workaround to smooth the animation.
+        // But code need to be removed
+        // Actual fix : perform on animation end.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Initial call to get vehicle health data.
+                DiagnosticController.instance().getVehicleHealth(getActivity());
+            }
+        }, 1000);
+        // work around end.
+    }
+
+
+    private void launchActivity(Class activity,String subModule){
+        activity = UserFactory.getInstance(getActivity()).getActivityView(activity,subModule);
+        Intent intent = new Intent(getActivity(),activity);
+        startActivity(intent);
+    }
+
+
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        Log.d(TAG,"onResume");
+
+    }
+
+    private void setupCallBacks() {
+        DiagnosticController.instance().getVehicleHealthModel().addObserver(this);
+        DiagnosticController.instance().register(this);
+    }
+
+    private void cleanup() {
+        DiagnosticController.instance().getVehicleHealthModel().deleteObserver(this);
+        DiagnosticController.instance().unregister(this);
+    }
+
+    void createAnimationEffects(Animation fadeInAnimation, Animation fadeOutAnimation) {
+        if(fadeInAnimation == null || fadeOutAnimation == null) return;
+        animationStopped = false;
+
+        fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+            Animation lFadeOutValue;
+
+            Animation.AnimationListener init(Animation value) {
+                lFadeOutValue = value;
+                return this;
+            }
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mVehicleHealthContainer.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if(!animationStopped) {
+                    mVehicleHealthContainer.startAnimation(lFadeOutValue);
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                // TODO Auto-generated method stub
+
+            }
+        }.init(fadeOutAnimation));
+
+        fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+            Animation lFadeInValue;
+
+            Animation.AnimationListener init(Animation value) {
+                lFadeInValue = value;
+                return this;
+            }
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mVehicleHealthContainer.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if(!animationStopped) {
+                    mVehicleHealthContainer.startAnimation(lFadeInValue);
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                // TODO Auto-generated method stub
+
+            }
+        }.init(fadeInAnimation));
+
+        mVehicleHealthContainer.startAnimation(fadeInAnimation);
+
+    }
+
+    private void sendDataToWidgetService() {
+
+        Log.d(TAG, "$$$ Sending message to service ");
+        final Intent intent = new Intent();
+        intent.setAction(WidgetConstants.ACTION_TO_WIDGET_SERVICE);
+        intent.putExtra("data", "this will be shown on service");
+        getActivity().sendBroadcast(intent);
+    }
+
+// Below code is commented
+// As per the latest UI guideline VehicleHealthScreen should not have landscape mode.
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//
+//        super.onConfigurationChanged(newConfig);
+//        Log.v("onConfigurationChanged","Vehicle Health Screen");
+//        if (getActivity() == null)
+//            return;
+//        //Work around for all onConfigurationChanged being called.
+//        String currentFragmentName = getCurrentFragmentName();
+//        if (currentFragmentName.equals("VehicleHealth")) {
+//            LayoutInflater inflater = (LayoutInflater) getActivity().getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            if (inflater == null) {
+//                return;
+//            }
+//            View newView = null;
+//
+//            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                ((HomeActivity) getActivity()).hideSlidingMenus();
+//                newView = inflater.inflate(R.layout.fragment_vehicle_health_land, null);
+//
+//            } else {
+//                ((HomeActivity) getActivity()).showSlidingMenus();
+//                newView = inflater.inflate(R.layout.fragment_vehicle_health, null);
+//            }
+//               if (newView == null)
+//                   return;
+//            newView.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View view, MotionEvent motionEvent) {
+//                    return true;
+//                }
+//            });
+//
+//
+//            init(newView);
+//
+//            //Commenting the below as this case never gonna come
+//            // as the device can be in landscape or portrait only , moved the code above touch listener
+//          //  if (newView == null)
+//            //    return;
+//
+//            ViewGroup rootView = (ViewGroup) getView();
+//            rootView.removeAllViews();
+//            rootView.addView(newView);
+//        }
+//    }
+
+    public void updateVehicleHealthUI() {
+
+        ArrayList<VehiclePartModel> partModels = (ArrayList<VehiclePartModel>)DiagnosticController.instance().getVehicleHealthModel().getData();
+
+        int statusImages[] = new int[partModels.size() + 1];
+
+        // Car background
+        statusImages[0] = R.drawable.car_background;
+        //
+        for (int i = 1; i < partModels.size(); i++) {
+            statusImages[i] = VehiclePartView.getStatusImage((VehiclePartData) partModels.get(i).getData());
+        }
+        // for now just show these two images.
+        mVehicleHealthContainer.setBitmapResourceArray(statusImages);
+    }
+
+    public void updateVehicleHealthUI(VehiclePartData partData) {
+        VehiclePartView vehiclePartView = VehiclePartView.get(partData);
+        if (vehiclePartView == null
+                || vehiclePartView.getPartFadeInAnimation() == 0
+                || vehiclePartView.getPartFadeOutAnimation() == 0)
+            return;
+
+        if (VehiclePartView.getStatusImage(partData) <= 0){
+
+            return;
+        }
+
+
+        mVehicleHealthContainer.setBackgroundResource(VehiclePartView.getStatusImage(partData));
+        createAnimationEffects(AnimationUtils.loadAnimation(
+                        getActivity(), vehiclePartView.getPartFadeInAnimation()),
+                AnimationUtils.loadAnimation(
+                        getActivity(), vehiclePartView.getPartFadeOutAnimation())
+        );
+
+    }
+    private void populateUIElements() {
+        // Update list
+        mVehiclePartsAdapter.notifyDataSetChanged();
+
+        if (mOverAllHealthStatus != null) {
+            String status = getOverallHealthStatus();
+
+            if (status.equals(VehiclePartData.STATUS_WARNING)) {
+                mDiagnosticSummaryStatus.setText(getActivity().getResources().getString(R.string.monitor_closely));
+                mDiagnosticSummaryStatus.setTextColor(0xFFFF7700);
+                mDiagnosticSummaryStatus.setVisibility(View.VISIBLE);
+                mOverAllHealthStatus.setVisibility(View.INVISIBLE);
+                statusInfoIV.setVisibility(View.VISIBLE);
+                statusInfoIV.setImageResource(R.drawable.warning_yellow);
+            }
+            else if (status.equals(VehiclePartData.STATUS_ERROR)) {
+                mDiagnosticSummaryStatus.setText(getActivity().getResources().getString(R.string.service_required));
+                mOverAllHealthStatus.setVisibility(View.INVISIBLE);
+                mDiagnosticSummaryStatus.setTextColor(0xFFFF0000);
+                mDiagnosticSummaryStatus.setVisibility(View.VISIBLE);
+                statusInfoIV.setVisibility(View.VISIBLE);
+                statusInfoIV.setImageResource(R.drawable.warning_red);
+            }
+            else if (status.equals(VehiclePartData.STATUS_OK)) {
+                mDiagnosticSummaryStatus.setText("No Issue Detected");
+                mDiagnosticSummaryStatus.setTextColor(0xFF00FF00);
+                mDiagnosticSummaryStatus.setVisibility(View.VISIBLE);
+                mOverAllHealthStatus.setVisibility(View.INVISIBLE);
+                statusInfoIV.setVisibility(View.GONE);
+//                return;
+            }
+
+            // stubbed code.
+            VehiclePartData overallCarPart = new VehiclePartData();
+            overallCarPart.set(VehiclePartData.PART_TITLE, "car");
+            overallCarPart.set(VehiclePartData.STATUS, status);
+            updateVehicleHealthUI(overallCarPart);
+            // stubbed code ended.
+        }
+        // error code of vehicle.
+        // updateVehicleHealthUI();
+    }
+
+    private String getOverallHealthStatus() {
+        return ((VehicleHealthModel)DiagnosticController.instance().getVehicleHealthModel()).getOverallHealthStatus();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        Log.v("OnAttach", "VehicleHealthFragment");
+        ((HomeActivity) activity).setCustomActionBarView(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[0],
+                true, false, false,false);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        Log.v("OnDetach","VehicleHealthFragment");
+        cleanup();
+         ((HomeActivity) getActivity()).setCustomActionBarView("", false, false, false,false);
+        ((HomeActivity)getActivity()).showActionToggleButton();
+        ((HomeActivity)getActivity()).setTitle("Diagnostics");
+        ((HomeActivity)getActivity()).showSlidingMenus();
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal()) {
+            if (mRefreshLayout != null && !mRefreshLayout.isRefreshing()) {
+                mRefreshLayout.setRefreshing(true);
+            }
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+
+        if (observable == null || getActivity() == null || isDetached())
+            return;
+
+        if (VehicleHealthModel.class.isInstance(observable)) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    populateUIElements();
+                }
+            });
+
+        }
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal()) {
+            if (mRefreshLayout != null && mRefreshLayout.isRefreshing()) {
+                mRefreshLayout.setRefreshing(false);
+                if(getActivity()!=null)
+                    Toast.makeText(getActivity(), "Error Occurred " + opr.getInformation(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onTopBarItemClick(View aView) {
+        if (aView.getId() == HomeActivity.LEFT_ARROW_ID) {
+            removeFragment();
+        }
+    }
+
+    private void removeFragment() {
+        getHomeFragment().popFragmentStack();
+    }
+
+    private void setListenersForSaveCancel() {
+        ((HomeActivity) getActivity()).addToDoneButtonClickHandlers(this);
+        ((HomeActivity) getActivity()).addToLeftArrowClickHandlers(this);
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal()) {
+            if (mRefreshLayout != null && mRefreshLayout.isRefreshing()) {
+                mRefreshLayout.setRefreshing(false);
+            }
+        }
+    }
+
+    private void showTerms(){
+        DBUtils.pullDbFromLocalStorageToSDCard();
+        ToBeDecidedDialog dialog = new ToBeDecidedDialog(getActivity(),getResources().getString(R.string.diagnostics_info));
+        dialog.setTitle("Diagnostic Summary");
+//        dialog.setInfo();
+        dialog.show();
+    }
+}

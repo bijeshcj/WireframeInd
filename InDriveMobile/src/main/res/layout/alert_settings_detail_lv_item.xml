@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_item_height"
+                android:background="@drawable/gradient_gray_bar"
+                android:descendantFocusability="blocksDescendants"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/alertDetailTV"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:text="@string/speed_alert_text"
+        android:textColor="@color/white"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/onOffIV"
+            android:src="@drawable/green_circle"
+            android:contentDescription="@string/on_state_cd"
+            android:layout_width="10dp"
+            android:layout_height="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/onOffTV"
+            android:textColor="@color/white"
+            android:layout_marginLeft="@dimen/list_item_left_margin"
+            android:layout_marginStart="@dimen/list_item_left_margin"
+            android:text="@string/on_text"/>
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/arrowIV"
+            android:contentDescription="@string/on_state_cd"
+            android:src="@drawable/right_arrow_btn"
+            />
+
+    </LinearLayout>
+</RelativeLayout>

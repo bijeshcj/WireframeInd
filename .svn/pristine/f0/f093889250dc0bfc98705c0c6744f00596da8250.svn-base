@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.verizontelematics.indrivemobile">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
+
+    <!-- GCM -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="andriod.permission.WAKE_LOCK"/>
+
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="com.verizontelematics.indrivemobile.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="com.verizontelematics.indrivemobile.permission.C2D_MESSAGE"/>
+
+    <permission
+        android:name="com.verizontelematics.indrivemobile.MAPS_RECEIVE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="com.verizontelematics.indrivemobile.permission.MAPS_RECEIVE"/>
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+
+
+
+    <meta-data
+        android:name="com.google.android.gms.analytics.globalConfigResource"
+        android:resource="@xml/global_tracker" />
+
+
+    <application
+        android:name=".IndriveApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/app_logo"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+        android:largeHeap="true">
+        <uses-library android:name="android.test.runner"/>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="@string/map_key"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
+        <activity
+            android:name=".activity.SplashActivity"
+            android:label="@string/app_name"
+            android:theme="@style/NoTitleTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.SplashIntermediateActivity"
+            android:label="@string/app_name"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.IndriveHomeActivity"
+
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme">
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            -->
+        </activity>
+        <activity android:name="com.google.zxing.client.android.CaptureActivity">
+        </activity>
+        <activity
+            android:name=".activity.AccountSelectorActivity"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.BaseActivity"
+            android:label="@string/title_activity_login"/>
+        <activity
+            android:name=".activity.HomeActivity"
+            android:configChanges="orientation|screenSize"
+
+            android:label="@string/title_activity_alerts"/>
+        <activity
+            android:name=".activity.TermsConditionsActivity"
+            android:label="@string/title_activity_terms_conditions"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.ForgotUsernameActivity"
+            android:label="@string/title_activity_forgot_username"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.ForgotPasswordActivity"
+            android:label="@string/title_activity_forgot_password"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.RegisterAccountActivity"
+            android:label="@string/title_activity_register_account"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.MenuHomeActivity"
+
+            android:label="@string/title_activity_register_account"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".animations.DemoAnimationActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.TimePeriodActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity android:name=".widget.IndriveWidgetActivity">
+        </activity>
+
+        <!-- for Indrive widget -->
+        <receiver android:name=".widget.IndriveWidget">
+            <intent-filter>
+
+                <!-- <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> -->
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="ACTION.WIDGET.UPDATE.FROM.ACTIVITY"/>
+                <action android:name="ACTION_WIDGET_UPDATE_FROM_ALARM"/>
+                <action android:name="ACTION_WIDGET_UPDATE_FROM_WIDGET"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/indrive_widget_info"/>
+        </receiver>
+
+        <!-- for Indrive widget -->
+        <service android:name=".widget.service.IndriveWidgetUpdateService"/>
+        <!-- for Indrive widget -->
+
+
+        <!-- for maintenance receiver -->
+        <receiver android:name=".receivers.MaintenanceRemainderReceiver"/>
+
+        <activity
+            android:name=".activity.CreateMaintenanceReminderActivity"
+            android:label="@string/title_activity_create_maintenance_reminder"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.VehicleHealthDetailActivity"
+            android:label="@string/title_activity_vehicle_health_detail"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.VehicleHealthDTCListActivity"
+            android:label="@string/title_activity_vehicle_health_detail"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.ServiceTypeActivity"
+            android:label="@string/title_activity_service_type"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.MaintenanceReminderDetailActivity"
+            android:label="@string/title_activity_maintenance_reminder_detail"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.RecallDetailsActivity"
+            android:label="@string/title_activity_recall_details"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.MaintenanceLogDetailActivity"
+            android:label="@string/title_activity_maintenance_log_detail"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.CreateMaintenanceLogActivity"
+            android:label="@string/title_activity_create_maintenance_log"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AlertsSettingsActivity"
+            android:label="@string/title_activity_alerts_settings"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.SpeedAlertActivity"
+            android:label="@string/title_activity_speed_alert"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AlertValetActivity"
+            android:label="@string/title_activity_alert_valet"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AlertsDiagnosticsActivity"
+            android:label="@string/title_activity_diagnostics_alert"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AlertBoundaryActivity"
+            android:label="@string/title_activity_diagnostics_alert"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.BaseFragActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AlertHistoryActivity"
+            android:label="@string/alert_history_small"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.DiagnosticsHistoryActivity"
+            android:label="@string/title_activity_diagnostics_alert"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ValetHistoryActivity"
+            android:label="@string/ValetHistoryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.SpeedHistoryActivity"
+            android:label="@string/SpeedHistoryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.BoundaryHistoryActivity"
+            android:label="@string/BoundaryHistoryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.LocateVehicleActivity"
+            android:label="@string/title_activity_locate_vehicle"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.LocationAddAlertsActivity"
+            android:label="@string/title_activity_location_alerts"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.LocationAlertsActivity"
+            android:label="@string/title_activity_location_alerts"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.LocationHistoryActivity"
+            android:label="@string/title_activity_location_history"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.LocationHistoryPickerActivity"
+            android:label="@string/title_activity_location_history_picker"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.EmergencyServicesActivity"
+            android:label="@string/title_activity_emergency_services"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.StolenVehicleActivity"
+            android:label="@string/title_activity_stolen_vehicle"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.RoadsideAssistActivity"
+            android:label="@string/title_activity_roadside_assist"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AppSettingsActivity"
+            android:label="@string/title_activity_app_settings"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.PremiumServicesActivity"
+            android:label="@string/title_activity_premium_services"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.FAQActivity"
+            android:label="@string/title_activity_faq"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme"/>
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.FAQDetailActivity"
+            android:label="@string/title_activity_faq_detail"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ProfileContentActivity"
+            android:label="@string/profile_content"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ProfilePrivacyAndTermsActivity"
+            android:label="@string/profile_content"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.UpSellPageActivity"
+            android:label="@string/profile_content"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ForgotUNSelectionActivity"
+            android:label="@string/title_activity_forgot_un_method_selection"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ForgotUNResultActivity"
+            android:label="@string/title_activity_forgot_un_result"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ForgotPwdSelectionActivity"
+            android:label="@string/title_activity_forgot_pwd_selection"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ForgotPwdAuthorizationActivity"
+            android:label="@string/title_activity_forgot_pwd_authorization"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.ForgotPwdResultActivity"
+            android:label="@string/title_activity_forgot_pwd_result"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AccountSetupActivity"
+            android:label="@string/title_activity_account_setup"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AccountSetupSelectionActivity"
+            android:label="@string/title_activity_account_setup_selection"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AccountSetupUNPWDActivity"
+            android:label="@string/title_activity_account_setup_un_pwd"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AccountSetupResultActivity"
+            android:label="@string/title_activity_account_setup_result"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.NewDeviceLoginActivity"
+            android:label="@string/title_activity_new_device_login"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.NewDeviceSelectionActivity"
+            android:label="@string/title_activity_new_device_selection"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.NewDeviceAuthorizationActivity"
+            android:label="@string/title_activity_new_device_authorization"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.NewDeviceResultActivity"
+            android:label="@string/title_activity_new_device_result"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.AccountAuthorizationResultActivity"
+            android:label="@string/title_activity_account_authorization_result"
+            android:screenOrientation="portrait"
+            android:launchMode="singleInstance"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+
+        <!-- GCM Receiver -->
+        <receiver
+            android:name=".CloudMessageReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <!-- Receives the actual messages. -->
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <!-- Receives the registration id. -->
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.verizontelematics.indrivemobile" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Message Service -->
+        <service
+            android:name=".CloudMessageServer">
+        </service>
+
+        <activity
+            android:name=".activity.CustomerSupportActivity"
+            android:label="@string/title_activity_customer_support"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleTheme">
+        </activity>
+        <activity
+            android:name=".activity.WhatIsThisActivity"
+            android:label="@string/title_activity_what_is_this"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
+        </activity>
+        <activity
+            android:name=".activity.NotificationActivity"
+
+            android:screenOrientation="portrait"
+
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
+        </activity>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,17 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 11/18/14.
+ */
+public class VehiclePartData extends BaseData {
+    // Keys
+    public static final String PART_TITLE = "title";
+    public static final String STATUS = "status";
+    public static final String STATUS_OK = "NoIssuesDetected";
+    public static final String TEXT_OK = "OK";
+    public static final String TEXT_WARNING = "Warning";
+    public static final String STATUS_WARNING = "MonitorClosely";
+    public static final String STATUS_ERROR = "ServiceRequired";
+    public static final String DTC_CODE = "dtc_code";
+    public static final String DIAGNOSTIC_INFO_LIST = "DiagnosticInfoList";
+}

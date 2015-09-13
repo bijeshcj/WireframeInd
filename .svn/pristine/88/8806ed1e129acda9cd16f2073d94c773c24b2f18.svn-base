@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="completed_recalls">Completed Recalls</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="date_issued">Date Issued</string>
+    <string name="text">Text</string>
+    <string name="email">Email</string>
+    <string name="dtc_code_label">Diagnostic Code:</string>
+    <string name="label_location">Location</string>
+    <string name="maintenance_log_detailed">Maintenance Log</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="radius_three_miles">3 miles</string>
+    <string name="confirm_yes">Yes</string>
+    <string name="confirm_no">No</string>
+    <string name="stolen_vehicle_contact_number">888–519–4832</string>
+    <string name="dot_char">.</string>
+
+</resources>

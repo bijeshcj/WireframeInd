@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/time_period"
+                tools:context="com.verizontelematics.indrivemobile.activity.FAQDetailActivity">
+
+    <include
+        android:id="@+id/headerRL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <TextView
+        android:id="@+id/questionTV"
+        android:layout_below="@id/headerRL"
+        android:textColor="@color/diagnostics_text_color"
+        android:textSize="@dimen/header_text_size"
+        android:layout_margin="@dimen/list_item_top_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ScrollView
+        android:layout_below="@id/questionTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/answerTV"
+            android:layout_margin="@dimen/list_item_top_margin"
+            android:background="@color/white"
+            android:padding="@dimen/list_item_top_margin"
+            android:layout_width="match_parent"
+            android:textColor="@color/diagnostics_text_color"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:layout_height="wrap_content"/>
+    </ScrollView>
+</RelativeLayout>

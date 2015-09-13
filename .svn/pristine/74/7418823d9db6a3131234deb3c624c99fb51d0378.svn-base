@@ -1,0 +1,621 @@
+package com.verizontelematics.indrivemobile.utils.ui;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.util.Log;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.Interpolator;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.verizontelematics.indrivemobile.R;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * Created by bijesh on 9/12/2014.
+ */
+public class MapUtils {
+
+    private static final String TAG = MapUtils.class.getCanonicalName();
+
+    public static final float meters_per_mile = 1609.34f;
+
+    public static void dropPinEffect(final Marker marker) {
+
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        final long duration = 1500;
+
+        final Interpolator interpolator = new BounceInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = Math.max(
+                        1 - interpolator.getInterpolation((float) elapsed
+                                / duration), 0);
+                marker.setAnchor(0.5f, 1.0f + 7 * t);
+
+                if (t > 0.0) {
+                    // Post again 15ms later.
+                    handler.postDelayed(this, 15);
+                } else {
+                    //marker.showInfoWindow();
+                }
+            }
+        });
+    }
+
+    public static void updateZoomLevel(GoogleMap googleMap, float map_zoom_level) {
+
+        if (googleMap == null)
+            return;
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .zoom(map_zoom_level)
+                .build();
+        googleMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
+
+    }
+
+    public interface OnAddressSearchFinished {
+        final static int ADDRESS_FOUND = 0;
+        final static int ADDRESS_NOT_FOUND = 1;
+        final static int MULTIPLE_ADDRESS_FOUND = 2;
+        public void onSearchFinished(int code, LatLng[] latLng);
+    }
+    public static float getMapZoomLevel(GoogleMap googleMap){
+        return googleMap.getCameraPosition().zoom;
+    }
+
+    public static Circle drawGeofenceCircle(GoogleMap googleMap, LatLng center, float radius) {
+        if (googleMap == null) {
+            return null;
+        }
+
+        int fill_color_circle_map = (128 << 24 ) | (0 << 16 ) | (0x00 << 8 ) | 0xFF;
+        CircleOptions circleOptions = new CircleOptions();
+        circleOptions.center(center);
+        circleOptions.radius(radius);
+        circleOptions.strokeColor(Color.RED).fillColor(fill_color_circle_map);
+
+        return googleMap.addCircle(circleOptions);
+    }
+    public static Polygon drawGeofencePolygon(GoogleMap googleMap, ArrayList<LatLng> points) {
+        if (googleMap == null) {
+            return null;
+        }
+
+        int fill_color_polygon_map = (128 << 24 ) | (0 << 16 ) | (0x00 << 8 ) | 0xFF;
+        PolygonOptions polygonOptions = new PolygonOptions();
+        polygonOptions.addAll(points);
+        polygonOptions.strokeColor(Color.RED).fillColor(fill_color_polygon_map);
+        return googleMap.addPolygon(polygonOptions);
+    }
+
+    public static float getMiles(float meters) {
+        return meters/meters_per_mile;
+    }
+
+    public static float getMeters(float miles) {
+        return miles * meters_per_mile;
+    }
+
+    public static Marker drawVehicleMarker(GoogleMap googleMap, LatLng location) {
+        return (googleMap.addMarker(new MarkerOptions().position(location)
+                .title("Parked Location")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_locate_icon))));
+    }
+
+    public static void changeCamera(GoogleMap googleMap,CameraUpdate update){
+        changeCameraAnimation(googleMap,update,null);
+    }
+
+    /**
+     * Change the camera position by moving or animating the camera depending on the state of the
+     * animate toggle button.
+     */
+    private static void changeCameraAnimation(GoogleMap googleMap,CameraUpdate update, GoogleMap.CancelableCallback callback) {
+                int duration = 1;//mCustomDurationBar.getProgress();
+                // The duration must be strictly positive so we make it at least 1.
+        googleMap.animateCamera(update, Math.max(duration, 1), callback);
+
+    }
+
+
+
+    public static void animateMoveTo(GoogleMap googleMap, LatLng position) {
+        if (googleMap == null || position == null)
+            return;
+        float map_zoom_level = 14.0f;
+        int default_map_tilt = 0;
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(position)
+                .zoom(map_zoom_level)
+                .tilt(default_map_tilt)
+                .build();
+        googleMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
+    }
+
+
+    public static void animateMoveToWithoutZoom(GoogleMap googleMap, LatLng position) {
+        if (googleMap == null || position == null)
+            return;
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(position)
+                .zoom(googleMap.getCameraPosition().zoom)
+                .build();
+        googleMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
+    }
+
+    public static void setBoundsOnMap(GoogleMap googleMap,LatLng... positions) {
+        if (googleMap == null || positions == null)
+            return;
+
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(positions[0])
+                .include(positions[1])
+                .include(positions[2])
+                .include(positions[3])
+//                .include(MELBOURNE)
+                .build();
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
+
+//        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,13.0f));
+//        CameraPosition cameraPosition = new CameraPosition.Builder()
+//                .target(position)
+//                .zoom(zoomLevel)
+//                .tilt(map_tilt)
+//                .build();
+//        googleMap.animateCamera(CameraUpdateFactory
+//                .newCameraPosition(cameraPosition));
+    }
+
+    public static void animateClipTo(GoogleMap googleMap, ArrayList<LatLng> locations) {
+        if (googleMap == null) {
+            return;
+        }
+        LatLngBounds.Builder bc = new LatLngBounds.Builder();
+        for (LatLng location : locations)
+            bc.include(location);
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 150));
+
+        float zoom = googleMap.getCameraPosition().zoom;
+        if (zoom >= 18.0f) {
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(18));
+        }
+    }
+
+    public static void setMarkerWithAddress(final Context ctx, final Marker marker, final LatLng position,final String date) {
+        if (ctx == null || marker == null) {
+            return;
+        }
+        new AsyncTask<LatLng, Void, String>() {
+
+            @Override
+            protected String doInBackground(LatLng... params) {
+                Geocoder geocoder =
+                        new Geocoder(ctx, Locale.getDefault());
+                // Get the current location from the input parameter list
+                LatLng loc = params[0];
+                // Create a list to contain the result address
+                List<Address> addresses = null;
+                try {
+                    addresses = geocoder.getFromLocation(loc.latitude,
+                            loc.longitude, 1);
+                } catch (IOException e1) {
+                    Log.e("LocationSampleActivity",
+                            "IO Exception in getFromLocation()");
+                    e1.printStackTrace();
+                    return ("IO Exception trying to get address");
+                } catch (IllegalArgumentException e2) {
+                    // Error message to post in the log
+                    String errorString = "Illegal arguments " +
+                            Double.toString(loc.latitude) +
+                            " , " +
+                            Double.toString(loc.longitude) +
+                            " passed to address service";
+                    Log.e("LocationSampleActivity", errorString);
+                    e2.printStackTrace();
+                    return errorString;
+                }
+                // If the reverse geocode returned an address
+                if (addresses != null && addresses.size() > 0) {
+                    // Get the first address
+                    Address address = addresses.get(0);
+                /*
+                 * Format the first line of address (if available),
+                 * city, and country name.
+                 */
+                    String addressText = String.format(
+                            "%s, %s, %s",
+                            // If there's a street address, add it
+                            address.getMaxAddressLineIndex() > 0 ?
+                                    address.getAddressLine(0) : "",
+                            // Locality is usually a city
+                            address.getLocality(),
+                            // The country of the address
+                            address.getCountryName());
+                    // Return the text
+                    return addressText;
+                } else {
+                    return "No address found";
+                }
+            }
+            @Override
+            protected void onPostExecute(String address) {
+                marker.setTitle(address);
+                marker.setSnippet(date);
+            }
+        }.execute(position);
+    }
+
+    public static void setMarkerWithAddress(final Context ctx, final Marker marker, final LatLng position) {
+        if (ctx == null || marker == null) {
+            return;
+        }
+        new AsyncTask<LatLng, Void, String>() {
+
+            @Override
+            protected String doInBackground(LatLng... params) {
+                Geocoder geocoder =
+                        new Geocoder(ctx, Locale.getDefault());
+                // Get the current location from the input parameter list
+                LatLng loc = params[0];
+                // Create a list to contain the result address
+                List<Address> addresses = null;
+                try {
+                    addresses = geocoder.getFromLocation(loc.latitude,
+                            loc.longitude, 1);
+                } catch (IOException e1) {
+                    Log.e("LocationSampleActivity",
+                            "IO Exception in getFromLocation()");
+                    e1.printStackTrace();
+                    return ("IO Exception trying to get address");
+                } catch (IllegalArgumentException e2) {
+                    // Error message to post in the log
+                    String errorString = "Illegal arguments " +
+                            Double.toString(loc.latitude) +
+                            " , " +
+                            Double.toString(loc.longitude) +
+                            " passed to address service";
+                    Log.e("LocationSampleActivity", errorString);
+                    e2.printStackTrace();
+                    return errorString;
+                }
+                // If the reverse geocode returned an address
+                if (addresses != null && addresses.size() > 0) {
+                    // Get the first address
+                    Address address = addresses.get(0);
+                /*
+                 * Format the first line of address (if available),
+                 * city, and country name.
+                 */
+                    String addressText = String.format(
+                            "%s, %s, %s",
+                            // If there's a street address, add it
+                            address.getMaxAddressLineIndex() > 0 ?
+                                    address.getAddressLine(0) : "",
+                            // Locality is usually a city
+                            address.getLocality(),
+                            // The country of the address
+                            address.getCountryName());
+                    // Return the text
+                    return addressText;
+                } else {
+                    return "No address found";
+                }
+            }
+            @Override
+            protected void onPostExecute(String address) {
+                marker.setTitle(address);
+            }
+        }.execute(position);
+    }
+
+    public static void searchAddress(final Context ctx, final String address, final LatLng lowerLocation, final LatLng upperLocation, final OnAddressSearchFinished listener) {
+
+        if (ctx == null || address == null || address.isEmpty()) {
+            return;
+        }
+        new AsyncTask<String, Void, LatLng[]>() {
+
+            @Override
+            protected LatLng[] doInBackground(String... address) {
+                // Creating an instance of Geocoder class
+                Geocoder geocoder = new Geocoder(ctx);
+                List<Address> addresses = null;
+
+                try {
+                    // Getting a maximum of 3 Address that matches the input text
+                    addresses = geocoder.getFromLocationName(address[0], 3, lowerLocation.latitude, lowerLocation.longitude, upperLocation.latitude, upperLocation.longitude);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (addresses != null && !addresses.isEmpty()) {
+                    LatLng[] locations = new LatLng[addresses.size()];
+                    int i = 0;
+                    for (Address address1 : addresses) {
+                        locations[i] = new LatLng(address1.getLatitude(), address1.getLongitude());
+                    }
+                    return locations;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(LatLng[] latLng) {
+
+                listener.onSearchFinished(latLng == null ? OnAddressSearchFinished.ADDRESS_NOT_FOUND : OnAddressSearchFinished.ADDRESS_FOUND, latLng);
+            }
+        }.execute(address);
+    }
+
+    public static void searchAddress(final Context ctx, final String address, final OnAddressSearchFinished listener) {
+
+        if (ctx == null || address == null || address.isEmpty()) {
+            return;
+        }
+        new AsyncTask<String, Void, LatLng[]>() {
+
+            @Override
+            protected LatLng[] doInBackground(String... address) {
+                // Creating an instance of Geocoder class
+                Geocoder geocoder = new Geocoder(ctx);
+                List<Address> addresses = null;
+
+                try {
+                    // Getting a maximum of 3 Address that matches the input text
+                    addresses = geocoder.getFromLocationName(address[0], 3);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (addresses != null && !addresses.isEmpty()) {
+                    LatLng[] locations = new LatLng[addresses.size()];
+                    int i = 0;
+                    for (Address address1 : addresses) {
+                        locations[i] = new LatLng(address1.getLatitude(), address1.getLongitude());
+                    }
+                    return locations;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(LatLng[] latLongs) {
+                if (listener == null)
+                    return;
+                if (latLongs == null) {
+                    listener.onSearchFinished(OnAddressSearchFinished.ADDRESS_NOT_FOUND, latLongs);
+                }
+                else if (latLongs.length > 1) {
+                    listener.onSearchFinished(OnAddressSearchFinished.MULTIPLE_ADDRESS_FOUND, latLongs);
+                }
+                else {
+                    listener.onSearchFinished(OnAddressSearchFinished.ADDRESS_FOUND, latLongs);
+                }
+            }
+        }.execute(address);
+    }
+
+    public static LatLng getCenterPointFromLocations(ArrayList<LatLng> mLatLngList){
+        System.out.println(" locations "+mLatLngList);
+        // get highest lat
+        LatLng highestLatitudeLocation = getHighestLowestLatitude(mLatLngList,"HIGHEST");
+        // get lowest lat
+        LatLng lowestLatitudeLocation = getHighestLowestLatitude(mLatLngList,"LOWEST");
+        // get highest lon
+        LatLng highestLongitudeLocation = getHighestLowestLongitude(mLatLngList,"HIGHEST");
+        // get lowest lon
+        LatLng lowestLongitudeLocation = getHighestLowestLongitude(mLatLngList,"LOWEST");
+
+
+//        get center point
+        LatLng centerLatLng = getCenterPoint(highestLatitudeLocation,lowestLatitudeLocation,highestLongitudeLocation,lowestLongitudeLocation);
+//         System.out.println("$$$ center point "+centerLatLng);
+
+        return centerLatLng;
+    }
+
+    private static LatLng getCenterPoint(LatLng highestLat,LatLng lowestLat,LatLng highestLon,LatLng lowestLon){
+        double newLat = (highestLat.latitude + lowestLat.latitude) / 2;
+        double newLon = (highestLon.longitude + lowestLon.longitude) / 2;
+        return new LatLng(newLat,newLon);
+    }
+
+    private static LatLng getHighestLowestLatitude(ArrayList<LatLng> mLatLngList,String type){
+        LatLng retLatLng = null;
+        double highLowLat = 0;//mLatLngList.get(0).latitude;
+        int size = mLatLngList.size();
+//        System.out.println("$$$$ in getHighestLowestLatitude "+mLatLngList);
+        for(int i=0;i<size;i++){
+            LatLng iLatLng = mLatLngList.get(i);
+            highLowLat = iLatLng.latitude;
+            for(int j=0;j<size;j++){
+                LatLng jLatLng = mLatLngList.get(j);
+                double jLat = jLatLng.latitude;
+                if(type.equals("HIGHEST")){
+//                    System.out.println("$$ type is highest jLat "+jLat+" highLowLat "+highLowLat);
+                    if(jLat > highLowLat){
+                        highLowLat = jLat;
+                        retLatLng = jLatLng;
+                    }
+                    if((j == size-1) && retLatLng == null){
+                        System.out.println("$$$ highest latitude size -1 ");
+                        retLatLng = jLatLng;
+                    }
+                }else{
+                    if(jLat < highLowLat){
+                        highLowLat = jLat;
+                        retLatLng = jLatLng;
+                    }
+                    if((j == size-1) && retLatLng == null){
+                        System.out.println("$$$ lowest latitude size -1 ");
+                        retLatLng = jLatLng;
+                    }
+                }
+            }
+        }
+//        System.out.println("highest/Lowest lat is "+retLatLng);
+        return retLatLng;
+    }
+
+    private static LatLng getHighestLowestLongitude(ArrayList<LatLng> mLatLngList,String type){
+        LatLng retLatLng = null;
+        double highLowLon = 0;//mLatLngList.get(0).latitude;
+        int size = mLatLngList.size();
+        for(int i=0;i<size;i++){
+            LatLng iLatLng = mLatLngList.get(i);
+            highLowLon = iLatLng.longitude;
+            for(int j=0;j<size;j++){
+                LatLng jLatLng = mLatLngList.get(j);
+                double jLon = jLatLng.longitude;
+                if(type.equals("HIGHEST")){
+                    if(jLon > highLowLon){
+                        highLowLon = jLon;
+                        retLatLng = jLatLng;
+                    }
+                    if((j == size-1) && retLatLng == null){
+                        System.out.println("$$$ highest long size -1 ");
+                        retLatLng = jLatLng;
+                    }
+                }else{
+                    if(jLon < highLowLon){
+                        highLowLon = jLon;
+                        retLatLng = jLatLng;
+                    }
+                    if((j == size-1) && retLatLng == null){
+                        System.out.println("$$$ lowest long size -1 ");
+                        retLatLng = jLatLng;
+                    }
+                }
+            }
+        }
+//        System.out.println("highest/Lowest lat is "+retLatLng);
+        return retLatLng;
+    }
+
+
+    public static LatLng getLatLngFromScreenCoordinates(GoogleMap googleMap, int x, int y) {
+        if (googleMap == null)
+            return null;
+        return googleMap.getProjection().fromScreenLocation(new android.graphics.Point(x, y));
+    }
+
+    public static void launchNavigationActivity(Activity ctx, LatLng from, LatLng to) {
+        if (from == null || to == null) {
+            Toast.makeText(ctx, "Cannot get directions Invalid locations", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // stub ended.
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?" + "saddr="
+                        + from.latitude + ","
+                        + from.longitude + "&daddr="
+                        + to.latitude + ","
+                        + to.longitude));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ctx.startActivity(intent);
+    }
+
+
+    public static Circle onMapLongClick(GoogleMap googleMap,Circle previousCircle,LatLng latLng){
+        if (previousCircle != null) {
+            previousCircle.remove();
+        }
+        float DEFAULT_RADIUS = 600f;
+        previousCircle = MapUtils.drawGeofenceCircle(googleMap, latLng, DEFAULT_RADIUS);
+        return previousCircle;
+    }
+
+    public static boolean checkReady(GoogleMap googleMap) {
+        if (googleMap == null) {
+            Log.e(TAG,"Map is not ready");
+            return false;
+        }
+        return true;
+    }
+
+    public static float getDistanceInMeters(LatLng fromLocation, LatLng toLocation) {
+        if (fromLocation == null || toLocation == null) {
+            return 0;
+        }
+        float distances[] = new float[1];
+        Location.distanceBetween(fromLocation.latitude, fromLocation.longitude, toLocation.latitude, toLocation.longitude, distances);
+        return distances[0];
+    }
+
+    public static double toRadian(double deg) {
+        return (deg * Math.PI/180);
+    }
+
+    public static double toDegree(double rad) {
+        return (rad * 180/Math.PI);
+    }
+
+    public static LatLng getLocationAtDistance(LatLng fromLocation, double brng, double dist) {
+
+        dist = dist / 6371;
+        brng = toRadian(brng);
+
+        double lat1 = toRadian(fromLocation.latitude);
+        double lon1 = toRadian(fromLocation.longitude);
+
+        double lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) +
+                Math.cos(lat1) * Math.sin(dist) * Math.cos(brng));
+
+        double lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) *
+                        Math.cos(lat1),
+                Math.cos(dist) - Math.sin(lat1) *
+                        Math.sin(lat2));
+
+        if (Double.isNaN(lat2) || Double.isNaN(lon2)) return null;
+
+        return new LatLng(toDegree(lat2), toDegree(lon2));
+
+    }
+
+    public static Bitmap createBitmap(int wid, int height, String text, int textSize, int textColor) {
+        Bitmap b = Bitmap.createBitmap(wid, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        Paint p = new Paint();
+        p.setColor(textColor);
+        p.setTextSize(textSize);
+        p.setTextAlign(Paint.Align.CENTER);
+        c.drawText(text, wid/2, height, p);
+        return b;
+    }
+}

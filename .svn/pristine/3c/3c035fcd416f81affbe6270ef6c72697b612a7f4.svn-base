@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container_id_recall"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/alertHistoryTV"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:textColor="@color/white"
+            android:background="@color/gray"
+            android:textSize="18sp"
+            android:text="@string/alert_history" />
+
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@id/alertHistoryTV"
+            android:id="@+id/alertHistoryLV"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/view_all"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/alertHistoryLV"
+            android:id="@+id/viewAllBTN" />
+
+        <TextView
+            android:id="@+id/alertSettingsTV"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:layout_below="@id/viewAllBTN"
+            android:textColor="@color/white"
+            android:background="@color/gray"
+            android:textSize="18sp"
+            android:text="@string/alert_settings" />
+
+        <RelativeLayout
+            android:id="@+id/alertsOnOffRL"
+            android:layout_width="match_parent"
+            android:layout_below="@id/alertSettingsTV"
+            android:layout_height="50dp">
+
+            <TextView
+                android:id="@+id/diagnosticAlertOnOffTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"
+                android:text="@string/receive_recall_alerts" />
+            <RelativeLayout
+                android:layout_width="110dp"
+                android:layout_height="35dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="vertical"
+                android:id="@+id/layoutSwitch"
+                android:background="@color/white"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                >
+                <ImageView
+                    android:id="@+id/onState"
+                    android:contentDescription="@string/on_state_cd"
+                    android:src="@drawable/on_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <ImageView
+                    android:id="@+id/offState"
+                    android:src="@drawable/off_state"
+                    android:contentDescription="@string/off_state_cd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_below="@id/alertsOnOffRL"
+            android:id="@+id/diagnosticsAlertOnOffDiv"
+            android:background="@color/gray" />
+
+
+        <RelativeLayout
+            android:id="@+id/alertsTypeRL"
+            android:layout_width="match_parent"
+            android:layout_below="@id/diagnosticsAlertOnOffDiv"
+            android:layout_height="50dp">
+
+            <TextView
+                android:id="@+id/alertTypeTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"
+                android:text="@string/alert_type" />
+
+            <TextView
+                android:id="@+id/alertTypeDetailTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:textColor="@color/gray"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="@string/alert_type_detail" />
+
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:id="@+id/alertTypeDiv"
+            android:layout_below="@id/alertsTypeRL"
+            android:background="@color/gray" />
+
+
+        <RelativeLayout
+            android:id="@+id/additionalContactsRL"
+            android:layout_width="match_parent"
+            android:layout_below="@id/alertTypeDiv"
+            android:layout_height="50dp">
+
+            <TextView
+                android:id="@+id/additionalContactsTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"
+                android:text="@string/additional_contacts" />
+
+            <TextView
+                android:id="@+id/additionalContactsDetailTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/gray"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="@string/additional_contacts_details" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:id="@+id/additionalContactsDiv"
+            android:layout_below="@id/additionalContactsRL"
+            android:background="@color/gray" />
+
+
+    </RelativeLayout>
+
+</ScrollView>

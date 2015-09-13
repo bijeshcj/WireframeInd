@@ -1,0 +1,120 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ListView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.adapters.DTCListAdapter;
+import com.verizontelematics.indrivemobile.controllers.DiagnosticController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.models.Operation;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link VehicleHealthDTCListFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link VehicleHealthDTCListFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ *
+ */
+public class VehicleHealthDTCListFragment extends Fragment implements UIInterface {
+
+    private SwipeRefreshLayout mRefreshLayout;
+
+    public VehicleHealthDTCListFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_vehicle_health_dtclist, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View v, Bundle b) {
+        super.onViewCreated(v, b);
+        FrameLayout mRootView = (FrameLayout) v;
+        mRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.dtc_list_refesh_layout);
+        mRefreshLayout.setRefreshing(false);
+        ListView mDTCListView = (ListView) mRootView.findViewById(R.id.dtc_list_view);
+        mDTCListView.setAdapter(new DTCListAdapter(getActivity()));
+        setup();
+    }
+
+    private void setup() {
+        mRefreshLayout.setColorSchemeResources(R.color.diagnostics_code, R.color.sub_header_color, R.color.diagnostics_code, R.color.sub_header_color);
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // here we have to call controller api.
+                // stubbed below
+                mRefreshLayout.setRefreshing(false);
+
+            }
+        });
+        DiagnosticController.instance().register(this);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        cleanup();
+    }
+
+    private void cleanup() {
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+
+        if (mRefreshLayout != null && !mRefreshLayout.isRefreshing())
+            mRefreshLayout.setRefreshing(true);
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (mRefreshLayout != null && mRefreshLayout.isRefreshing())
+            mRefreshLayout.setRefreshing(false);
+
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (mRefreshLayout != null && mRefreshLayout.isRefreshing())
+            mRefreshLayout.setRefreshing(false);
+    }
+}

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <com.shinobicontrols.charts.ChartView
+        android:id="@+id/driving_data_chart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".12"
+        >
+
+        <Button
+            android:id="@+id/buttonTtlMiles"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".25"
+            android:text="@string/total_miles_btn"
+            android:textSize="12sp"
+            tools:ignore="ButtonStyle,InconsistentLayout"/>
+
+        <Button
+            android:id="@+id/buttonMaxSpeed"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".25"
+            android:text="@string/max_speed_btn"
+            android:textSize="12sp"
+
+            tools:ignore="ButtonStyle,InconsistentLayout"/>
+
+        <Button
+            android:id="@+id/buttonAvgSpeed"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".25"
+            android:text="@string/ave_trip"
+            android:textSize="12sp"
+
+            tools:ignore="ButtonStyle,InconsistentLayout"/>
+
+    </LinearLayout>
+    <!-- edit text span 2 column -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".12"
+        >
+
+        <Button
+            android:id="@+id/buttonCstFuel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".25"
+            android:text="@string/cost_fuel"
+            android:textSize="12sp"
+
+            tools:ignore="ButtonStyle,InconsistentLayout"/>
+
+        <Button
+            android:id="@+id/buttonCityMpg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".25"
+            android:text="@string/city_mpg"
+            android:textSize="12sp"
+
+            tools:ignore="ButtonStyle,InconsistentLayout"/>
+
+        <Button
+            android:id="@+id/buttonHighwayMpg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".25"
+            android:text="@string/highway_mpg"
+            android:textSize="12sp"
+            tools:ignore="ButtonStyle,InconsistentLayout"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

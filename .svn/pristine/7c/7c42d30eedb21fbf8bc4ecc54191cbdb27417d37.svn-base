@@ -1,0 +1,49 @@
+package com.verizontelematics.indrivemobile.models;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.models.data.UserAccountData;
+import com.verizontelematics.indrivemobile.models.data.UserDetail;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
+/**
+ * Created by z688522 on 3/6/15.
+ */
+public class UserAccountInfoModel extends BaseModel {
+
+    ArrayList<UserDetail> UserDetails;
+
+    public UserAccountInfoModel() {
+        mData = new UserAccountData();
+    }
+    public void setData(JSONObject inData) throws JSONException {
+        // parse input data as per the format
+        // store the corresponding.
+        //
+        // mUserAcctInfoData = extract the UserAccountInfoData
+        // mUserVehicles = extract the UserVehicles
+        // mUserPreferenceData = extract the UserVehicles
+        Gson gson = new GsonBuilder().create();
+        Type listType = new TypeToken<ArrayList<UserDetail>>(){}.getType();
+        String strData = inData.get("UserDetails").toString();
+        if (strData !=null && !strData.isEmpty() && !strData.equalsIgnoreCase("null")) {
+            UserDetails = gson.fromJson(inData.getJSONArray("UserDetails").toString(), listType);
+        }
+        setChanged();
+        notifyObservers();
+    }
+
+    public ArrayList<UserDetail> getUserDetails() {
+        return UserDetails;
+    }
+
+    public void setUserDetails(ArrayList<UserDetail> userDetails) {
+        UserDetails = userDetails;
+    }
+}

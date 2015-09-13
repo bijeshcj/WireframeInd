@@ -1,0 +1,112 @@
+package com.verizontelematics.indrivemobile.adapters;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+
+import java.util.ArrayList;
+
+/**
+ * Created by bijesh on 1/29/2015.
+ */
+public class ProfileAdapter extends BaseAdapter {
+
+    private Context mContext;
+    private ArrayList<UserInfo> mOptions = new ArrayList<UserInfo>();
+    private ArrayList<String> mOptionsDesc = new ArrayList<String>();
+    private static final int PROFILE_HEADER = 0;
+    public static final int PROFILE_OPTIONS = 1;
+    private int mType;
+
+    public ProfileAdapter(Context context,int mType){
+        this.mContext = context;
+        this.mType = mType;
+        initOptions();
+    }
+
+    @Override
+    public int getCount() {
+        return mOptions.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return mOptions.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        if(mType == PROFILE_HEADER){
+           convertView = getHeaderView(convertView,parent,position);
+        }else{
+           convertView = getOptionsView(convertView,parent,position);
+        }
+
+        return convertView;
+    }
+
+    private View getHeaderView(View convertView,ViewGroup parent,int position){
+
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.adapter_profile_row_view, parent, false);
+        }
+
+        UserInfo userInfo = mOptions.get(position);
+        TextView tvDetail = (TextView) convertView.findViewById(R.id.profile_header);
+        tvDetail.setText(userInfo.detail);
+
+        TextView tvDesc = (TextView) convertView.findViewById(R.id.profile_detail);
+        tvDesc.setText(userInfo.detailDescription);
+
+        return convertView;
+    }
+
+    private View getOptionsView(View convertView,ViewGroup parent,int position){
+
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.adapter_profile_options_row, parent, false);
+        }
+
+        TextView tvDetail = (TextView) convertView.findViewById(R.id.profile_options);
+        tvDetail.setText(mOptionsDesc.get(position));
+
+        return convertView;
+    }
+
+    private void initOptions(){
+        mOptions.add(new UserInfo("Joe Green","Name"));
+        mOptions.add(new UserInfo("jgreen@gamil.com","email address"));
+        mOptions.add(new UserInfo("777-456-5678","Primary phone number"));
+
+
+        mOptionsDesc.add("Change Password");
+        mOptionsDesc.add("Privacy Policy");
+        mOptionsDesc.add("Terms of use");
+    }
+
+    public static class UserInfo{
+        String detail;
+        String detailDescription;
+        public UserInfo(String detail,String detailDescription){
+            this.detail = detail;
+            this.detailDescription = detailDescription;
+        }
+    }
+
+
+}

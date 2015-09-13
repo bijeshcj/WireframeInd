@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  for categories -->
+    <string name="category_access_app">AccessApp</string>
+    <string name="category_app_navigation">AppNavigation</string>
+    <string name="category_alerts">Alerts</string>
+    <string name="category_location">Location</string>
+    <string name="category_driving">DrivingData</string>
+    <string name="category_diagnostics">Diagnostics</string>
+    <string name="category_emergency">Emergency</string>
+    <string name="category_help">Help</string>
+    <string name="category_admin">Admin</string>
+
+
+    <!--  for labels -->
+    <string name="label_login">LogIn</string>
+    <string name="label_mobile_app_setup">MobileAppSetUp</string>
+    <string name="label_submit_vin">SubmitVINSerial</string>
+    <string name="label_submit_help">SubmitVINSerialhelp</string>
+    <string name="label_scan_serial">Scanserial</string>
+    <string name="label_scan_vin">Scanvin</string>
+    <string name="label_receive_auth_code">Receiveauthcode</string>
+    <string name="label_continue_auth_code">Continueauthcode</string>
+    <string name="label_submit_name_pass">SubmitNamePassword</string>
+    <string name="label_submit_name_pass_help">SubmitNamePasswordHelp</string>
+    <string name="label_retun_login">NewDeviceLogin</string>
+    <string name="label_sync_continue">SyncContinue</string>
+    <string name="label_home_dashboard">HomeSelectVehicle</string>
+    <string name="label_alerts_alerts_settings">AlertAlertSettings</string>
+    <string name="label_alerts_alerts_history">AlertAlertHistory</string>
+
+
+
+
+    <!-- for screen names -->
+    <string name="screen_login">Login</string>
+    <string name="screen_new_device_reg">New Device Registration</string>
+    <string name="screen_home">AppNavigation</string>
+
+</resources>

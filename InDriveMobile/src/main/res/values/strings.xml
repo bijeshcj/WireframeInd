@@ -1,0 +1,851 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+           tools:ignore="MissingTranslation">
+
+    <!-- App related strings -->
+
+    <string name="app_name">In-Drive</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_alerts">Alerts</string>
+    <string name="title_activity_select_time_period">Select Time Period</string>
+    <string name="title_activity_forgot_username">ForgotUsernameActivity</string>
+    <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
+    <string name="title_activity_register_account">RegisterAccountActivity</string>
+    <string name="title_activity_terms_conditions">Terms and Conditions Activity</string>
+
+    <string name="invalid_auth_code">Invalid authorization code.  Please try again.</string>
+
+    <string name="ValetHistoryActivity">ValetHistoryActivity</string>
+    <string name="SpeedHistoryActivity">SpeedHistoryActivity</string>
+    <string name="BoundaryHistoryActivity">BoundaryHistoryActivity</string>
+    <string name="profile_content">profile content</string>
+
+    <!-- Login strings -->
+
+    <string name="remember_username">Remember Me</string>
+    <string name="forgot_username">Forgot Username?</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="register_account">Register Account</string>
+    <string name="login">Log In</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="user_login">User Login</string>
+    <string name="account_setup">Mobile App set up</string>
+    <string name="stay_logged_in">Stay logged in</string>
+    <string name="username_required">Username is required.</string>
+    <string name="password_required">Password is required.</string>
+    <string name="un_pwd_required"> Username and password fields are both required.</string>
+
+    <!-- Privacy Policy strings -->
+    <string name="privacy_policy_validation">You must agree to the Privacy Policy &amp; Customer Agreement terms before you can continue setting up Mobile App.</string>
+
+    <!-- Webservice related -->
+    <string name="success_response">Successful Execution</string>
+    <string name="failure_response">Failed Execution</string>
+    <string name="vehicle_does_not_exists">Vehicle does not exist</string>
+
+    <!-- Account setup strings -->
+    <string name="last_name_required">Last Name is required.</string>
+    <string name="old_password_required">Old Password is required.</string>
+    <string name="new_password_required">New Password is required.</string>
+    <string name="vin_serial_required">VIN or Serial Number is required.</string>
+    <string name="vin_required">VIN is required.</string>
+    <string name="serial_no_validation">Serial Number is incorrect. Please update serial number.</string>
+    <string name="vin_validation">VIN must be between 6 and 17 alpha numeric characters.</string>
+    <string name="username_validation">Username must be a minimum of 6 characters and maximum of 20 characters. Cannot contain special characters.</string>
+    <string name="password_validation">Password must be a minimum of 10 characters. Password must consist of one upper case letter, one lower case letter, and one number. Special characters are not allowed. Please make password secure as possible.</string>
+    <string name="pwd_confirm_validation">New Password and Confirmed Password must match. Please enter again.</string>
+    <string name="authorization_sent">Your authorization code has been sent.</string>
+    <string name="authorization_sent_infoText">Your authorization code has been sent. Please check your email. You will need this code for the next step.</string>
+    <string name="authorization_code_required">Authorization Code is required.</string>
+    <string name="confirmation_password_required">Confirmation password is required.</string>
+    <string name="email_required"> Email is required.</string>
+    <string name="text_required">Phone number is required</string>
+    <!-- Forgot username strings -->
+
+    <string name="prompt_vin">VIN</string>
+    <string name="continue_text">Continue</string>
+    <string name="enter_vin">Enter In-Drive VIN and last name to receive username</string>
+    <string name="last_name">Last name</string>
+    <string name="select_method">Select method to receive your username</string>
+    <string name="submit">Submit</string>
+    <string name="username_sent">Your username has been sent</string>
+    <string name="go_back_login">Go back to login</string>
+
+    <!-- Forgot password strings -->
+    <string name="enter_username">Please enter your username</string>
+    <string name="select_method_pwd">Select method to receive your password authorization code</string>
+    <string name="enter_authorization_code">Enter authorization code and new password</string>
+    <string name="authorization_code">Authorization code</string>
+    <string name="new_password">New password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="password_updated">Your password has been updated</string>
+    <!-- Account selector strings -->
+
+    <string name="login_text">Login</string>
+    <string name="account_text">Account#:</string>
+    <string name="vehicle_desc">Vehicle Description</string>
+    <string name="enter_vin_last_name">Enter your last name and In-Drive&#174; device serial number or your VIN</string>
+    <string name="and_text">--and--</string>
+    <string name="serial_number">Serial Number</string>
+    <string name="what_is_this">what\'s this?</string>
+    <string name="or_text">--or--</string>
+    <string name="select_method_account">Select method to receive your authorization code</string>
+    <string name="choose_un_pwd">Choose your username and password</string>
+    <string name="account_created">Your mobile account has been set up</string>
+    <string name="account_setup_text">text (must be mobile number)</string>
+    <string name="account_setup_email">email</string>
+
+    <!-- Terms and conditions strings -->
+
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+    <string name="privacy_policy">Privacy Policy and \nCustomer Agreement</string>
+    <string name="privacy_policy_conditions">By checking the box you are  stating that you have read and understand the Privacy Policy and Customer agreement… FPO Copy</string>
+    <string name="privacy_policy_text">Privacy Policy</string>
+    <string name="customer_agreement_text">Customer Agreement</string>
+
+    <!-- New Device Login strings -->
+    <string name="new_device_login">Your new mobile device must be paired in order to access your mobile account.</string>
+    <string name="continue_txt">Continue</string>
+    <string name="select_method_pairing">Select method to receive authorization code to pair your device.</string>
+    <string name="enter_code_pairing">Enter your mobile device authorization code.</string>
+    <string name="auth_code_prompt">8-digit numeric code</string>
+    <string name="new_device_updated">Your new mobile device \nhas been updated.</string>
+    <string name="device_registration">Device Registration</string>
+    <!-- Dashboard strings -->
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="on_off">off/on</string>
+    <string name="set_radius">Set Radius</string>
+    <string name="alert_type">Alert Type</string>
+    <string name="alert_type_detail">Email &amp; Text</string>
+    <string name="additional_contacts">Additional Contacts</string>
+    <string name="additional_contacts_details">xxx.xxx.xxxx</string>
+    <string name="receive_recall_alerts">Receive Recall Alerts</string>
+    <string name="alert_history">ALERT HISTORY</string>
+    <string name="alert_settings">ALERT SETTINGS</string>
+    <string name="view_all">View All</string>
+    <string name="diagnostics_summary">Diagnostic Summary</string>
+    <string name="maintenance_log">Add Log</string>
+    <string name="maintenance_reminders">Add Reminder</string>
+    <string name="reminder">Reminder</string>
+    <string name="drop_button_geofence">Drop</string>
+    <string name="draw_button_geofence">Draw</string>
+    <string name="empty_reminder_text">Create a reminder that notifies you when your vehicle is due for routine maintenance. </string>
+    <string name="empty_log_text">Create a maintenance log to keep tabs on your vehicle’s maintenance history.</string>
+    <string name="date">Date</string>
+    <string name="mileage_interval">Mileage Interval</string>
+    <string name="day_month">Day/Month</string>
+    <string name="dummy_date">9/18</string>
+    <string name="dummy_no">5</string>
+    <string name="dummy_time">12:00 pm</string>
+    <string name="dummy_cost">$ 00.00</string>
+    <string name="edit_location_alert">Edit Location Alert</string>
+    <string name="alert_name">Custom Name</string>
+    <string name="custom_reminder_name">Custom Reminder Name</string>
+    <string name="alert_desc">Description</string>
+    <string name="maintenance_prompt">Type of Service</string>
+    <string name="current_recalls">Current Recalls</string>
+    <string name="cost">Cost</string>
+    <string name="mileage">Mileage</string>
+    <string name="accept_changes">Accept Changes</string>
+    <string name="create_log_entry">Add Log</string>
+    <string name="create_alert_entry">Add Reminder</string>
+    <string name="service_selection">Service Types</string>
+    <string name="edit_log_entry">Edit Log</string>
+    <string name="edit_alert_entry">Edit Reminder</string>
+    <string name="delete_maintenance_log">Delete Entry</string>
+    <string name="delete_maintenance_log_header">Delete Log</string>
+    <string name="delete_maintenance_reminder_header">Delete Reminder</string>
+    <string name="locate_vehicle">Locate Vehicle</string>
+    <string name="location_history">Location History</string>
+    <string name="no_location_history">No location history has been recorded. </string>
+    <string name="alert_settings_error">The system can not retrieve your information at this time. Please check back later.</string>
+    <string name="location_alert">Location Alert</string>
+    <string name="add_location_alert">Add Location Alert</string>
+    <string name="next">Next</string>
+    <string name="name_location_alert">Name of Location Alert</string>
+    <string name="location_schedule">Set Location Schedule</string>
+    <string name="get_directions">Get Directions</string>
+    <string name="edit_day">Edit Day</string>
+    <string name="day_selected">Day Selected</string>
+
+    <!--  -->
+    <string name="map_key">AIzaSyC6nCoHF7UGh1vOHgxvk3J-4kolE4YTI60</string>
+
+    <!-- Diagnostics module strings -->
+
+    <string name="serviceselection">Service Selection</string>
+
+    <!-- Diagnostics module strings -->
+
+    <string name="total_miles_btn">Total Miles \n 573 Mi</string>
+    <string name="max_speed_btn">Max speed \n 74 mph</string>
+    <string name="ave_trip">Average Trip \n 388 Mi</string>
+    <string name="cost_fuel">Cost of fuel \n $82</string>
+    <string name="city_mpg">City MPG \n 21 mpg</string>
+    <string name="highway_mpg">Highway MPG \n 23 mpg</string>
+    <string name="repeat">Frequency</string>
+    <string name="diagnostics_info">Insight into your vehicle\'s health can help you avoid costly repairs.\n\n Three status levels indicate to you the relative health of eight areas in which your vehicle\'s diagnostics are monitored.\n\n\n OK (green): No system-generated maintenance codes. \n\n\n WARNING (yellow): There may be a maintenance issue soon.  \n\n\nSERVICE REQUIRED (red): Take your vehicle to be serviced. \n\n The eight areas in which your vehicle\'s diagnostics are monitored include: wiring, electrical, mechanical, alternator, battery, radiator, powertrain, and emissions. \n\n You can easily turn on/off alerts that notify you when your vehicle\'s diagnostic status level changes.  </string>
+    <string name="dtc_info_text">Diagnostic Trouble Codes (DTCs) help you identify vehicle problems – without having to pay a mechanic to diagnose them. \n\n DTCs indicate specific vehicle problems. \n\n Mechanics commonly use DTCs to determine necessary repairs. </string>
+    <!-- Service Type Strings -->
+
+    <string name="select_service_type">Select Service Type</string>
+    <string name="enter_service_type">Enter Service Type</string>
+    <string name="service_type">Service Type</string>
+
+    <!-- Alert Home strings -->
+
+    <string name="geofence_alerts">Geofence Alerts</string>
+    <string name="speed_alerts">Speed Alerts</string>
+    <string name="diagnostics">Diagnostics</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="valet">Valet</string>
+    <string name="save">Save</string>
+    <string name="done">Done</string>
+    <string name="clear">Clear</string>
+    <string name="edit">Edit</string>
+    <string name="settings">Settings</string>
+    <string name="enter_address">Enter Address</string>
+    <string name="use_current_location"> Use Current Location</string>
+    <string name="radius">Radius</string>
+    <string name="more">more</string>
+    <string name="completed_recalls">Completed Recalls</string>
+    <string name="location_upgrade_lbl">Vehicle Location \nServices</string>
+    <string name="diagnostics_upgrade_lbl">Enhanced Diagnostics</string>
+    <string name="location_upgrade_text">Currently, this service is not activated. Upgrade to In-Drive Co-Pilot to monitor the driving behavior of your loved ones, such as teens or aging drivers.\n\n\nTo add Vehicle Location Monitoring, select Premium Services from the main menu and subscribe to In-Drive Co-Pilot.</string>
+    <string name="diagnostics_upgrade_text">Currently, this service is not activated. Upgrade to In-Drive Guardian to ??????? \n\nTo add ??????, select Premium Services from the main menu and subscribe to In-Drive Guardian. </string>
+    <string name="push_notifications">Push Notifications</string>
+    <string name="auto_updates">Auto updates</string>
+    <string name="location">Location</string>
+    <string name="radius_default">Radius Default</string>
+    <string name="message_notification">Message Notification</string>
+    <string name="radius_half_mile">0.5 mile</string>
+    <string name="radius_one_mile">1 mile</string>
+    <string name="radius_two_miles">2 miles</string>
+    <string name="driving_data">Driving Data</string>
+    <string name="time_period_default">Time Period Default </string>
+    <string name="data_category_default">Data Category Default </string>
+    <!-- Recall Strings -->
+    <string name="no_recalls_prompt">Your vehicle has no recalls at this time. Please check back later.</string>
+    <string name="no_recalls_completed_prompt">No recalls have been marked completed. </string>
+    <string name="recall_info_details">Recall Details</string>
+    <string name="recall_id_number">ID Number:</string>
+    <string name="recall_component">Component:</string>
+    <string name="recall_vehicle_impacted">Vehicle Impacted:</string>
+    <string name="recall_manufacturer">Manufacturer:</string>
+    <string name="recall_manufacturing_dates">Manufacturing Dates:</string>
+    <string name="recall_units_affected">Potential Number of Units Affected:</string>
+    <string name="recall_summary">Summary:</string>
+    <string name="recall_defect_desc">Defect Description:</string>
+    <string name="recall_corrective_action">Corrective Action:</string>
+    <string name="recall_completed">Completed</string>
+    <string name="no_chart_data_text">No driving data available at this time. Please check back later.</string>
+
+    <!-- arrays are declared from here onwards for this project -->
+
+
+    <!-- all modules titles -->
+    <string-array name="module_array">
+        <item>Alerts</item>
+        <item>Location</item>
+        <item>Driving Data</item>
+        <item>Diagnostics</item>
+        <item>Emergency</item>
+    </string-array>
+    <string-array name="slide_menu_array">
+        <item>Home</item>
+        <item>App Settings</item>
+        <item>Premium Services</item>
+        <item>Customer Support</item>
+        <item>Profile</item>
+        <item>FAQs</item>
+    </string-array>
+    <!-- alerts screen option list items array -->
+    <string-array name="alerts_array">
+        <item>Alerts Home</item>
+        <item>Geofence Alerts</item>
+        <item>Valet Alert</item>
+        <item>Speed Alert</item>
+        <item>Diagnostics Alert</item>
+        <item>Maintenance Alerts</item>
+        <item>Recall Alerts</item>
+        <item>Alert History</item>
+        <item>Logout</item>
+    </string-array>
+
+    <!-- location screen option list items array -->
+    <string-array name="locations_array">
+        <item>Locate Vehicle</item>
+        <item>Location History</item>
+        <item>Geofence</item>
+        <item>Logout</item>
+    </string-array>
+
+    <!-- driving data screen option list items array -->
+    <string-array name="driving_data_option_list_array">
+        <item>Driving Data</item>
+    </string-array>
+
+    <!-- diagnosis data screen option list items array -->
+    <string-array name="diagnosis_data_option_list_array">
+
+        <!-- <item>Diagnostics Home</item> -->
+        <item>Vehicle Health</item>
+        <item>Maintenance Reminder</item>
+        <item>Maintenance Log</item>
+        <item>Recall Information</item>
+        <!-- <item>Logout</item> -->
+
+    </string-array>
+    <string-array name="location_list_options">
+        <item>Locate Vehicle</item>
+        <item>Location Alerts</item>
+        <item>Location History</item>
+    </string-array>
+    <string-array name="alerts_option_list_array">
+        <item>Alert Settings</item>
+
+    </string-array>
+    <string-array name="location_option_list_array">
+        <item>Locate Vehicle</item>
+        <item>Location Alerts</item>
+        <item>Location History</item>
+    </string-array>
+    <string-array name="emergency_option_list_array">
+        <item>Emergency Services</item>
+        <item>Stolen Vehicle Location Assistance</item>
+        <item>Roadside Assistance</item>
+    </string-array>
+
+    <!-- Maintenance Log & Alerts strings -->
+
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="date_issued">Date Issued</string>
+    <string name="reminder_by_date_new_1">Date Reminder.</string>
+    <string name="reminder_by_mileage_new">Mileage Reminder</string>
+    <string name="text">Text</string>
+    <string name="email">Email</string>
+    <string name="push">Push</string>
+
+    <!-- Help screen option list items array -->
+
+    <string-array name="maintenance_alert_type">
+        <item>Oil/Filter Change</item>
+        <item>Tire Rotation</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="maintenance_service_types">
+        <item>OilFilterChange</item>
+        <item>TireRotation</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="repeat_options">
+        <item>Weekly</item>
+        <item>Bi-weekly</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+    </string-array>
+    <string-array name="time_period_options">
+        <item>@string/this_week</item>
+        <item>@string/last_week</item>
+        <item>@string/this_month</item>
+        <item>@string/last_month</item>
+        <item>@string/custom</item>
+    </string-array>
+
+    <string-array name="faq_array">
+        <item>What packages are offered ? </item>
+        <item>How do I set up In-Drive Co-Pilot Location Alerts ?</item>
+        <item>How do I set up In-Drive Co-Pilot Speed Alerts ?</item>
+        <item>Can I view multiple vehicles simultaneously on the In-Drive mobile app ?</item>
+        <item>How do I access my projected discount on the State Farm website ?</item>
+    </string-array>
+
+    <string-array name="faq_answer_array">
+        <item><![CDATA[<p class="Pa2">Drive Safe &amp; Save&trade; with In–Drive<sup>&reg; </sup>offers you what you need, when you need it with the following package options:</p><p class="Pa6"><strong>&nbsp;</strong></p><p class="Pa6"><strong>In-Drive Connect </strong>&ndash; This package includes core services to collect your driving data in order to save you money, help improve your driving behaviors and provide additional safety and security with Stolen Vehicle Location Assistance and hands-free talking. In-Drive Connect empowers you to drive safe and save.</p><p class="Default">&nbsp;</p><p class="Pa6"><strong>In-Drive Guardian </strong>&ndash; This advanced service package includes all the features of In-Drive Connect plus additional safety and diagnostic features such as Incident Alert, Manual Emergency Call, Roadside Assistance, and Enhanced Diagnostics to keep you and your vehicle safe on the road. With In-Drive Guardian, you&rsquo;re not only connected, you&rsquo;re protected.</p><p class="Default">&nbsp;</p><p class="Pa6"><strong>In-Drive Co-Pilot </strong>&ndash; This advanced service package is designed to give you greater peace of mind knowing your loved ones are safe and secure behind the wheel. You&rsquo;ll have the ability to instantly locate your vehicle, personalize driving zones, set speed alerts, and even receive notifications when your vehicle departs and arrives at a specified location. Through a customized website, mobile web view, email or text message, you can access this real-time location-based data. This package is especially helpful for families with drivers who are new to the road. For more information on packages and services, call 1-888-665-9901</p>]]></item>
+        <item><![CDATA[<p>Click the &ldquo;Locator&rdquo; icon on the bottom of your screen.</p><p class="Default">Select &ldquo;Location Alerts&rdquo; from the menu.</p>
+        <p class="Default">Either enter an address or click the map icon.</p>
+        <p class="Default">Either select a radius or draw a boundary to define geographic parameters for the alerts.</p>
+        <p class="Default">Select your preferred alert communication method from the &ldquo;Location Alert&ldquo; screen.</p>
+        <p class="Default">You can select specific days of the week, start time and end time.</p>
+        <p>Toggle &ldquo;entered&ldquo; or &ldquo;exited&ldquo; on/off to determine if you want to be notified when your vehicle enters or exits a boundary. &nbsp;</p>]]></item>
+        <item><![CDATA[<p>Click the &ldquo;Alerts&rdquo; icon on the bottom of your screen.</p><p class="Default">Select &ldquo;Alert Settings&rdquo; from the menu.</p><p>Define speed parameters for the alert.</p><p>Toggle on/off to set the alert.&nbsp;</p>]]></item>
+        <item><![CDATA[You can only view one vehicle’s data at a time on the App. However, if you have linked your vehicle on the In-Drive Dashboard with other vehicles in Drive Safe & Save with In-Drive, from the main screen you can scroll between all vehicles to which you are linked.]]></item>
+        <item><![CDATA[<p>To view your projected discount, and to estimate your potential discount, follow these simple steps:</p><p>Log in to your State Farm Drive Safe &amp; Save Account</p><p>Under Enrolled Vehicles, click on &ldquo;View Discount Details and Tools&rdquo;&nbsp;</p>]]></item>
+    </string-array>
+
+    <!-- Alert Strings -->
+
+    <string name="alert_select_email_text">Select Email and/or Text to choose how you want to receive reminders.</string>
+    <string name="alert_delete">Are you sure you want to delete?</string>
+    <string name="alert_enter_frequency">Please enter Frequency before adding a Reminder</string>
+    <string name="alert_enter_service_type">Please select Service Type before adding a Reminder</string>
+    <string name="alert_frequency_validation">Maintenance Reminder frequency must be set between 1-48</string>
+    <string name="alert_mileage_validation"> Mileage cannot exceed 99999999</string>
+    <string name="alert_fill_custom_reminder">Please enter Custom Reminder Name</string>
+    <string name="alert_fill_location_alert">Please enter Location Alert Name</string>
+    <string name="alert_select_service_type">Service Type is required.</string>
+    <string name="alert_enter_mileage_interval">Mileage interval is required.</string>
+    <string name="about_logs">About Logs</string>
+    <string name="about_maintenance_log">About Maintenance Logs</string>
+    <string name="about_recalls">About Recalls</string>
+    <string name="about_reminders">About Reminders</string>
+    <string name="about_driving_data">About Driving Data</string>
+    <string name="about_boundary_alerts">Location Alerts</string>
+    <string name="about_location_alerts">Location Alerts</string>
+    <string name="about_valet_alerts">Valet Alerts</string>
+    <string name="about_speed_alerts">Speed Alerts</string>
+    <string name="about_speed_alert">Speed Alert</string>
+    <string name="about_diagnostics_alerts">Diagnostic Alerts</string>
+    <string name="about_diagnostics">Diagnostics</string>
+    <string name="info_diagnostics_alerts">Turn Diagnostic Alerts on/off that automatically notify you depending on notification preferences you’ve set when your vehicle’s diagnostics status changes. </string>
+    <string name="info_speed_alerts">Turn Speed Alerts on/off that notify you depending on notification preferences you’ve set when family drivers exceed the speed limit you have designated. Speed Alerts are available only to In-Drive Co-Pilot subscribers.</string>
+    <string name="info_valet_alerts">Turn Valet Alerts on/off that notify you depending on notification preferences you’ve set when your vehicle exits the boundary of your valet alert, so you know when a parking attendant might be taking your car for an unauthorized drive. You can choose from three boundary distances. </string>
+    <string name="info_location_alerts">Turn Location Alerts on/off that notify you depending on notification preferences you’ve set when family drivers enter or exit a predefined location such as work, school, or areas you\'ve asked them not to go. Location alerts are available only to In-Drive Co-Pilot subscribers.</string>
+    <string name="error_occurred">Error occurred </string>
+    <string name="vehicle_locate_error">System could not locate vehicle. Please try again later</string>
+    <string name="adding_maintenance_remainder">Adding Maintenance Reminder</string>
+    <string name="editing_maintenance_reminder">Editing Maintenance Reminder</string>
+    <string name="deleting_maintenance_reminder">Deleting Maintenance Reminder</string>
+    <string name="adding_maintenance_log">Adding Maintenance Log</string>
+    <string name="editing_maintenance_log">Editing Maintenance Log</string>
+    <string name="deleting_maintenance_log">Deleting Maintenance Log</string>
+    <string name="successfully_updated">You successfully updated a</string>
+    <string name="successfully_added">You successfully added a</string>
+    <string name="custom">Custom</string>
+    <string name="reminder_already_exists">This reminder is already on your calendar.</string>
+    <string name="please_enter_custom_service_name">Please enter Custom Log Name</string>
+    <string name="component">Component</string>
+    <string name="id_number">ID Number</string>
+    <string name="vehicle_impacted">Vehicle Impacted</string>
+    <string name="manufacturer">Manufacturer</string>
+    <string name="manufacturing_dates">Manufacturing Dates</string>
+    <string name="potential_number_of_units_affected">Potential Number of Units Affected</string>
+    <string name="summary">Summary</string>
+    <string name="defect_description">Defect Description</string>
+    <string name="corrective_action">Corrective Action</string>
+
+    <!-- Side Navigation Drawer options -->
+
+    <string name="home">Home</string>
+    <string name="app_settings">App Settings</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="customer_support">Customer Support</string>
+    <string name="profile">Profile</string>
+    <string name="faqs">FAQs</string>
+    <string name="faq_header">FAQ\'s</string>
+    <string name="logout">Logout</string>
+
+    <!-- Side Navigation Drawer options -->
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Vehicle Health Strings -->
+    <string name="battery">Battery</string>
+    <string name="dtc_code_label">Diagnostic Code:</string>
+
+    <!-- Dashboard strings -->
+
+    <string name="manage_automated_alerts">Manage your automated alerts</string>
+
+    <!-- Driving Data strings -->
+
+    <string name="driving_data_header">View Mileage, Speed \n and Fuel Costs</string>
+
+    <!-- other strings -->
+    <string name="skip_demo">Skip Demo</string>
+    <string name="recognize">Recognize</string>
+    <string name="draw">Draw</string>
+    <string name="scan">Scan</string>
+    <string name="delete">Delete</string>
+    <string name="vehicle">Vehicle</string>
+    <string name="geofence">Geofence</string>
+    <string name="service_required">Service Required</string>
+    <string name="no_issue_detected">No issue detected.</string>
+    <string name="monitor_closely">Monitor Closely</string>
+    <string name="warning">Warning</string>
+    <string name="everyday">Everyday</string>
+    <string name="start_tutorial">Start Tutorial</string>
+    <string name="end_tutorial">End Tutorial</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="miles">Miles</string>
+    <string name="save_alert">Save Alert</string>
+    <string name="edit_shape">Edit Shape</string>
+    <string name="months">Months</string>
+    <string name="description">Description</string>
+    <string name="email_text">Email and Text</string>
+    <string name="entry">Entry</string>
+    <string name="set_location_style">Set Location Style</string>
+    <string name="help_content">Help content</string>
+    <string name="add_to_calendar">Add to Calendar</string>
+    <string name="add_to_alerts">Add to Alerts</string>
+    <string name="time_validate_error">End Time must be greater than Start Time</string>
+
+    <!-- week days text -->
+    <string name="monday">M</string>
+    <string name="tuesday">T</string>
+    <string name="wednesday">W</string>
+    <string name="thursday">T</string>
+    <string name="friday">F</string>
+    <string name="saturday">S</string>
+    <string name="sunday">S</string>
+    <string name="alert_settings_small">Alert Settings</string>
+    <string name="profile_header">Profile</string>
+    <string name="terms_conditions">this is terms and condition</string>
+    <string name="tbd">TBD</string>
+    <string name="page">Page:</string>
+    <string name="recent_alerts_caps">RECENT ALERTS</string>
+    <string name="something_went_wrong">Oops something went wrong No message</string>
+    <string name="alert_history_small">Alert History</string>
+    <string name="diagnostic_summary">Blurb on the function of the battery and what can happen when there is a malfunction identified.</string>
+    <string name="call_centre_summary">Currently, this service is not activated.\nDiagnostic Trouble Codes (DTCs) help you identify specific vehicle problems – without having to pay a mechanic to diagnose them.\nTo receive DTCs, select Premium Services from side menu and subscribe to In-Drive Guardian.</string>
+    <string name="dtc_info">Diagnostic Trouble Codes (DTCs) help you identify vehicle problems – without having to pay a mechanic to diagnose them.\n DTCs indicate specific vehicle problems.\n Mechanics commonly use DTCs to determine necessary repairs.  </string>
+    <string name="dtc_code">DTC-CODE :</string>
+    <string name="not_activated">[Service Not Enabled]</string>
+    <string name="label_location">Location</string>
+    <string name="maintenance_log_detailed">Maintenance Log Detail </string>
+    <string name="maintenance_reminder">Maintenance Reminder </string>
+    <string name="notify_me">Notify Me :</string>
+    <string name="title_activity_create_maintenance_reminder">CreateMaintenanceReminderActivity</string>
+    <string name="info_driving_data"><![CDATA[<p>On this screen, you can view data related to recent driving, such as number of miles driven, maximum speed and carbon footprint.</p><p>Tap &ldquo;Select Time Period&rdquo; to choose&nbsp; from current week, last week, current month, last month or customized dates.</p><p><strong>Total Miles</strong></p><p>Displays total number of miles driven during selected time period.&nbsp;</p><p><strong>Max Speed</strong></p><p>Displays maximum speed driven during selected time period.</p><p><strong>Average Trip</strong></p><p>Displays average number of miles driven per trip during selected time period.</p><p>Trip is defined as the distance traveled between when you start your engine and when you shut it off.</p><p><strong>Carbon Footprint</strong></p><p>Helps measure the amount of greenhouse gases emitted by your vehicle. The score displayed shows your vehicle&rsquo;s estimated CO2 tailpipe emissions. To find more information on your vehicle&rsquo;s greenhouse gas emissions, use your favorite search engine to conduct an Internet search.</p><p><strong>City MPG</strong></p><p>Displays average number of miles your vehicle has traveled in a city environment on one gallon of gas during selected time period.</p><p><strong>Highway MPG</strong></p><p>Highway MPG displays the average number of miles your vehicle has traveled on the highway on one gallon of gasduring selected time period.&nbsp;</p>]]></string>
+    <string name="info_alerts_settings">Info about Alert Settings</string>
+    <string name="location_alerts_info_text">Location Alerts notify you via text or email (depending on preferences you\'ve set) when family drivers enter or exit a predefined location such as work, school, or areas you\'ve asked them not to go. Location alerts are available only to In-Drive Co-Pilot subscribers.</string>
+    <string name="locate_vehicle_info_text">With In-Drive Co-Pilot you can use your smartphone to check the whereabouts of your car at any given time.</string>
+    <string name="location_history_info_text">With In-Drive Co-Pilot, you can view a 24-hour history of your vehicle\'s most recent locations.</string>
+    <string name="info_alerts_history">Info about Alert History</string>
+    <string name="info_logs">Keep a detailed record of your vehicle\'s service maintenance. Update your Maintenance Log each time your vehicle is serviced. Log fields include: description of the service, where the service was performed, cost, date and mileage. </string>
+    <string name="info_recall">Find out if your vehicle has any recalls associated with it. In the event your vehicle has a recall notification, you will see an alert icon.
+Keep a record of recall services completed  by marking each in a log.</string>
+    <string name="info_reminder">Routine maintenance helps keep your vehicle performing at its best.  Create reminders that automatically send you a text or email when it’s time for your vehicle to be serviced. This helps you keep track of when you need to perform necessary maintenance such as tune-ups, tire rotations, oil changes, replacing windshield wipers, brake pads and more.\n\nEasily enter a description of the service required, set up recurring reminders and add dates to your calendar.</string>
+    <string name="title_activity_vehicle_health_detail">VehicleHealthDetailActivity</string>
+    <string name="title_activity_service_type">ServiceTypeActivity</string>
+    <string name="title_activity_maintenance_reminder_detail">MaintenanceReminderDetailActivity</string>
+    <string name="startDateLabel">Start Date</string>
+    <string name="endDateLabel">End Date</string>
+    <string name="diagnostic_details">Diagnostic Details</string>
+    <string name="title_activity_recall_details">RecallDetailsActivity</string>
+    <string name="updating_recall">Updating Recall…</string>
+    <string name="title_activity_maintenance_log_detail">MaintenanceLogDetailActivity</string>
+    <string name="title_activity_create_maintenance_log">CreateMaintenanceLogActivity</string>
+    <string name="title_activity_alerts_settings">Alerts Settings</string>
+    <string name="title_activity_speed_alert">Speed Alert</string>
+    <string name="title_activity_alert_valet">Alert Valet</string>
+    <string name="title_activity_diagnostics_alert">Diagnostics Alerts</string>
+    <string name="validation_driving_data_date">End date should not be lesser than start date</string>
+    <string name="validation_location_alerts_date"> End Time must be greater than Start Time.</string>
+    <string name="driving_data_for">Driving Data for </string>
+    <string name="default_freq_month">12</string>
+    <string name="select_time_period"> Edit Time </string>
+    <string name="total_miles">Total Miles</string>
+    <string name="max_speed">Max Speed</string>
+    <string name="average_trip">Average Trip</string>
+    <string name="carbon_footprint">Carbon Footprint</string>
+    <string name="default_empty_text">---</string>
+    <string name="carbon_footprint_unit">lbs/CO2/mi</string>
+    <string name="city_mpg_text">City MPG</string>
+    <string name="highway_mpg_text">Highway MPG</string>
+    <string name="diagnostic_home_text">Monitor Your Vehicle\'s Health and Maintenance</string>
+    <string name="alerts_home_text">Manage Your \nAutomated Alerts</string>
+    <string name="location_home_text">Manage Location Alerts \n  and Location Services</string>
+    <string name="emergency_home_text">Get Professional Help \nin Your Moment of Need</string>
+    <string name="speed_alert_text">Speed Alert</string>
+    <string name="diagnostics_alert_text">Diagnostics Alert</string>
+    <string name="valet_alert_text">Valet Alert</string>
+    <string name="boundary_alert_text">Location Alert</string>
+    <string name="speed_unit">mph</string>
+    <string name="updating_diagnostics_alert">Updating Diagnostic Alert Setting…</string>
+    <string name="updating_speed_alert">Updating SpeedAlertSetting…</string>
+    <string name="error_server_alert_settings">The system can not retrieve your information at this time. Please check back later.</string>
+    <string name="error_update_boundary_alerts">Error in updating boundary alert</string>
+    <string name="error_locating_vehicle">Error in locating vehicle</string>
+    <string name="error_location_history">Error in fetching location history</string>
+    <string name="this_week">This Week</string>
+    <string name="last_week">Last Week</string>
+    <string name="this_month">This Month</string>
+    <string name="last_month">Last Month</string>
+    <string name="update_alert">Update Alert</string>
+    <string name="delete_alert">Delete Alert</string>
+    <string name="location_services_inactive">Location Services Not Active</string>
+    <string name="enable_location_services">Please enable Location Services and GPS</string>
+
+    <!-- Emergency module strings -->
+    <string name="emergency_services_text">Within In-Drive &#174; Guardian you can get professional help in your moment of need.\n\nThere are three types of emergency services available with In-Drive Guardian: Incident Alert, Manual Emergency Calling and Roadside Assistance.\n\nWith Incident Alert, if you\'re ever in an incident, our emergency specialists will contact you over the visor clip in your vehicle to determine if you need help. If they are unable to speak to you, emergency services will automatically be dispatched to your exact location.\n\nWith Manual Emergency Calling, you can initiate a call manually. If you are involved in an incident, you can press the Emergency Button on the In-Drive Visor Clip to connect with emergency specialists who will identify your location and send help.\n\nWith Roadside Assistance*, you can request help for any non-emergencies by pressing the State Farm Button on the In-Drive Visor Clip. Emergency specialists can identify your location and dispatch the help you need.\n\nSelect Premium Services from main menu to subscribe to In-Drive Guardian.\n\nDisclaimer: *Roadside Assistance charges apply, unless you have State Farm\'s Emergency Road Service coverage. Please consult your State Farm insurance card or contact State Farm agent to verify your coverage choices.</string>
+    <string name="stolen_vehicle_text_1">If your vehicle is stolen, In-Drive &#174; helps authorities attempt to locate it, making it quicker and easier to return not only the car you love, but your possessions inside it. </string>
+    <string name="stolen_vehicle_text_2">In the event your vehicle is stolen, secure a police case number, then contact In-Drive at </string>
+    <string name="road_side_assist_text">With Roadside Assistance*, you can request help at any time by pressing the State Farm Button on the In-Drive Visor Clip. Emergency Specialists can identify your location and dispatch the help you need.</string>
+    <string name="road_side_assis_premium">To add Roadside Assistance, select Premium Services from main menu and subscribe to In-Drive Guardian.</string>
+    <string name="road_side_assist_additional_text">Disclaimer: *Roadside Assistance charges apply, unless you have State Farm\'s Emergency Road Service coverage. Please consult your State Farm insurance card or contact State Farm agent to verify your coverage choices.</string>
+    <string name="premium_services_intro_text">In-Drive &#174; has two advanced service packages available. Enjoy additional safety and security services with In-Drive Guardian and family driver monitoring with In-Drive Co-Pilot.\n\n To learn more about advanced service packages, call 1-888-665-9901</string>
+    <string name="premium_services">Premium Services</string>
+    <string name="inDrive_guardian_header">In-Drive Guardian</string>
+    <string name="inDrive_guardian_text">With In-Drive Guardian, you get help sent to your GPS location automatically even when you can\'t physically call for it, or when your mobile phone is damaged or out of reach. You can also press a button to get help anytime you need it. \n\nBe prepared with In-Drive Guardian: \n• Incident Alert \n• Roadside Assistance \n• Manual Emergency Calling \n• Enhanced Diagnostics </string>
+    <string name="inDrive_pilot_header">In-Drive Co-Pilot</string>
+    <string name="inDrive_pilot_text">Driving is not a responsibility to be taken lightly. Teen drivers need rules and accountability. Sometimes, so do aging adults. With In-Drive Co-Pilot, you\'ll know when family members are exceeding speed limits you\'ve set or driving in areas you\'ve asked them not to go. \nIn-Drive Co-Pilot provides peace of mind:\n• Vehicle Location Monitoring\n• Location Alerts\n• Speed Alerts</string>
+    <!-- ImageView content description texts -->
+
+    <string name="left_arrow_cd">Left Arrow</string>
+    <string name="right_arrow_cd">Right Arrow</string>
+    <string name="service_type_arrow_cd">Service Type Arrow</string>
+    <string name="on_state_cd">On State</string>
+    <string name="off_state_cd">Off State</string>
+    <string name="logo_cd">Logo</string>
+    <string name="red_alert_cd">Red Alert</string>
+    <string name="tab_bar_img_cd">Tab Bar</string>
+    <string name="dashboard_img_cd">Dashboard Image</string>
+    <string name="left_black_arrow_cd">Left Black Arrow</string>
+    <string name="right_black_arrow_cd">Right Black Arrow</string>
+    <string name="info_img_cd">Info Image</string>
+    <string name="separator_cd">Separator</string>
+    <string name="add_btn_cd">Add</string>
+    <string name="pencil_cd">Pencil</string>
+    <string name="toast_cd">Toast</string>
+    <string name="widget_cd">Widget</string>
+    <string name="scan_serial_cd">Scan Serial Number</string>
+    <string name="scan_vin_cd">Scan Vin</string>
+    <string name="locate_cd">Locate</string>
+    <string name="check_box_cd">Locate</string>
+    <string name="premium_services_cd">Locate</string>
+    <string name="home_cd">Home Image</string>
+    <string name="directions_cd">Directions</string>
+
+    <string name="upsell_heaader_default">Upsell Page</string>
+    <string name="upsell_message_default">Upsell Page</string>
+
+
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="title_activity_locate_vehicle">LocateVehicleActivity</string>
+    <string name="title_activity_location_alerts">LocationAlertsActivity</string>
+    <string name="title_activity_location_history">LocationHistoryActivity</string>
+    <string name="title_activity_location_history_picker">LocationHistoryPickerActivity</string>
+    <string name="title_activity_emergency_services">EmergencyServicesActivity</string>
+    <string name="title_activity_stolen_vehicle">StolenVehicleActivity</string>
+    <string name="title_activity_roadside_assist">RoadsideAssistActivity</string>
+    <string name="title_activity_app_settings">AppSettingsActivity</string>
+    <string name="title_activity_premium_services">PremiumServicesActivity</string>
+    <string name="title_activity_faq">FAQActivity</string>
+    <string name="title_activity_faq_detail">FAQDetailActivity</string>
+    <string name="radius_three_miles">3 miles</string>
+    <string name="confirm_yes">Yes</string>
+    <string name="confirm_no">No</string>
+    <string name="title_activity_forgot_un_method_selection">ForgotUNMethodSelection</string>
+    <string name="title_activity_forgot_un_result">ForgotUNResultActivity</string>
+    <string name="title_activity_forgot_pwd_selection">ForgotPwdSelectionActivity</string>
+    <string name="title_activity_forgot_pwd_authorization">ForgotPwdAuthorizationActivity</string>
+    <string name="title_activity_forgot_pwd_result">ForgotPwdResultActivity</string>
+    <string name="title_activity_account_setup">AccountSetupActivity</string>
+    <string name="title_activity_account_setup_selection">AccountSetupSelectionActivity</string>
+    <string name="title_activity_account_setup_un_pwd">AccountSetupUNPWDActivity</string>
+    <string name="title_activity_account_setup_result">AccountSetupResultActivity</string>
+    <string name="title_activity_new_device_login">NewDeviceLoginActivity</string>
+    <string name="title_activity_new_device_selection">NewDeviceSelectionActivity</string>
+    <string name="title_activity_new_device_authorization">NewDeviceAuthorizationActivity</string>
+    <string name="title_activity_new_device_result">NewDeviceResultActivity</string>
+    <string name="locating_vehicle">The system is locating your vehicle. </string>
+    <string name="locate_vehicle_cancel_message">Are you sure you want to cancel locate vehicle ?</string>
+    <string name="title_activity_account_authorization_result">AccountAuthorizationResultActivity</string>
+    <string name="location_alerts_limit_exceed">You currently have 10 active alerts  – the maximum allowed. To add a new alert, you must delete an existing alert.</string>
+    <string name="stolen_vehicle_contact_number">888–519–4832</string>
+    <string name="dot_char">.</string>
+    <string name="map_locked">Map Locked</string>
+    <string name="week_days">Week days</string>
+    <string name="week_ends">Week ends</string>
+    <string name="always_on">Always on</string>
+    <string name="alert_when">Alert When:</string>
+    <string name="entered">Entered</string>
+    <string name="exit">Exit</string>
+    <string name="change_password">Change Password</string>
+    <string name="type_new_password">Type new password</string>
+    <string name="old_password">Old password</string>
+    <string name="contents">Contents</string>
+    <string name="select_time_periods">Select Time Period</string>
+    <string name="header">Header</string>
+    <string name="detail">Detail</string>
+    <string name="on_text">On</string>
+    <string name="micheal_jones">Micheal Jones</string>
+    <string name="nissan_morano">2012 Nissan Morano</string>
+    <string name="ford">2010 Ford F -150</string>
+    <string name="honda">2011 Honda Accord</string>
+    <string name="service_code">Service Code</string>
+    <string name="no_location_alerts">You have not set any Location Alerts. </string>
+    <string name="upsell_page">Upsell Page</string>
+    <string name="address">Address</string>
+    <string name="title_activity_customer_support">CustomerSupportActivity</string>
+
+    <string name="support_center">In-Drive Support Center</string>
+    <string name="support_center_number">1–888-270-0267</string>
+    <string name="account_center">In-Drive New Account Center</string>
+    <string name="account_center_number">1–888-665-9901</string>
+    <string name="stolen_vehicle_assistance">Stolen Vehicle Location Assistance*</string>
+    <string name="stolen_vehicle_number">1–888-519-4832</string>
+
+    <string name="entered_exited_needed">Selecting either Entered or Exited is required.</string>
+
+    <!-- Server error strings for Login Module -->
+
+    <string name="no_phone_email">Please update the Customer Web Portal with your current email address or mobile phone number.</string>
+    <string name="account_not_found_forgot_username">System could not find account information. Please enter valid Last Name and VIN.</string>
+    <string name="account_not_found_forgot_password">System could not find account information. Please enter Username again.</string>
+    <string name="account_has_mobile_account">You have already set up a mobile app account. Users are limited to one account.</string>
+    <string name="account_not_found_set_up">System could not find account information. Please enter valid Last Name, VIN or Serial Number.</string>
+    <string name="username_not_unique">This username is already in our system. Please enter a unique username.</string>
+    <string name="cannot_complete_set_up">System is encountering a technical issue and cannot complete mobile app set-up at this time.  Please try again.</string>
+    <string name="device_not_installed">Your device has not been installed in your vehicle.  You cannot access the mobile app until the device is installed.</string>
+    <string name="account_not_approved">Your In-Drive account does not have permission to access the mobile app.</string>
+    <string name="cannot_create_mobile_account">This username is already in our system. Please enter a unique username.</string>
+    <string name="cannot_register_new_device">System is encountering a technical issue and cannot register a new device at this time. Please try again later.</string>
+    <string name="cannot_generate_authorization_code">System is encountering a technical issue and cannot generate an authorization code at this time. Please try again later.</string>
+    <string name="max_login_attempts">You have reached the maximum number of login attempts.  Please try again in one hour.</string>
+    <string name="cannot_update_password">System is encountering a technical issue and cannot update password at this time.  Please try again later.</string>
+    <string name="authorization_code_expired">Authorization code has expired. Please start the process over again.</string>
+    <string name="authorization_code_invalid">Invalid authorization code.  Please try again.</string>
+    <string name="username_pwd_mismatch">Username and Password combination do not match. Please try again.</string>
+    <string name="old_password_incorrect">The old password you entered is incorrect. Please enter valid password.</string>
+    <string name="kitchen_sink_failure">Server error please login again or try later</string>
+
+
+    <!-- Offline strings-->
+    <string name="populates_only_password">Please enter valid Username along with valid Password.</string>
+    <string name="app_setting_select_notification_method">Please select at least one notification method.</string>
+    <string name="session_inactivity">Your session has timed out due to inactivity. Please log in again.</string>
+    <string name="certificate_expired">Your Mobile Device certificate has expired. Please sync your Mobile Device again.</string>
+    <string name="no_recalls">Your vehicle has no recalls.</string>
+    <string name="passwords_mismatch">Passwords do not match. Please enter again.</string>
+    <string name="alerts_successfully_set">Alert successfully set.</string>
+    <string name="account_status_inactive">Your account status is inactive. You are only able to view data.</string>
+    <string name="device_not_installed_data">Device has not been installed in your vehicle. Data will be available once the device is installed.</string>
+    <string name="locate_vehicle_cancelled">Locate vehicle request canceled.</string>
+    <string name="cannot_locate_vehicle">System could not locate vehicle. Please try again later.</string>
+    <string name="location_alert_cannot_added">System is encountering a technical issue and cannot complete your request at this time. Please try again later.</string>
+    <string name="location_alert_added">Location Alert successfully added.</string>
+    <string name="location_alert_updated">Location Alert successfully updated.</string>
+    <string name="no_network_connectivity">Connection lost. Please try again later.</string>
+    <string name="location_alert_cannot_updated">Location Alert could not be updated. Please try again later.</string>
+    <string name="location_alert_error">Error in deleting location alert.</string>
+    <string name="finding_user">Finding User...</string>
+    <string name="finding_user_error">Finding User...Error Occurred</string>
+    <string name="updating_password">Updating Password...</string>
+    <string name="update_password">Update Password</string>
+    <string name="updating_password_error">Updating Password...Error Occurred</string>
+    <string name="updating_password_success">Password updated successfully.</string>
+    <string name="fetching_user_preferences">Fetching User Preferences...</string>
+    <string name="updating_user_preferences">Updating User Preferences...</string>
+    <string name="fetching_user_preferences_error">Fetching User Preferences...Error Occurred</string>
+    <string name="updating_user_preferences_error">Updating User Preferences...Error Occurred</string>
+    <string name="user_preferences_update_success">Updated User Preferences Successfully</string>
+    <string name="title_activity_what_is_this">WhatIsThisActivity</string>
+
+    <string name="serial_number_help">Scan the serial number barcode located on the product label affixed to the side of the In-Drive &#174; packaging.</string>
+    <string name="vin_help">For best results, scan the vehicle identification number (VIN) barcode on the driver\'s side doorjamb sticker. This is typically located on the driver\'s side door or driver\'s side doorpost.</string>
+    <string name="dashboard_info_title">Account and vehicles</string>
+    <string name="dashboard_info_detail">You can login with your username and password. \n\n If you have multiple vehicles on your account, you can switch easily on this home page.</string>
+
+    <!--Upsell Texts -->
+
+    <string name="vehicle_location_services_header">Vehicle Location Services</string>
+    <string name="location_services_upsell_text">Currently, this service is not activated. With In-Drive &#174; Co-Pilot, you get Location Alerts that notify you via text or email when your vehicle enters or exits areas you\'ve defined - so you know your loved ones are where you expect them to be.\n\n To learn more about In-Drive Co-Pilot, call 1-888-665-9901</string>
+    <string name="locationHistory_services_upsell_text">Currently, this service is not activated. With In-Drive &#174; Co-Pilot, you can view a location history of your vehicle—so you know where your vehicle has been driven even if you weren’t behind the wheel.\n\n To learn more about In-Drive Co-Pilot, call 1-888-665-9901.</string>
+    <string name="locateVehicle_services_upsell_text">Currently, this service is not activated. With In-Drive &#174; Co-Pilot, you canpinpoint where your vehicle is at any given time.\n\nTo learn more about In-Drive Co-Pilot, call 1-888-665-9901.</string>
+    <string name="vehicle_health_upsell_text">Currently, this service is not activated. With In-Drive &#174; Guardian, you can get Diagnostic Trouble Codes (DTCs) that help you identify specific vehicle problems - without having to pay a mechanic to diagnose them.\n\n To learn more about In-Drive Guardian, call 1-888-665-9901</string>
+    <string name="speed_alert_upsell_text">Currently, this service is not activated. With In-Drive &#174; Co-Pilot, you get Speed Alerts that notify you via text or email when family drivers exceed the speed limit you have designated - giving you peace of mind that your loved ones are driving safely.\n\n To learn more about In-Drive Co-Pilot, call 1-888-665-9901</string>
+
+
+    <!-- Login strings -->
+    <string name="first_time_users">First time users</string>
+    <string name="first_time_users_info">Enter your last name; then your serial number or VIN.\n\n You can find the serial number on the In-Drive packaging.\n\n You can find the VIN in the lower left corner of your dashboard, in front of the steering wheel.\n\n Press submit, then you will receive an authorization code to verify the account. Once verified, you can choose a username and password to be used for future login.</string>
+    <string name="standard_login_process">Standard log in process</string>
+    <string name="standard_login_process_info">Enter the authorization code you received to verify your account. Then create a unique username and password to complete the login process.</string>
+
+
+    <!--  for categories -->
+    <string name="category_access_app">AccessApp</string>
+    <string name="category_app_navigation">AppNavigation</string>
+    <string name="category_alerts">Alerts</string>
+    <string name="category_location">Location</string>
+    <string name="category_driving">DrivingData</string>
+    <string name="category_diagnostics">Diagnostics</string>
+    <string name="category_emergency">Emergency</string>
+    <string name="category_help">Help</string>
+    <string name="category_admin">Admin</string>
+
+
+    <!--  for labels -->
+    <string name="label_login">LogIn</string>
+    <string name="label_mobile_app_setup">MobileAppSetUp</string>
+    <string name="label_submit_vin">SubmitVINSerial</string>
+    <string name="label_submit_help">SubmitVINSerialhelp</string>
+    <string name="label_scan_serial">Scanserial</string>
+    <string name="label_scan_vin">Scanvin</string>
+    <string name="label_receive_auth_code">Receiveauthcode</string>
+    <string name="label_continue_auth_code">Continueauthcode</string>
+    <string name="label_submit_name_pass">SubmitNamePassword</string>
+    <string name="label_submit_name_pass_help">SubmitNamePasswordHelp</string>
+    <string name="label_retun_login">NewDeviceLogin</string>
+    <string name="label_sync_continue">SyncContinue</string>
+    <string name="label_home_dashboard">HomeSelectVehicle</string>
+    <string name="label_alerts_alerts_settings">AlertAlertSettings</string>
+    <string name="label_alerts_alerts_history">AlertAlertHistory</string>
+
+
+
+
+    <!-- for screen names -->
+    <string name="screen_splash">Splash</string>
+    <string name="screen_login">Login</string>
+    <string name="screen_pro">Profile Settings</string>
+    <string name="screen_app_sett">App Settings</string>
+    <string name="screen_cus">Customer Support</string>
+    <string name="screen_pre_ser">Premium Services</string>
+    <string name="screen_enha_diag">Enhanced Diagnostics</string>
+    <string name="screen_speed_al_upg">Speed Alerts upgrade</string>
+    <string name="screen_diag_upgrade">Diagnostics Upgrade</string>
+    <string name="screen_location_upgrade">Location Upgrade</string>
+    <string name="screen_location_aler_upgr">Location Alerts Upgrade</string>
+    <string name="screen_faq">FAQs</string>
+    <string name="screen_road">Roadside Assistance</string>
+    <string name="screen_stolen">Stolen Vehicle Assistance</string>
+    <string name="screen_alerts">Alerts</string>
+    <string name="screen_location">Location</string>
+    <string name="screen_locate_vehicle">Locate Vehicle</string>
+    <string name="screen_add_location">Add Location Alert</string>
+    <string name="screen_location_history">Location History</string>
+    <string name="screen_alerts_settings">Alert Settings</string>
+    <string name="screen_new_device_reg">New Device Registration</string>
+    <string name="screen_forgot_username">Forgot Username</string>
+    <string name="screen_forgot_pass">Forgot Password</string>
+    <string name="screen_home">AppNavigation</string>
+    <string name="screen_driving_data">Driving Data</string>
+    <string name="screen_diagnostics">Diagnostics</string>
+    <string name="screen_diag_detail">Diagnostic Detail</string>
+    <string name="screen_vehicle_health">Vehicle Health</string>
+    <string name="screen_maintenance_remainder">Maintenance Reminder</string>
+    <string name="screen_add_remainder">Add Remainder</string>
+    <string name="screen_edit_rem">Edit Reminders</string>
+    <string name="screen_maintenance_log">Maintenance Log</string>
+    <string name="screen_add_log">Add Maintenance Log</string>
+    <string name="screen_edit_log">Edit Maintenance Log</string>
+    <string name="screen_recall_info">Recall Information</string>
+    <string name="screen_recall_detail">Recall Detail</string>
+    <string name="screen_emergency">Emergency</string>
+    <string name="screen_emergency_services">Emergency Services</string>
+
+
+    <string name="error_technical_issue">System is experiencing technical difficulties. Please try again later.</string>
+    <string name="error_password_issue">Password must be a minimum of 8 characters. Password must consist of one upper case letter, one lower case letter, and one number. Special characters are not allowed. Please make password secure as possible.</string>
+    <string name="error_account_issue">System is encountering a technical issue and cannot complete mobile app set-up at this time.  Please try again.</string>
+    <string name="error_username_issue">Username must be a minimum of 6 characters and maximum of 20 characters.  Cannot contain special characters.</string>
+
+    <string name="invalid_user">Username invalid. Please try again.</string>
+
+    <string name="user_already_exists">This username is already in our system. Please enter a unique username.</string>
+
+
+</resources>

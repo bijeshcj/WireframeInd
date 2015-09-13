@@ -1,0 +1,204 @@
+package com.verizontelematics.indrivemobile;
+
+import android.app.Application;
+import android.content.Context;
+import android.provider.Settings;
+import android.view.ViewConfiguration;
+
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.controllers.RestResponseHandlerThread;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonRestClient;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonSSLSocketFactoryClient;
+import com.verizontelematics.indrivemobile.httpwrapper.RestClientFactory;
+import com.verizontelematics.indrivemobile.utils.Foreground;
+import com.verizontelematics.indrivemobile.utils.config.Config;
+import com.verizontelematics.indrivemobile.utils.config.InDrivePreference;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+/**
+ * Created by bijesh on 9/3/2014.
+ */
+public class IndriveApplication extends Application {
+    private static final String TAG = IndriveApplication.class.getSimpleName();
+
+    private String decodedDbFilePath = null;
+    private static IndriveApplication mInstance;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        getOverflowMenu();
+
+
+        mInstance = this;
+
+        // Create application specific preference file.
+        InDrivePreference.createInstance(this);
+
+
+        Foreground.init(this);
+
+//        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+//            @Override
+//            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityStarted(Activity activity) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityResumed(Activity activity) {
+//               Log.d(TAG,"App is on foreground");
+//            }
+//
+//            @Override
+//            public void onActivityPaused(Activity activity) {
+//               Log.d(TAG,"App is on background");
+//            }
+//
+//            @Override
+//            public void onActivityStopped(Activity activity) {
+//
+//            }
+//
+//            @Override
+//            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+//
+//            }
+//
+//            @Override
+//            public void onActivityDestroyed(Activity activity) {
+//
+//            }
+//        });
+
+
+        // Store Default service Type in shared preferences.
+//        storeServiceType();
+
+        RestResponseHandlerThread.init();
+
+
+        VerizonRestClient lClient = (VerizonRestClient) RestClientFactory.getDefaultRestClient();
+
+        // if layer 7 init with ssl socket for https  like below
+        //lClient.init(this, VerizonSSLSocketFactoryClient.instance().getSocketFactory());
+        lClient.init(this, new SSLSocketFactory() {
+            @Override
+            public String[] getDefaultCipherSuites() {
+                return new String[0];
+            }
+
+            @Override
+            public String[] getSupportedCipherSuites() {
+                return new String[0];
+            }
+
+            @Override
+            public Socket createSocket(Socket socket, String host, int i, boolean b) throws IOException {
+                SSLSocket s = (SSLSocket) VerizonSSLSocketFactoryClient.instance().getSocketFactory().createSocket(socket, host, i, b);
+                s.setEnabledProtocols(new String[] {"TLSv1.2"} );
+                return s;
+            }
+
+            @Override
+            public Socket createSocket(String s, int i) throws IOException, UnknownHostException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(String s, int i, InetAddress inetAddress, int i2) throws IOException, UnknownHostException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+                return null;
+            }
+
+            @Override
+            public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress2, int i2) throws IOException {
+                return null;
+            }
+        });
+        // else
+        //lClient.init(this);
+
+
+        Config.getInstance(this);
+
+        /*
+        // create some dummy file.
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                // check if this even comes to here
+                // if it does
+                        // 1. Can we use the applicationContext still ? {  The app has crashed already }
+                CryptoWrapper.encryptDB(getApplicationContext());
+            }
+        });
+        */
+
+        // Register the app with gcm
+        //registerWithGcm();
+    }
+
+    public static synchronized IndriveApplication getInstance(){
+
+        return mInstance;
+    }
+
+
+
+    public Context getInDriveApplicationContext(){
+        return getApplicationContext();
+    }
+
+    public String getDeviceName(){
+        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+
+
+    private void storeServiceType() {
+        InDrivePreference appPref = InDrivePreference.getInstance();
+        ArrayList<String> serviceTypeArrList = appPref.getCustomObject(InDrivePreference.SERVICE_TYPE, new TypeToken<List<String>>() {
+        }.getType());
+        if (serviceTypeArrList == null) {
+
+            appPref.setCustomObject(InDrivePreference.SERVICE_TYPE, new ArrayList<String>(Arrays.asList(this.getResources().getStringArray(com.verizontelematics.indrivemobile.R.array.maintenance_alert_type))));
+        }
+    }
+
+    private void getOverflowMenu() {
+
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+}

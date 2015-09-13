@@ -1,0 +1,168 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.verizontelematics.indrivemobile.IndriveApplication;
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.AuthenticateController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.UserRegistrationData;
+import com.verizontelematics.indrivemobile.models.data.UserVehicleData;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.GoogleAnalyticsUtil;
+import com.verizontelematics.indrivemobile.utils.config.InDrivePreference;
+
+/**
+ * Created by Priyanga on 8/21/2014.
+ */
+public class ForgotPasswordActivity extends Activity implements UIInterface {
+    private EditText usernameET;
+    private UserVehicleData mUserVehicleData;
+    private CustomProgressDialog mProgressDialog;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_forgot_password);
+
+        new GoogleAnalyticsUtil().trackScreens(IndriveApplication.getInstance(),getResources().getString(R.string.screen_forgot_pass));
+
+        usernameET = (EditText) findViewById(R.id.userNameET);
+
+        Button submitBtn = (Button) findViewById(R.id.submitBTN);
+        submitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameET.getText().toString().isEmpty()) {
+                    showAlertDialog(getResources().getString(R.string.forgot_password), getResources().getString(R.string.username_required));
+                    return;
+                }
+
+//                if (usernameET.getText().toString().length() < 6) {
+//                    showAlertDialog(getResources().getString(R.string.forgot_password), getResources().getString(R.string.username_validation));
+//                    return;
+//                }
+
+                mUserVehicleData = new UserVehicleData();
+                mUserVehicleData.setMobileUserID(usernameET.getText().toString());
+                mUserVehicleData.setMobileDeviceID(InDrivePreference.getInstance().getStringData(AppConstants.MOBILE_UNIQUE_DEVICE_ID_KEY,""));
+                UserRegistrationData userRegistrationData = AuthenticateController.instance().getUserRegistrationData();
+                userRegistrationData.setMobileUserID(usernameET.getText().toString());
+                userRegistrationData.setMobileDeviceID(InDrivePreference.getInstance().getStringData(AppConstants.MOBILE_UNIQUE_DEVICE_ID_KEY,""));
+                AuthenticateController.instance().setUserRegistrationData(userRegistrationData);
+                // update the userVehicleData as per the user input.
+                AuthenticateController.instance().findUsers(ForgotPasswordActivity.this, mUserVehicleData);
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleAnalytics.getInstance(ForgotPasswordActivity.this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(ForgotPasswordActivity.this).reportActivityStop(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setup();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        cleanup();
+    }
+
+    private void setup() {
+        AuthenticateController.instance().register(this);
+    }
+
+    private void cleanup() {
+        AuthenticateController.instance().unregister(this);
+    }
+
+    private void showAlertDialog(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+
+                    }
+                })
+                .show();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.forgot_username, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+
+        if (opr.getId() == Operation.OperationCode.FIND_USER.ordinal()) {
+            if (mProgressDialog == null) {
+                mProgressDialog = new CustomProgressDialog(this, "");
+            }
+            mProgressDialog.show();
+        }
+
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.FIND_USER.ordinal()) {
+            if (mProgressDialog != null)
+                mProgressDialog.dismiss();
+            Toast.makeText(this, getResources().getString(R.string.finding_user_error), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.FIND_USER.ordinal()) {
+            if (mProgressDialog != null)
+                mProgressDialog.dismiss();
+            Intent intent = new Intent(ForgotPasswordActivity.this, ForgotPwdSelectionActivity.class);
+            startActivity(intent);
+        }
+    }
+}

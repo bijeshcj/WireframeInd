@@ -1,0 +1,24 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+import com.verizontelematics.indrivemobile.models.Operation;
+
+/**
+ * Created by z688522 on 3/17/15.
+ */
+public class MessageController extends BaseController {
+
+    private static String TAG = MessageController.class.getCanonicalName();
+
+    private static MessageController mInstance = null;
+
+    public static MessageController instance() {
+        if (mInstance == null)
+            mInstance = new MessageController();
+        return mInstance;
+    }
+
+
+    public Operation sendRegistration(String regId) {
+        return null;
+    }
+}

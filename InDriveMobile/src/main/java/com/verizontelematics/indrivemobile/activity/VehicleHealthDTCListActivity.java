@@ -1,0 +1,158 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.IndriveApplication;
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.adapters.DTCListAdapter;
+import com.verizontelematics.indrivemobile.controllers.DiagnosticController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.VehicleHealthModel;
+import com.verizontelematics.indrivemobile.utils.GoogleAnalyticsUtil;
+
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Created by z688522 on 2/19/15.
+ */
+public class VehicleHealthDTCListActivity extends FragmentActivity implements Observer, UIInterface {
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ListView mDTCListView ;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.vehicle_health_dtc_list_activity);
+        setupHeaderView();
+        setup();
+        new GoogleAnalyticsUtil().trackScreens(IndriveApplication.getInstance(),getResources().getString(R.string.screen_diag_detail));
+
+    }
+
+    private void setup() {
+
+
+        mDTCListView = (ListView) findViewById(R.id.dtc_list_view);
+        mDTCListView.setAdapter(new DTCListAdapter(this));
+
+
+        ImageView infoIV = (ImageView)findViewById(R.id.infoIV);
+        infoIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ToBeDecidedDialog dialog = new ToBeDecidedDialog(VehicleHealthDTCListActivity.this,getResources().getString(R.string.dtc_info_text));
+                dialog.setTitle("DTC Code");
+                dialog.show();
+
+            }
+        });
+
+        setupCallBacks();
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.dtc_list_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.diagnostics_code, R.color.sub_header_color, R.color.diagnostics_code, R.color.sub_header_color);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // once job done setRefresh to false.
+                swipeRefreshLayout.setRefreshing(true);
+                // perform controller refresh operation
+                DiagnosticController.instance().getVehicleHealth(VehicleHealthDTCListActivity.this);
+
+            }
+        });
+
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    private void setupCallBacks() {
+        DiagnosticController.instance().getVehicleHealthModel().addObserver(VehicleHealthDTCListActivity.this);
+        DiagnosticController.instance().register(this);
+    }
+
+    private void cleanup() {
+        DiagnosticController.instance().getVehicleHealthModel().deleteObserver(this);
+        DiagnosticController.instance().unregister(this);
+    }
+
+
+
+    private void setupHeaderView() {
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerRL);
+//        headerRL.setBackgroundColor(this.getResources().getColor(R.color.diagnostics_code));
+        headerRL.setBackgroundResource(R.drawable.diagnostic_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        headerTitleTV.setText(this.getResources().getString(R.string.diagnostic_details));
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        headerBtn.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+
+        if (VehicleHealthModel.class.isInstance(observable)) {
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    mDTCListView.setAdapter(new DTCListAdapter(VehicleHealthDTCListActivity.this));
+
+                }
+            });
+
+        }
+
+    }
+
+
+    @Override
+    public void onProgress(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal()) {
+            if (swipeRefreshLayout != null && !swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(true);
+            }
+        }
+
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal()) {
+            if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(this, "Error Occurred " + opr.getInformation(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal()) {
+            if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }
+
+    }
+}

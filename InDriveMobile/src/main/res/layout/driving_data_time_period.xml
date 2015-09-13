@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/time_period"
+ >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="@dimen/form_labels_text_size"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:gravity="center|start"
+        android:id="@+id/txtViewTImePeriod"
+        android:textColor="@color/diagnostics_text_color"
+        android:background="@color/time_period"
+        />
+    <LinearLayout android:id="@+id/customTimePeriodSelection"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/time_period"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:id="@+id/layoutStartDate"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/form_labels_text_size"
+                android:text="@string/startDateLabel"
+                android:textColor="@color/diagnostics_text_color"
+                android:gravity="center_vertical"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="10dp"
+                />
+
+            <com.verizontelematics.indrivemobile.customViews.CustomDatePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/datePickerStartDateValue"
+                android:calendarViewShown="false"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layoutEndDate"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/endDateLabel"
+                android:textColor="@color/diagnostics_text_color"
+                android:layout_margin="10dp"
+                android:layout_centerVertical="true"
+
+                />
+            <com.verizontelematics.indrivemobile.customViews.CustomDatePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/datePickerEndDateValue"
+                android:calendarViewShown="false"
+                />
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

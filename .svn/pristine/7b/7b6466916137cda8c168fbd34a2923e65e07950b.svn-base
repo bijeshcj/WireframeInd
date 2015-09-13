@@ -1,0 +1,338 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.AuthenticateController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.models.GetUserPreferencesModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.UserPreferenceData;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.userprofile.utils.UserUtils;
+
+import java.util.Observable;
+import java.util.Observer;
+
+public class AppSettingsActivity extends FragmentActivity implements UserRoleConstants, CompoundButton.OnCheckedChangeListener, UIInterface, Observer {
+
+    private static final String TAG = AppSettingsActivity.class.getCanonicalName();
+
+
+    private RadioGroup timePeriodOneRG;
+    private RadioGroup categoryOneRG;
+    private RadioGroup categoryTwoRG;
+
+    private CheckBox chkBxPushNotifications;
+    private CheckBox chkBxText;
+    private CheckBox chkBxEmail;
+
+
+    private RadioButton mRbtThisWeek;
+    private RadioButton mRbtLastWeek;
+    private RadioButton mRbtThisMonth;
+    private RadioButton mRbtlastMonth;
+    private RadioButton mRbtCustom;
+    private RadioButton mRbtTotalMiles;
+    private RadioButton mRbtMaxSpeed;
+    private RadioButton mRbtAvgTrip;
+    private RadioButton mRbtCarbonFprint;
+    private RadioButton mRbtCityMpg;
+    private RadioButton mRbtHighwayMpg;
+    private UserPreferenceData mUserPreferenceData;
+    private CustomProgressDialog mProgressDialog;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_app_settings);
+        setupUI();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setup();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        cleanup();
+    }
+
+    private void setup() {
+        AuthenticateController.instance().register(this);
+        AuthenticateController.instance().getUserPreferencesModel().addObserver(this);
+        AuthenticateController.instance().getUserPreferences(this, "IVAN2003");
+    }
+
+    private void cleanup() {
+        AuthenticateController.instance().unregister(this);
+        AuthenticateController.instance().getUserPreferencesModel().deleteObserver(this);
+    }
+
+
+    private void setupUI() {
+        setupHeaderView();
+        timePeriodOneRG = (RadioGroup) this.findViewById(R.id.time_selection_layout);
+        categoryOneRG = (RadioGroup) this.findViewById(R.id.category_selection_layout);
+        categoryTwoRG = (RadioGroup) this.findViewById(R.id.category_selection_layout_two);
+
+        chkBxPushNotifications = (CheckBox) findViewById(R.id.pushNotificationCB);
+        chkBxText = (CheckBox) findViewById(R.id.textCB);
+        chkBxEmail = (CheckBox) findViewById(R.id.emailCB);
+
+
+        mRbtThisWeek = (RadioButton) findViewById(R.id.thisWeekRB);
+        mRbtLastWeek = (RadioButton) findViewById(R.id.lastWeekRB);
+        mRbtThisMonth = (RadioButton) findViewById(R.id.thisMonthRB);
+        mRbtlastMonth = (RadioButton) findViewById(R.id.lastMonthRB);
+
+        mRbtTotalMiles = (RadioButton) findViewById(R.id.thisWeekRB);
+        mRbtMaxSpeed = (RadioButton) findViewById(R.id.thisWeekRB);
+        mRbtAvgTrip = (RadioButton) findViewById(R.id.thisWeekRB);
+        mRbtCarbonFprint = (RadioButton) findViewById(R.id.thisWeekRB);
+        mRbtCityMpg = (RadioButton) findViewById(R.id.thisWeekRB);
+        mRbtHighwayMpg = (RadioButton) findViewById(R.id.thisWeekRB);
+
+
+        setUpListeners();
+
+    }
+
+    private void setUpListeners() {
+        chkBxPushNotifications.setOnCheckedChangeListener(this);
+        chkBxText.setOnCheckedChangeListener(this);
+        chkBxEmail.setOnCheckedChangeListener(this);
+
+//        mRbtThisWeek.setOnCheckedChangeListener(this);
+//        mRbtLastWeek.setOnCheckedChangeListener(this);
+//        mRbtThisMonth.setOnCheckedChangeListener(this);
+//        mRbtlastMonth.setOnCheckedChangeListener(this);
+//        mRbtCustom.setOnCheckedChangeListener(this);
+//        mRbtTotalMiles.setOnCheckedChangeListener(this);
+//        mRbtMaxSpeed.setOnCheckedChangeListener(this);
+//        mRbtAvgTrip.setOnCheckedChangeListener(this);
+//        mRbtCarbonFprint.setOnCheckedChangeListener(this);
+//        mRbtCityMpg.setOnCheckedChangeListener(this);
+//        mRbtHighwayMpg.setOnCheckedChangeListener(this);
+    }
+
+    private void setupHeaderView() {
+
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerRL);
+        headerRL.setBackgroundColor(this.getResources().getColor(R.color.gray));
+//        headerRL.setBackgroundResource(R.drawable.diagnostic_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        headerTitleTV.setText(this.getResources().getString(R.string.app_settings));
+        headerBtn.setVisibility(View.GONE);
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_app_settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void radioButtonClick(View view) {
+        if (UserUtils.isUserInactive(this, inactiveMessage)) {
+            return;
+        }
+//        boolean checked = ((RadioButton) view).isChecked();
+        switch (view.getId()) {
+            case R.id.thisWeekRB:
+            case R.id.lastWeekRB:
+            case R.id.thisMonthRB:
+                timePeriodOneRG.check(view.getId());
+                break;
+
+            case R.id.lastMonthRB:
+                timePeriodOneRG.clearCheck();
+                break;
+
+            case R.id.totalMilesRB:
+            case R.id.maxSpeedRB:
+            case R.id.avgTripRB:
+                categoryTwoRG.clearCheck();
+                categoryOneRG.check(view.getId());
+                break;
+
+            case R.id.carbonFootPrintRB:
+            case R.id.cityMPGRB:
+            case R.id.highwayMPGRB:
+                categoryOneRG.clearCheck();
+                categoryTwoRG.check(view.getId());
+                break;
+
+            default:
+                break;
+
+
+        }
+    }
+
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        if (UserUtils.isUserInactive(this, inactiveMessage)) {
+        Log.d(TAG, "isChecked "+isChecked);
+        if (buttonView.getId() == R.id.pushNotificationCB) {
+            if (isChecked) {
+                chkBxText.setChecked(false);
+                updateUserPreferences("false", "true", String.valueOf(false));
+            } else {
+                chkBxText.setChecked(true);
+                updateUserPreferences("false", "false", String.valueOf(true));
+            }
+        } else if (buttonView.getId() == R.id.textCB) {
+            if (isChecked) {
+                chkBxPushNotifications.setChecked(false);
+                updateUserPreferences("false", String.valueOf(false), "true");
+            } else {
+                chkBxPushNotifications.setChecked(true);
+
+                updateUserPreferences("false", String.valueOf(true), "false");
+            }
+        } else if (buttonView.getId() == R.id.emailCB) {
+            if (isChecked) {
+                updateUserPreferences("true", "true", "false");
+            } else {
+                updateUserPreferences("false", "false", "false");
+            }
+        }
+
+//        }
+
+//        if(buttonView.getId() == R.id.pushNotificationCB){
+//
+//        }else if(buttonView.getId() == R.id.autoUpdatesCB){
+//
+//        }else if(buttonView.getId() == R.id.textCB){
+//
+//        }else if(buttonView.getId() == R.id.emailCB){
+//
+//        }
+    }
+
+
+    @Override
+    public void onProgress(Operation opr) {
+
+        if (opr.getId() == Operation.OperationCode.GET_USER_PREFERENCE.ordinal()) {
+            showProgressDialogFragment(getResources().getString(R.string.fetching_user_preferences));
+        } else {
+            showProgressDialogFragment(getResources().getString(R.string.updating_user_preferences));
+        }
+
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        dismissProgressDialog();
+        String errorString;
+        if (opr.getId() == Operation.OperationCode.GET_USER_PREFERENCE.ordinal()) {
+            errorString = getResources().getString(R.string.fetching_user_preferences_error);
+        } else {
+            errorString = getResources().getString(R.string.updating_user_preferences_error);
+        }
+
+        Toast lToast = Toast.makeText(this, errorString, Toast.LENGTH_SHORT);
+        lToast.show();
+
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        dismissProgressDialog();
+        if (opr.getId() == Operation.OperationCode.UPDATE_USER_PREFERENCE.ordinal()) {
+            finish();
+        }
+    }
+
+    private void updateUserPreferences(String email, String pushNotification, String text) {
+
+        if (mUserPreferenceData != null) {
+            mUserPreferenceData.setEmailNotification(email);
+            mUserPreferenceData.setPushNotification(pushNotification);
+            mUserPreferenceData.setSmsNotification(text);
+            AuthenticateController.instance().updateUserPreferences(this, mUserPreferenceData);
+        }
+
+    }
+
+    private void showProgressDialogFragment(String aMessage) {
+
+
+        if (mProgressDialog == null) {
+            mProgressDialog = new CustomProgressDialog(this, aMessage);
+            mProgressDialog.show();
+        }
+
+    }
+
+    public void dismissProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+
+        if (GetUserPreferencesModel.class.isInstance(observable)) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mUserPreferenceData = (UserPreferenceData) AuthenticateController.instance().getUserPreferencesModel().getData();
+                    populateUI();
+                }
+            });
+        }
+
+
+    }
+
+    private void populateUI() {
+
+        chkBxPushNotifications.setChecked(mUserPreferenceData.getPushNotification().equalsIgnoreCase("true") ? true : false);
+        chkBxEmail.setChecked(mUserPreferenceData.getEmailNotification().equalsIgnoreCase("true") ? true : false);
+        chkBxText.setChecked(mUserPreferenceData.getSmsNotification().equalsIgnoreCase("true") ? true : false);
+
+    }
+}

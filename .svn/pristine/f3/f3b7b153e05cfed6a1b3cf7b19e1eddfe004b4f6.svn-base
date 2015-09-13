@@ -1,0 +1,783 @@
+package com.verizontelematics.indrivemobile.activity;
+
+
+import android.app.AlertDialog;
+import android.app.Service;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.AlertsController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.CustomizedTimePicker;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.models.AlertsDataModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.Alert;
+import com.verizontelematics.indrivemobile.models.data.CircleCenterType;
+import com.verizontelematics.indrivemobile.models.data.CircleType;
+import com.verizontelematics.indrivemobile.models.data.LocationAlert;
+import com.verizontelematics.indrivemobile.models.data.ScheduleType;
+import com.verizontelematics.indrivemobile.models.data.ShapeType;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.ui.DateDataFormat;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+public class LocationAlertsActivity extends FragmentActivity implements View.OnClickListener, UIInterface, Observer, CustomizedTimePicker.OnTimeChangedListener {
+
+    private static final String TAG = LocationAlertsActivity.class.getCanonicalName();
+    private CustomizedTimePicker startTimePicker, endTimePicker;
+    private Calendar calendar;
+    private Button sunBtn;
+    private Button monBtn;
+    private Button tueBtn;
+    private Button wedBtn;
+    private Button thuBtn;
+    private Button friBtn;
+    private Button satBtn;
+    private RadioButton weekDayRB;
+    private RadioButton weekEndRB;
+    private RadioButton alwaysOnRB;
+    private CheckBox enteredCB;
+    private CheckBox exitCB;
+    private boolean mEditMode = false;
+    private LocationAlert mLocationAlert;
+    private Button mBtnUpdate;
+    private Button mBtnDelete;
+    private EditText mEditLocationName;
+    private float circleRadius = 0.0f;
+    private double circleLatitude = 0.0d;
+    private double circleLongitude = 0.0d;
+    private CustomProgressDialog mProgressDialog;
+    private View[] mDayButtons = new View[7];
+    private Alert mAlert;
+    private int LOCATION_ALERTS_LIMIT = 10;
+    private boolean mCreateLocationAlertPending;
+    private Context mContext;
+
+
+
+    @Override
+    public void onTimeChanged(CustomizedTimePicker view, int hourOfDay, int minute) {
+
+        if (view.getId() == R.id.start_time_picker_id) {
+            System.out.println("start timer time changed " + hourOfDay + " minute " + minute);
+            long startTimeAsMillis = getTimeInMillis(hourOfDay, minute);
+        } else {
+            System.out.println("end timer time changed " + hourOfDay + " minute " + minute);
+            long endTimeAsMillis = getTimeInMillis(hourOfDay, minute);
+
+
+        }
+    }
+
+    private long getTimeInMillis(int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+        calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        System.out.println("start current time in millis " + calendar.getTimeInMillis());
+        return calendar.getTimeInMillis();
+    }
+
+
+
+
+
+
+    private static interface AlertTrigger {
+        public static final String BI_DIR = "Bidirectional";
+        public static final String ENTER = "OnEnter";
+        public static final String EXIT = "OnExit";
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mContext = this;
+        parseInput();
+        setContentView(R.layout.activity_location_alerts);
+        setupUI();
+        if (mEditMode) {
+            populateUI();
+        }
+    }
+
+    private void populateUI() {
+        if (mLocationAlert != null) {
+            // Location Name
+            mEditLocationName.setText(mLocationAlert.getAlertName());
+            mEditLocationName.setEnabled(false);
+            // Weekdays state
+            // radio buttons state
+            ScheduleType schedule = mLocationAlert.getSchedule();
+            setWeekdaysSelected(schedule.getWeekDays());
+            // Start time
+            setDurationFromMidNight(startTimePicker, schedule.getMinutesFromMidNight());
+            // End time
+            setDurationFromMidNight(endTimePicker, schedule.getMinutesFromMidNight() + schedule.getDuration());
+            // Update Enter or Exit depends on AlertTrigger
+            setAlertTrigger(mLocationAlert.getAlertTrigger());
+        } else {
+            mLocationAlert = new LocationAlert();
+            mAlert = (Alert) AlertsController.instance().getAlertsDataModel().getData();
+        }
+    }
+
+    private void parseInput() {
+        // parse input
+        Intent inputIntent = getIntent();
+        if (inputIntent != null) {
+            mEditMode = inputIntent.getBooleanExtra("edit-mode", false);
+            if (mEditMode)
+                mLocationAlert = inputIntent.getParcelableExtra("data");
+            else {
+                Bundle extras = inputIntent.getExtras();
+                circleRadius = extras.getFloat("Radius");
+                circleLatitude = extras.getDouble("Latitude");
+                circleLongitude = extras.getDouble("Longitude");
+            }
+        }
+    }
+
+    private void setUpCallBacks() {
+        AlertsController.instance().register(this);
+        AlertsController.instance().getAlertsDataModel().addObserver(this);
+    }
+
+    private void clearCallBacks() {
+        AlertsController.instance().unregister(this);
+        AlertsController.instance().getAlertsDataModel().deleteObserver(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //hide keyboard
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        setUpCallBacks();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        clearCallBacks();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        clearCallBacks();
+    }
+
+    private void setupUI() {
+
+        setupHeaderView();
+//        setupCallbacks();
+        mEditLocationName = (EditText) findViewById(R.id.edtLocation);
+        startTimePicker = (CustomizedTimePicker) findViewById(R.id.start_time_picker_id);
+
+        endTimePicker = (CustomizedTimePicker) findViewById(R.id.end_time_picker_id);
+
+        startTimePicker.setOnTimeChangedListener(this);
+        endTimePicker.setOnTimeChangedListener(this);
+
+
+        setDefaultTimeOnView();
+
+        sunBtn = (Button) findViewById(R.id.sun_id);
+        monBtn = (Button) findViewById(R.id.mon_id);
+        tueBtn = (Button) findViewById(R.id.tue_id);
+        wedBtn = (Button) findViewById(R.id.wed_id);
+        thuBtn = (Button) findViewById(R.id.thu_id);
+        friBtn = (Button) findViewById(R.id.fri_id);
+        satBtn = (Button) findViewById(R.id.sat_id);
+
+        mDayButtons[0] = sunBtn;
+        mDayButtons[1] = monBtn;
+        mDayButtons[2] = tueBtn;
+        mDayButtons[3] = wedBtn;
+        mDayButtons[4] = thuBtn;
+        mDayButtons[5] = friBtn;
+        mDayButtons[6] = satBtn;
+
+        weekDayRB = (RadioButton) findViewById(R.id.weekDaysRB);
+        weekEndRB = (RadioButton) findViewById(R.id.weekEndsRB);
+        alwaysOnRB = (RadioButton) findViewById(R.id.alwaysOnRB);
+
+        enteredCB = (CheckBox) findViewById(R.id.enteredCB);
+        exitCB = (CheckBox) findViewById(R.id.exitCB);
+
+        mBtnUpdate = (Button) findViewById(R.id.update_alert);
+        mBtnDelete = (Button) findViewById(R.id.delete_alert);
+        mBtnUpdate.setVisibility(mEditMode ? View.VISIBLE : View.GONE);
+        mBtnDelete.setVisibility(mEditMode ? View.VISIBLE : View.GONE);
+
+        setListeners();
+
+        // set by default always on
+        alwaysOnRB.setChecked(true);
+        setAllDaysRBSelected(true);
+        setUpCallBacks();
+    }
+
+    private void setListeners() {
+
+        setDefaultTag();
+        sunBtn.setOnClickListener(this);
+        monBtn.setOnClickListener(this);
+        tueBtn.setOnClickListener(this);
+        wedBtn.setOnClickListener(this);
+        thuBtn.setOnClickListener(this);
+        friBtn.setOnClickListener(this);
+        satBtn.setOnClickListener(this);
+        weekDayRB.setOnClickListener(this);
+        weekEndRB.setOnClickListener(this);
+        alwaysOnRB.setOnClickListener(this);
+        enteredCB.setOnClickListener(this);
+        exitCB.setOnClickListener(this);
+        mBtnUpdate.setOnClickListener(this);
+        mBtnDelete.setOnClickListener(this);
+
+    }
+
+    private void setDefaultTag() {
+
+        setAllDaysRBSelected(false);
+
+    }
+
+
+    private void showAlertDialog(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+
+                    }
+                })
+                .show();
+    }
+
+    private void checkForRBSelection() {
+
+        if ((isButtonSelectedForView(sunBtn)) && (isButtonSelectedForView(satBtn)) && (!isButtonSelectedForView(monBtn)) && (!isButtonSelectedForView(tueBtn)) && (!isButtonSelectedForView(wedBtn)) && (!isButtonSelectedForView(thuBtn)) && (!isButtonSelectedForView(friBtn))) {
+            weekEndRB.setChecked(true);
+        } else if ((isButtonSelectedForView(monBtn)) && (isButtonSelectedForView(tueBtn)) && (isButtonSelectedForView(wedBtn)) && (isButtonSelectedForView(thuBtn)) && (isButtonSelectedForView(friBtn)) && (!isButtonSelectedForView(sunBtn)) && (!isButtonSelectedForView(satBtn))) {
+            weekDayRB.setChecked(true);
+        } else if ((isButtonSelectedForView(sunBtn)) && (isButtonSelectedForView(satBtn)) &&
+                (isButtonSelectedForView(monBtn)) && (isButtonSelectedForView(tueBtn)) && (isButtonSelectedForView(wedBtn)) && (isButtonSelectedForView(thuBtn)) && (isButtonSelectedForView(friBtn))) {
+            alwaysOnRB.setChecked(true);
+        } else {
+            ((RadioGroup) findViewById(R.id.alerts_selection_layout)).clearCheck();
+        }
+    }
+
+
+    private void updateImageForDay(View view, boolean isChecked) {
+        int resourceID = R.drawable.white_radio_button;
+        if (isChecked) {
+            resourceID = R.drawable.green_radio_button;
+        }
+        view.setBackgroundResource(resourceID);
+        view.setTag(resourceID);
+    }
+
+    private boolean isButtonSelectedForView(View view) {
+
+        Integer resourceID = (Integer) view.getTag();
+        return resourceID == R.drawable.green_radio_button;
+    }
+
+    private void setAllWeekEndsRBSelected(boolean isSelected) {
+        updateImageForDay(sunBtn, isSelected);
+        updateImageForDay(satBtn, isSelected);
+    }
+
+    private void setAllWeekDaysRBSelected(boolean isSelected) {
+        updateImageForDay(monBtn, isSelected);
+        updateImageForDay(tueBtn, isSelected);
+        updateImageForDay(wedBtn, isSelected);
+        updateImageForDay(thuBtn, isSelected);
+        updateImageForDay(friBtn, isSelected);
+
+    }
+
+    private void setWeekdaysSelected(String pattern) {
+        char flags[] = new char[pattern.length()];
+        pattern.getChars(0, pattern.length(), flags, 0);
+        for (int i = 0; i < pattern.length(); i++) {
+            updateImageForDay(mDayButtons[i], (flags[i] == '1'));
+        }
+        checkForRBSelection();
+    }
+
+    private void setAllDaysRBSelected(boolean isSelected) {
+        setAllWeekDaysRBSelected(isSelected);
+        setAllWeekEndsRBSelected(isSelected);
+    }
+
+
+    private void setDefaultTimeOnView() {
+        startTimePicker.setCurrentHour(AppConstants.DEFAULT_START_TIME);
+        startTimePicker.setCurrentMinute(0);
+        endTimePicker.setCurrentHour(AppConstants.DEFAULT_END_TIME);
+        endTimePicker.setCurrentMinute(0);
+    }
+
+
+    private void setupHeaderView() {
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerLayout);
+        headerRL.setBackgroundResource(mEditMode ? R.drawable.alerts_header_background : R.drawable.location_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        headerBtn.setVisibility(mEditMode ? View.GONE : View.VISIBLE);
+        headerBtn.setText(getResources().getString(mEditMode ? R.string.done : R.string.add_to_alerts));
+        headerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(validateTime()) {
+                    save();
+                }else{
+                    Toast.makeText(LocationAlertsActivity.this,getResources().getString(R.string.time_validate_error),Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        headerTitleTV.setText(this.getResources().getString(mEditMode ? R.string.edit_location_alert : R.string.location_alert));
+    }
+
+    private boolean validateTime(){
+        int startTimeHour = startTimePicker.getCurrentHour();
+        int startTimeMin = startTimePicker.getCurrentMinute();
+        int startIndex = startTimePicker.getIndex();
+
+        long startTimeAsMillis = startTimePicker.getCalendar().getTimeInMillis();
+
+        int endTimeHour = endTimePicker.getCurrentHour();
+        int endTimeMin = endTimePicker.getCurrentMinute();
+        int endIndex = endTimePicker.getIndex();
+
+
+        long endTimeAsmillis = endTimePicker.getCalendar().getTimeInMillis();
+
+        Log.d(TAG,"timepicker startTimeAsMillis "+startTimeAsMillis+" startTimeHour "+startTimeHour+" startTimeMin "+startTimeMin+" startIndex "+startIndex);
+        Log.d(TAG,"timepicker endTimeAsMillis "+endTimeAsmillis+" endTimeHour "+endTimeHour+" endTimeMin "+endTimeMin+" endindex "+endIndex);
+
+        boolean retFlag = endTimeAsmillis > startTimeAsMillis;
+        Log.d(TAG,"timepicker retFlag "+retFlag);
+        return retFlag;
+    }
+
+    private void save() {
+
+
+        //check whether the location alert edit text is empty
+        String locationAlertName = mEditLocationName.getText().toString();
+        if (locationAlertName.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.alert_fill_location_alert), Toast.LENGTH_SHORT).show();
+            if (mEditLocationName.requestFocus()) {
+                ((InputMethodManager) this.getSystemService(Service.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+            }
+            return;
+        }
+
+        //check whether the end date is greater than the start date.
+        Calendar startTimeCal = Calendar.getInstance();
+        startTimeCal.set(Calendar.YEAR, startTimeCal.get(Calendar.YEAR));
+        startTimeCal.set(Calendar.MONTH, startTimeCal.get(Calendar.MONTH));
+        startTimeCal.set(Calendar.DAY_OF_MONTH, startTimeCal.get(Calendar.DAY_OF_MONTH));
+        startTimeCal.set(Calendar.HOUR_OF_DAY, startTimePicker.getCurrentHour());
+        startTimeCal.set(Calendar.MINUTE, startTimePicker.getCurrentMinute());
+        startTimeCal.set(Calendar.SECOND,0);
+        long startTime = startTimeCal.getTimeInMillis();
+
+        Log.v("OnSave + Start time is " , ""+startTime);
+
+
+        Calendar endTimeCal = Calendar.getInstance();
+        endTimeCal.set(Calendar.YEAR, endTimeCal.get(Calendar.YEAR));
+        endTimeCal.set(Calendar.MONTH, endTimeCal.get(Calendar.MONTH));
+        endTimeCal.set(Calendar.DAY_OF_MONTH, endTimeCal.get(Calendar.DAY_OF_MONTH));
+        endTimeCal.set(Calendar.HOUR_OF_DAY, endTimePicker.getCurrentHour());
+        endTimeCal.set(Calendar.MINUTE, endTimePicker.getCurrentMinute());
+        endTimeCal.set(Calendar.SECOND,0);
+        long endTime = endTimeCal.getTimeInMillis();
+
+        Log.v("OnSave + End time is " , ""+endTime);
+
+
+        if (startTime >= endTime) {
+            Toast.makeText(this, getResources().getString(R.string.validation_location_alerts_date), Toast.LENGTH_SHORT).show();
+            return;
+
+        }
+
+        if (mLocationAlert == null) {
+            mLocationAlert = new LocationAlert();
+        }
+        ScheduleType scheduleTypeObj = new ScheduleType(getWeekDays(), getMinutesFromMidNight(startTimePicker), getDuration());
+        mLocationAlert.setSchedule(scheduleTypeObj);
+        mLocationAlert.setAlertTrigger(getAlertTrigger());
+        if (!mEditMode) {
+            mLocationAlert.setAlertName(mEditLocationName.getText().toString());
+            CircleType circleTypeObj = new CircleType(circleRadius, new CircleCenterType(circleLatitude, circleLongitude));
+            mLocationAlert.setShape(new ShapeType(circleTypeObj, null));
+        }
+        if (mEditMode) {
+            AlertsController.instance().updateLocationAlert(this, mLocationAlert);
+        } else {
+            if (mAlert != null) {
+                if (checkLocationAlertsMaxLimitExceeded()) {
+                    Toast.makeText(this, String.format(getString(R.string.location_alerts_limit_exceed), LOCATION_ALERTS_LIMIT), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                AlertsController.instance().createLocationAlert(this, mLocationAlert);
+            } else {
+                mCreateLocationAlertPending = true;
+                AlertsController.instance().getAlertsData(this);
+            }
+
+        }
+    }
+
+    private boolean checkLocationAlertsMaxLimitExceeded() {
+        if (mAlert != null) {
+            List<LocationAlert> locationAlerts = mAlert.getLocationAlerts();
+            if (locationAlerts == null)
+                return false;
+            int count = 0;
+            for (LocationAlert locationAlert : locationAlerts) {
+                if (locationAlert.getStatus().equalsIgnoreCase("Active")) {
+                    count++;
+                }
+            }
+            return count >= LOCATION_ALERTS_LIMIT;
+
+        }
+        return false;
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_location_alerts, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.weekDaysRB:
+                setAllWeekDaysRBSelected(true);
+                setAllWeekEndsRBSelected(false);
+                break;
+            case R.id.weekEndsRB:
+                setAllWeekEndsRBSelected(true);
+                setAllWeekDaysRBSelected(false);
+                break;
+            case R.id.alwaysOnRB:
+                setAllDaysRBSelected(true);
+                break;
+            case R.id.sun_id:
+            case R.id.mon_id:
+            case R.id.tue_id:
+            case R.id.wed_id:
+            case R.id.thu_id:
+            case R.id.fri_id:
+            case R.id.sat_id:
+                Integer resourceID = (Integer) view.getTag();
+                updateImageForDay(view, !(resourceID == R.drawable.green_radio_button));
+                checkForRBSelection();
+                break;
+
+            case R.id.enteredCB:
+            case R.id.exitCB:
+                if ((!enteredCB.isChecked()) && (!exitCB.isChecked())) {
+                    Toast.makeText(this, getResources().getString(R.string.entered_exited_needed), Toast.LENGTH_SHORT).show();
+                    // As per the BI we need to revert the user change also.
+                    if (view.getId() == R.id.exitCB) {
+                        exitCB.setChecked(true);
+                    } else {
+                        enteredCB.setChecked(true);
+                    }
+                }
+                break;
+            case R.id.update_alert:
+                updateAlert();
+                break;
+            case R.id.delete_alert:
+                deleteAlert();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private void deleteAlert() {
+        if (mLocationAlert != null) {
+            AlertsController.instance().deleteLocationAlert(this, mLocationAlert);
+        }
+    }
+
+    private void updateAlert() {
+        save();
+    }
+
+    @Override
+    public void onProgress(final Operation opr) {
+        if (opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal()
+                || opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()
+                ) {
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mProgressDialog == null) {
+                        mProgressDialog = new CustomProgressDialog(LocationAlertsActivity.this,
+                                (opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal() ? "Adding " :
+                                        (opr.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()) ? "Deleting" :
+                                                "Updating")
+                                        + " Location Alert ...");
+                    }
+                    mProgressDialog.show();
+                }
+            });
+        }
+
+    }
+
+    @Override
+    public void onError(final Operation opr) {
+
+        if (opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal()
+                || opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()
+                || opr.getId() == Operation.OperationCode.GET_ALERTS.ordinal()) {
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mProgressDialog != null)
+                        mProgressDialog.dismiss();
+
+                    if (opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal()) {
+                        Toast.makeText(mContext, getResources().getString(R.string.location_alert_cannot_added), Toast.LENGTH_SHORT).show();
+                    } else if (opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()) {
+                        Toast.makeText(mContext, getResources().getString(R.string.location_alert_cannot_updated), Toast.LENGTH_SHORT).show();
+                    } else if (opr.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()) {
+                        Toast.makeText(mContext, getResources().getString(R.string.location_alert_error), Toast.LENGTH_SHORT).show();
+                    }
+
+
+                    /*Toast.makeText(LocationAlertsActivity.this, " Error in "+ (opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal() ? "Adding " :
+                            (opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal() ? "Updating" : "Deleting") )
+                            +" : "+ opr.getInformation(), Toast.LENGTH_SHORT).show();*/
+                    if (opr.getId() == Operation.OperationCode.GET_ALERTS.ordinal()) {
+                        if (mCreateLocationAlertPending) {
+                            mCreateLocationAlertPending = false;
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onSuccess(final Operation opr) {
+        if (opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal()
+                || opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                || opr.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mProgressDialog != null)
+                        mProgressDialog.dismiss();
+
+                    setResult(opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal() ? 2 : (opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal() ? 1 : 0));
+                    if (opr.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal()) {
+                        Toast.makeText(mContext, getResources().getString(R.string.location_alert_added), Toast.LENGTH_SHORT).show();
+                    } else if (opr.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()) {
+                        Toast.makeText(mContext, getResources().getString(R.string.location_alert_updated), Toast.LENGTH_SHORT).show();
+                    }
+
+                    finish();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        if (AlertsDataModel.class.isInstance(observable)) {
+
+            mAlert = (Alert) data;
+            if (mCreateLocationAlertPending) {
+                mCreateLocationAlertPending = false;
+                if (checkLocationAlertsMaxLimitExceeded()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mProgressDialog != null) {
+                                mProgressDialog.dismiss();
+                            }
+
+                            Toast.makeText(mContext, String.format(getString(R.string.location_alerts_limit_exceed), LOCATION_ALERTS_LIMIT), Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+                    return;
+                }
+                AlertsController.instance().createLocationAlert(this, mLocationAlert);
+            }
+        }
+    }
+
+    private String getAlertTrigger() {
+        String alertTrigger = "";
+        if (enteredCB.isChecked() && exitCB.isChecked()) {
+            alertTrigger = AlertTrigger.BI_DIR;
+        } else if (enteredCB.isChecked()) {
+            alertTrigger = AlertTrigger.ENTER;
+        } else {
+            alertTrigger = AlertTrigger.EXIT;
+        }
+        Log.v("Alert Trigger is ", alertTrigger);
+        return alertTrigger;
+    }
+
+    private void setAlertTrigger(String alertTrigger) {
+
+        enteredCB.setChecked(false);
+        exitCB.setChecked(false);
+        if (alertTrigger.equalsIgnoreCase(AlertTrigger.BI_DIR)) {
+            enteredCB.setChecked(true);
+            exitCB.setChecked(true);
+        } else if (alertTrigger.equalsIgnoreCase(AlertTrigger.ENTER)) {
+            enteredCB.setChecked(true);
+        } else if (alertTrigger.equalsIgnoreCase(AlertTrigger.EXIT)) {
+            exitCB.setChecked(true);
+        }
+    }
+
+    private String getWeekDays() {
+        StringBuilder weekDaysBuilder = new StringBuilder();
+        weekDaysBuilder.append(isButtonSelectedForView(sunBtn) ? "1" : "0");
+        weekDaysBuilder.append(isButtonSelectedForView(monBtn) ? "1" : "0");
+        weekDaysBuilder.append(isButtonSelectedForView(tueBtn) ? "1" : "0");
+        weekDaysBuilder.append(isButtonSelectedForView(wedBtn) ? "1" : "0");
+        weekDaysBuilder.append(isButtonSelectedForView(thuBtn) ? "1" : "0");
+        weekDaysBuilder.append(isButtonSelectedForView(friBtn) ? "1" : "0");
+        weekDaysBuilder.append(isButtonSelectedForView(satBtn) ? "1" : "0");
+        Log.v("GetWeekDays", weekDaysBuilder.toString());
+        return weekDaysBuilder.toString();
+    }
+
+    private void setDurationFromMidNight(CustomizedTimePicker picker, int minutes) {
+        picker.setCurrentHour(0);
+        picker.setCurrentMinute(0);
+
+        // convert minutes to hh:mm format
+        int hh = minutes / 60;
+        int mm = minutes % 60;
+
+        picker.setCurrentHour(hh);
+        picker.setCurrentMinute(mm);
+    }
+
+    private int getMinutesFromMidNight() {
+        Calendar calInstance = Calendar.getInstance();
+        calInstance.set(Calendar.HOUR_OF_DAY, startTimePicker.getCurrentHour());
+        calInstance.set(Calendar.MINUTE, startTimePicker.getCurrentMinute());
+        long startTime = calInstance.getTimeInMillis();
+        return DateDataFormat.differenceFromMidNight(startTime);
+    }
+
+    private int getMinutesFromMidNight(CustomizedTimePicker picker) {
+        int hours = picker.getCurrentHour();
+        int minutes = picker.getCurrentMinute();
+        minutes += hours * 60;
+        return minutes;
+    }
+
+    private int getDuration() {
+
+        int startTimeInMinutes = getMinutesFromMidNight(startTimePicker);
+        int endTimeInMinutes = getMinutesFromMidNight(endTimePicker);
+        return (endTimeInMinutes - startTimeInMinutes);
+
+    }
+
+//    private int getDuration()
+//    {
+//        Calendar startTimeCal = Calendar.getInstance();
+//        startTimeCal.set(Calendar.HOUR, startTimePicker.getCurrentHour());
+//        startTimeCal.set(Calendar.MINUTE, startTimePicker.getCurrentMinute());
+//        startTimeCal.set(Calendar.AM_PM, startTimePicker.getCurrentPeriodOfDay());
+//        startTimeCal.set(Calendar.YEAR,startTimeCal.get(Calendar.YEAR));
+//        startTimeCal.set(Calendar.MONTH,startTimeCal.get(Calendar.MONTH));
+//        long startTime = startTimeCal.getTimeInMillis();
+//
+//        Log.v("GetDuration -- StartTime", "HOUR ::: " + startTimePicker.getCurrentHour() + " MIN :::" + startTimePicker.getCurrentMinute() + "  AM_PM" + startTimePicker.getCurrentPeriodOfDay());
+//
+//        Calendar endTimeCal = Calendar.getInstance();
+//        endTimeCal.set(Calendar.HOUR, endTimePicker.getCurrentHour());
+//        endTimeCal.set(Calendar.MINUTE, endTimePicker.getCurrentMinute());
+//        endTimeCal.set(Calendar.AM_PM, endTimePicker.getCurrentPeriodOfDay());
+//        endTimeCal.set(Calendar.YEAR,endTimeCal.get(Calendar.YEAR));
+//        endTimeCal.set(Calendar.MONTH,startTimeCal.get(Calendar.MONTH));
+//        long endTime = endTimeCal.getTimeInMillis();
+//
+//        Log.v("GetDuration -- EndTime","HOUR ::: " +endTimePicker.getCurrentHour() +" MIN :::"+endTimePicker.getCurrentMinute()+"  AM_PM" +endTimePicker.getCurrentPeriodOfDay());
+//
+//        return DateDataFormat.differenceInMinutes(startTime,endTime);
+//    }
+}

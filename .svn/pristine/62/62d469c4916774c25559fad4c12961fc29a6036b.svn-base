@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context="com.verizontelematics.indrivemobile.activity.ServiceTypeActivity">
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <ListView
+        android:id="@+id/serviceTypeLV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/time_period">
+    </ListView>
+
+</LinearLayout>

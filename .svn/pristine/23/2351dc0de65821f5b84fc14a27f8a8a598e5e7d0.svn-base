@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_bg"
+                tools:context="com.verizontelematics.indrivemobile.activity.ForgotUsernameActivity">
+
+    <RelativeLayout
+        android:id="@+id/forgotPWRL"
+        android:layout_width="300dp"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/enterUNDescTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_username"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/userNameET"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/enterUNDescTV"
+            android:paddingLeft="@dimen/list_item_top_margin"
+            android:inputType="textNoSuggestions"
+            android:maxLength="30"
+            android:digits="abcdefghijklmnopqrstuvwxyz1234567890"
+            android:background="@color/white"
+            />
+
+        <TextView
+            android:id="@+id/enterUNTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/userNameET"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/prompt_username"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:text="@string/submit"
+            android:id="@+id/submitBTN"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/enterUNTV"
+            android:layout_marginTop="@dimen/form_labels_text_height"/>
+    </RelativeLayout>
+</RelativeLayout>

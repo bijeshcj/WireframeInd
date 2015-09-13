@@ -1,0 +1,641 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+import android.content.Context;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.Response;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonHttpRequest;
+import com.verizontelematics.indrivemobile.httpwrapper.RestClient;
+import com.verizontelematics.indrivemobile.models.AlertsControllerOperationData;
+import com.verizontelematics.indrivemobile.models.AlertsDataModel;
+import com.verizontelematics.indrivemobile.models.BaseModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.Alert;
+import com.verizontelematics.indrivemobile.models.data.DiagnosticAlert;
+import com.verizontelematics.indrivemobile.models.data.LocationAlert;
+import com.verizontelematics.indrivemobile.models.data.SpeedAlert;
+import com.verizontelematics.indrivemobile.models.data.ValetAlert;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.NetworkUtil;
+import com.verizontelematics.indrivemobile.utils.config.Config;
+import com.verizontelematics.indrivemobile.utils.config.ConfigKeys;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by bijesh on 12/31/2014.
+ */
+public class AlertsController extends BaseController {
+    private static String TAG = AlertsController.class.getCanonicalName();
+
+    private static final int ALERTS_DATA_MODEL = 0;
+
+
+    private static AlertsController mInstance = null;
+
+
+    public static AlertsController instance() {
+        if (mInstance == null)
+            mInstance = new AlertsController();
+        return mInstance;
+    }
+
+    // Alerts controller Operation Codes.
+    private final int GET_ALERTS_DATA = Operation.OperationCode.GET_ALERTS.ordinal();
+    private final int GET_ALERTS_HISTORY = Operation.OperationCode.GET_ALERTS_HISTORY.ordinal();
+    private final int UPDATE_SPEED_ALERTS = Operation.OperationCode.UPDATE_SPEED_ALERTS.ordinal();
+    private final int UPDATE_DIAGNOSTIC_ALERTS = Operation.OperationCode.UPDATE_DIAGNOSTIC_ALERTS.ordinal();
+    private final int UPDATE_LOCATION_ALERT = Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal();
+    private final int CREATE_LOCATION_ALERT = Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal();
+    private final int  DELETE_LOCATION_ALERT = Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal();
+
+
+    private final int CREATE_VALET_ALERT = Operation.OperationCode.CREATE_VALET_ALERT.ordinal();
+    private final int UPDATE_VALET_ALERT = Operation.OperationCode.UPDATE_VALET_ALERT.ordinal();
+
+    private OperationFactory mOperationFactory = AlertsControllerOperationFactory.instance();
+
+    private AlertsController() {
+        super();
+        mModels.add(new AlertsDataModel());
+    }
+
+    public BaseModel getAlertsDataModel() {
+        return mModels.get(ALERTS_DATA_MODEL);
+    }
+
+    public Operation getAlertsData(Context ctx) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(GET_ALERTS_DATA, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                // hardcoded to dev once itest1 deployed we will have to remove "dev"
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_FETCH_ALERTS_DATA);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(GET_ALERTS_DATA));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBody("" + AppController.instance().getVehicleId()));
+                Log.d(TAG, "Request is " + prepareBody("" + AppController.instance().getVehicleId()));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(GET_ALERTS_DATA);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(GET_ALERTS_DATA);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(GET_ALERTS_DATA);
+    }
+
+    public Operation getAlertsHistoryData(Context ctx) {
+
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(GET_ALERTS_HISTORY, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                // hardcoded to dev once itest1 deployed we will have to remove "dev"
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_FETCH_ALERTS_HISTORY);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(GET_ALERTS_HISTORY));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBody("" + AppController.instance().getVehicleId()));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(GET_ALERTS_HISTORY);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(GET_ALERTS_HISTORY);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(GET_ALERTS_HISTORY);
+    }
+
+
+    private String prepareBody(String vehicleId) {
+        // Stubbed parameter
+//        String mVehicleId = "1695";
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + vehicleId + "\""
+                + "}"
+                + "}";
+        // Stub ended.
+        return str;
+    }
+
+    private String prepareBodyForAlertHistory(String vehicleId) {
+        // Stubbed parameter
+//        String mVehicleId = "1695";
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + vehicleId + "\""
+                + "}"
+                + "}";
+        // Stub ended.
+        return str;
+    }
+
+
+    private String prepareBodyForSpeedAlerts(ArrayList<SpeedAlert> speedAlerts) {
+        Gson gson = new GsonBuilder().create();
+        Type listType = new TypeToken<ArrayList<SpeedAlert>>() {
+        }.getType();
+        // Stubbed parameter
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\""
+                + ","
+                + "\"SpeedAlert\"" + ":" + gson.toJson(speedAlerts, listType)
+                + "}"
+                + "}";
+        // Stub ended.
+        return str;
+    }
+
+    private String prepareBodyForLocationAlerts(ArrayList<LocationAlert> locationAlerts) {
+        Gson gson = new GsonBuilder().create();
+        Type listType = new TypeToken<ArrayList<LocationAlert>>() {
+        }.getType();
+        // Stubbed parameter
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\""
+                + ","
+                + "\"LocationAlerts\"" + ":" + gson.toJson(locationAlerts, listType)
+                + "}"
+                + "}";
+        // Stub ended.
+        return str;
+    }
+
+    private String prepareBodyForDiagnosticAlerts(ArrayList<DiagnosticAlert> diagnosticAlerts) {
+        Gson gson = new GsonBuilder().create();
+        Type listType = new TypeToken<ArrayList<DiagnosticAlert>>() {
+        }.getType();
+        // Stubbed parameter
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\""
+                + ","
+                + "\"DiagnosticAlert\"" + ":" + gson.toJson(diagnosticAlerts, listType)
+                + "}"
+                + "}";
+        // Stub ended.
+        return str;
+    }
+
+    public Operation updateSpeedAlerts(Context ctx, ArrayList<SpeedAlert> speedAlerts) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(UPDATE_SPEED_ALERTS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                // hardcoded to dev once itest1 deployed we will have to remove "dev"
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_UPDATE_SPEED_ALERTS);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(UPDATE_SPEED_ALERTS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForSpeedAlerts(speedAlerts));
+                Log.v("Request", "Request for Speed Alerts --->" + prepareBodyForSpeedAlerts(speedAlerts));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(UPDATE_SPEED_ALERTS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(UPDATE_SPEED_ALERTS);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(UPDATE_SPEED_ALERTS);
+    }
+
+    private String prepareBodyForLocationAlert(LocationAlert locationAlert) {
+        Gson gson = new GsonBuilder().create();
+        // Stub parameter
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\"" + ","
+                + "\"LocationAlert\"" + ":" +  gson.toJson(locationAlert)
+                + "}"
+                + "}";
+        // Stub ended.
+        Log.d(TAG,str);
+
+        return str;
+    }
+
+
+    private String prepareBodyForDeleteAlert(Integer alertId) {
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\""
+                + ","
+                + "\"AlertId\"" + ":" + "\"" + alertId +"\""
+                + "}"
+                + "}";
+        Log.d(TAG,str);
+        return str;
+    }
+
+    public Operation createLocationAlert(Context context, LocationAlert locationAlert) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(CREATE_LOCATION_ALERT, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(context)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+ Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_CREATE_LOCATION_ALERT));
+                HashMap<String, String> map = (HashMap<String, String>) aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(CREATE_LOCATION_ALERT));
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForLocationAlert(locationAlert));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(CREATE_LOCATION_ALERT);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(CREATE_LOCATION_ALERT);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        return mOperationsModel.getOperation(CREATE_LOCATION_ALERT);
+    }
+
+    public Operation updateLocationAlert(Context ctx, LocationAlert locationAlert) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(UPDATE_LOCATION_ALERT, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_UPDATE_LOCATION_ALERT);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(UPDATE_LOCATION_ALERT));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                // stub to ignore shape
+                locationAlert.setShape(null);
+                // stub ended.
+                aHttpRequest.setData(prepareBodyForLocationAlert(locationAlert));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(UPDATE_LOCATION_ALERT);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(UPDATE_LOCATION_ALERT);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(UPDATE_LOCATION_ALERT);
+    }
+
+    public Operation deleteLocationAlert(Context ctx, LocationAlert locationAlert) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(DELETE_LOCATION_ALERT, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                // hardcoded to dev once itest1 deployed we will have to remove "dev"
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_DELETE_LOCATION_ALERT);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(DELETE_LOCATION_ALERT));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForDeleteAlert(locationAlert.getAlertId()));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(DELETE_LOCATION_ALERT);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(DELETE_LOCATION_ALERT);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(DELETE_LOCATION_ALERT);
+    }
+
+
+    public Operation updateDiagnosticAlerts(Context ctx, ArrayList<DiagnosticAlert> diagnosticAlerts) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(UPDATE_DIAGNOSTIC_ALERTS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                // hardcoded to dev once itest1 deployed we will have to remove "dev"
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_UPDATE_DIAGNOSTIC_ALERTS);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(UPDATE_DIAGNOSTIC_ALERTS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForDiagnosticAlerts(diagnosticAlerts));
+                Log.v(TAG, "Request is :  " + prepareBodyForDiagnosticAlerts(diagnosticAlerts));
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(UPDATE_DIAGNOSTIC_ALERTS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(UPDATE_DIAGNOSTIC_ALERTS);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(UPDATE_DIAGNOSTIC_ALERTS);
+    }
+
+    public void handleErrorForOperation(Response aResponse, Operation aOperation) {
+
+        if (aOperation.getId() == Operation.OperationCode.GET_ALERTS.ordinal()
+                || aOperation.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.CREATE_VALET_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_VALET_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_SPEED_ALERTS.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_DIAGNOSTIC_ALERTS.ordinal()) {
+            aOperation.setState(Operation.ERROR);
+            aOperation.setInformation(aResponse.getResponseDescription());
+            onError(aOperation);
+            getAlertsDataModel().clear();
+        }
+    }
+
+    public void handleResponseForOperation(Response aResponse, Operation aOperation) {
+        Log.d(TAG, "handleResponse for operation " + aOperation.getClass());
+        if (aOperation.getId() == Operation.OperationCode.GET_ALERTS.ordinal()
+                || aOperation.getId() == Operation.OperationCode.CREATE_LOCATION_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_LOCATION_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.CREATE_VALET_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_VALET_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.DELETE_LOCATION_ALERT.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_SPEED_ALERTS.ordinal()
+                || aOperation.getId() == Operation.OperationCode.UPDATE_DIAGNOSTIC_ALERTS.ordinal()) {
+            try {
+                Gson gson = new GsonBuilder().create();
+                JSONObject lData = aResponse.getData();
+
+                Alert alert = new Alert();
+
+                // Needed null checks before parse.
+                Type listTypeSpeed = new TypeToken<ArrayList<SpeedAlert>>() {
+                }.getType();
+                String strSpeedAlertInfo = lData.get("SpeedAlert").toString();
+                List<SpeedAlert> alertsSpeedDataList = null;
+                if (!strSpeedAlertInfo.isEmpty() && !strSpeedAlertInfo.equalsIgnoreCase("null")) {
+                    alertsSpeedDataList = gson.fromJson(lData.getJSONArray("SpeedAlert").toString(), listTypeSpeed);
+                } else {
+                    alertsSpeedDataList = new ArrayList<SpeedAlert>();
+                    alertsSpeedDataList.add(new SpeedAlert());
+                }
+                alert.setSpeedAlert(alertsSpeedDataList);
+
+                Type listTypeDiagnostics = new TypeToken<ArrayList<DiagnosticAlert>>() {
+                }.getType();
+                String strDiagnosticAlertInfo = lData.get("DiagnosticAlert").toString();
+                List<DiagnosticAlert> diagnosticsList = null;
+                if (!strDiagnosticAlertInfo.isEmpty() && !strDiagnosticAlertInfo.equalsIgnoreCase("null")) {
+                    diagnosticsList = gson.fromJson(lData.getJSONArray("DiagnosticAlert").toString(), listTypeDiagnostics);
+                } else {
+                    diagnosticsList = new ArrayList<DiagnosticAlert>();
+                    diagnosticsList.add(new DiagnosticAlert());
+                }
+                alert.setDiagnosticAlert(diagnosticsList);
+
+                Type listTypeLocation = new TypeToken<ArrayList<LocationAlert>>() {
+                }.getType();
+                String strLocationsAlertInfo = lData.get("LocationAlerts").toString();
+                List<LocationAlert> locList = null;
+                if (!strLocationsAlertInfo.isEmpty() && !strLocationsAlertInfo.equalsIgnoreCase("null")) {
+                    locList = gson.fromJson(lData.getJSONArray("LocationAlerts").toString(), listTypeLocation);
+                    alert.setLocationAlerts(locList);
+
+                }
+//                else {
+//                    locList = new ArrayList<LocationAlert>();
+//                    locList.add(new LocationAlert());
+//                }
+                Type ListTypeValetAlert = new TypeToken<ArrayList<ValetAlert>>(){}.getType();
+                String strValetAlertsInfo = lData.get("ValetAlert").toString();
+                List<ValetAlert> valetAlerts = null;
+                if (!strValetAlertsInfo.isEmpty() && !strValetAlertsInfo.equalsIgnoreCase("null")) {
+                    //valetAlerts = gson.fromJson(lData.getJSONArray("ValetAlert").toString(), ListTypeValetAlert);
+                    ValetAlert valetAlert = gson.fromJson(lData.getJSONObject("ValetAlert").toString(), ValetAlert.class);
+                    valetAlerts = new ArrayList<ValetAlert>();
+                    valetAlerts.add(valetAlert);
+                    alert.setValetAlerts(valetAlerts);
+                }
+                else {
+                    valetAlerts = new ArrayList<ValetAlert>();
+                    valetAlerts.add(new ValetAlert());
+                }
+
+                AlertsDataModel lModel = (AlertsDataModel) getAlertsDataModel();
+                if (!alert.isEmpty()) {
+                    lModel.setData(alert);
+                } else {
+                    lModel.clear();
+                }
+                aOperation.setState(Operation.FINISHED);
+                onSuccess(aOperation);
+
+            } catch (JSONException e) {
+                aOperation.setState(Operation.ERROR);
+                aOperation.setInformation(e.getLocalizedMessage());
+                onError(aOperation);
+            } catch (JsonSyntaxException syntaxException) {
+                aOperation.setState(Operation.ERROR);
+                aOperation.setInformation(syntaxException.getLocalizedMessage());
+                onError(aOperation);
+            }
+        }
+    }
+
+    public Operation createValetAlert(Context ctx, ValetAlert valetAlert) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(CREATE_VALET_ALERT, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_CREATE_VALET_ALERT);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(CREATE_VALET_ALERT));
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForCreateValetAlert(valetAlert));
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(CREATE_VALET_ALERT);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(CREATE_VALET_ALERT);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        return mOperationsModel.getOperation(CREATE_VALET_ALERT);
+    }
+
+    private String prepareBodyForCreateValetAlert(double radius, double latitude, double longitude) {
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\""
+                + ","
+                + "\"Circle\"" + ":" + "{"
+                + "\"Radius\"" + ":" + "\"" + radius + "\""
+                + ","
+                + "\"CircleCenter\"" + ":" + "{"
+                + "\"Latitude\"" + ":" + "\"" + latitude + "\""
+                + ","
+                + "\"Longitude\"" + ":" + "\"" + longitude + "\""
+                + "}"
+                + "}"
+                + "}"
+                + "}";
+        Log.v("Request -- prepareBodyForCreateValetAlert",str);
+        return str;
+    }
+
+    private String prepareBodyForCreateValetAlert(ValetAlert valetAlert) {
+        Gson gson = new GsonBuilder().create();
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                    + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\""
+                    + ","
+                    + "\"Circle\"" + ":" + gson.toJson(valetAlert.getCircle())
+                    + "}"
+                + "}";
+        Log.v("Request -- prepareBodyForCreateValetAlert",str);
+        return str;
+    }
+
+    public Operation updateValetAlert(Context ctx, int alertId, String status) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(UPDATE_VALET_ALERT, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest) createRequest();
+                String url = getHost() + Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_UPDATE_VALET_ALERT);
+                aHttpRequest.setUrl(url);
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(UPDATE_VALET_ALERT));
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForUpdateValetAlert(alertId, status));
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(UPDATE_VALET_ALERT);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            } else {
+                Operation opr = mOperationsModel.getOperation(UPDATE_VALET_ALERT);
+                opr.setState(Operation.ERROR);
+                ((AlertsControllerOperationData) opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        return mOperationsModel.getOperation(UPDATE_VALET_ALERT);
+    }
+
+    private String prepareBodyForUpdateValetAlert(int alertId, String status) {
+        String str = "{"
+                + "\"Data\"" + ":" + "{"
+                + "\"VehicleID\"" + ":" + "\"" + AppController.instance().getVehicleId() + "\""
+                + ","
+                + "\"AlertId\"" + ":" + "\"" + alertId + "\""
+                + ","
+                + "\"Status\"" + ":" + "\"" + status + "\""
+                + "}"
+                + "}";
+        Log.v("Request -- prepareBodyForUpdateValetAlert",str);
+        return str;
+    }
+}

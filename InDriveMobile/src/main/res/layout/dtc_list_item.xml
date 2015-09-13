@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:descendantFocusability="blocksDescendants"
+    >
+
+    <RelativeLayout
+        android:id="@+id/headerRL"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/list_item_left_margin"
+            android:layout_marginStart="@dimen/list_item_left_margin"
+            android:id="@+id/lbl_service_area"
+            android:textStyle="bold"
+            android:text="Battery"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/form_labels_text_size"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/list_item_left_margin"
+            android:layout_marginEnd="@dimen/list_item_left_margin"
+            android:id="@+id/lbl_service_status"
+            android:textStyle="bold"
+            android:text="Service Required"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/form_labels_text_size"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/warning_red"
+            android:layout_toLeftOf="@id/lbl_service_status"
+            android:layout_marginRight="@dimen/list_item_top_margin"
+            android:layout_marginEnd="@dimen/list_item_top_margin"
+            android:contentDescription="@string/info_img_cd"
+            android:layout_centerVertical="true"
+            android:id="@+id/dtc_status"
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dtc_desc_list"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_below="@id/headerRL"
+        android:orientation="vertical"/>
+</RelativeLayout>

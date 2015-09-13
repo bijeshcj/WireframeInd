@@ -1,0 +1,138 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_bg"
+                tools:context="com.verizontelematics.indrivemobile.activity.ForgotPwdSelectionActivity">
+
+    <RelativeLayout
+        android:id="@+id/selectMethodRL"
+        android:layout_width="300dp"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/selectMethodTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            android:text="@string/select_method_pwd"/>
+
+
+        <RelativeLayout
+            android:id="@+id/textRL"
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/selectMethodTV"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="radioButtonClick"
+                android:background="@android:color/transparent"
+                android:button="@android:color/transparent"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:checked="true"
+                android:drawableLeft="@drawable/custom_radio_button1"
+                android:drawableStart="@drawable/custom_radio_button1"
+                android:id="@+id/textRB"
+                />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/form_labels_text_height"
+                android:id="@+id/textET"
+                android:layout_toRightOf="@id/textRB"
+                android:layout_toEndOf="@id/textRB"
+                android:layout_marginLeft="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_top_margin"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:paddingLeft="@dimen/list_item_top_margin"
+                android:background="@color/white"
+                android:inputType="phone"
+                />
+
+            <TextView
+                android:id="@+id/textTV"
+                android:layout_width="match_parent"
+                android:textSize="@dimen/header_text_size"
+                android:layout_alignLeft="@id/textET"
+                android:layout_alignStart="@id/textET"
+                android:textColor="@color/white"
+                android:layout_below="@id/textET"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:text="@string/text"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/emailRL"
+            android:layout_below="@id/textRL"
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="radioButtonClick"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:background="@android:color/transparent"
+                android:button="@android:color/transparent"
+                android:drawableLeft="@drawable/custom_radio_button1"
+                android:drawableStart="@drawable/custom_radio_button1"
+                android:id="@+id/emailRB"
+                />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/form_labels_text_height"
+                android:id="@+id/emailET"
+                android:inputType="textEmailAddress"
+                android:layout_toRightOf="@id/emailRB"
+                android:layout_toEndOf="@id/emailRB"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginLeft="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_top_margin"
+                android:paddingLeft="@dimen/list_item_top_margin"
+                android:background="@color/white"
+                />
+
+            <TextView
+                android:id="@+id/emailTV"
+                android:layout_width="wrap_content"
+                android:textSize="@dimen/header_text_size"
+                android:layout_alignLeft="@id/emailET"
+                android:layout_alignStart="@id/emailET"
+                android:textColor="@color/white"
+                android:layout_below="@id/emailET"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:text="@string/email"/>
+        </RelativeLayout>
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:text="@string/submit"
+            android:id="@+id/submitBTN"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/emailRL"
+            android:layout_marginTop="@dimen/form_labels_text_height"/>
+    </RelativeLayout>
+</RelativeLayout>

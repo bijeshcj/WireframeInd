@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<InDrive>
+
+    <Connect>
+        <Login>A,I</Login>
+        <HomePage>A,I</HomePage>
+
+        <HamburgerMenu>
+            <Home>A,I</Home>
+            <AppSettings>A,I</AppSettings>
+            <PremiumServices>A,I</PremiumServices>
+            <CustomerSupport>A,I</CustomerSupport>
+            <Profile>A,I</Profile>
+            <FAQs>A,I</FAQs>
+        </HamburgerMenu>
+
+        <Alerts>
+            <AlertSettings>
+                <diagnosticsAlert>Active</diagnosticsAlert>
+                <valetAlert>Active</valetAlert>
+                <speedAlert>UpsellPage</speedAlert>
+                <locationAlert>Active</locationAlert>
+            </AlertSettings>
+            <AlertHistory>
+                <diagnosticsAlertHistory>UpsellPage</diagnosticsAlertHistory>
+                <valetAlertHistory>Active Only</valetAlertHistory>
+                <speedAlertHistory>UpsellPage</speedAlertHistory>
+                <locationAlertHistory>UpsellPage</locationAlertHistory>
+            </AlertHistory>
+        </Alerts>
+
+        <Location>
+            <LocateVehicle>Active</LocateVehicle>
+            <LocationAlerts>UpsellPage</LocationAlerts>
+            <LocationHistory>InActive</LocationHistory>
+        </Location>
+
+        <DrivingData>InActive</DrivingData>
+
+        <Diagnostics>
+            <VehicleHealth>
+                <vehicleHealthShowServiceNotEnabled>Active</vehicleHealthShowServiceNotEnabled>
+                <vehicleHealthDiagnosticsDetailsPage>UpsellPage</vehicleHealthDiagnosticsDetailsPage>
+            </VehicleHealth>
+
+            <MaintenanceRemainders>
+                <maintenanceRemaindersView>Active</maintenanceRemaindersView>
+                <maintenanceRemaindersViewEditButton>InActive</maintenanceRemaindersViewEditButton>
+                <maintenanceRemainderAdd>InActive</maintenanceRemainderAdd>
+                <maintenanceRemainderEditDelete>Active</maintenanceRemainderEditDelete>
+            </MaintenanceRemainders>
+
+            <MaintenanceLogs>
+                <maintenanceLogsView>Active</maintenanceLogsView>
+                <maintenanceLogsViewEditButton>Active</maintenanceLogsViewEditButton>
+                <maintenanceLogsAdd>Active</maintenanceLogsAdd>
+                <maintenanceLogsEditDelete>Active</maintenanceLogsEditDelete>
+            </MaintenanceLogs>
+
+            <RecallInformation>
+                <recallInformationCurrentAndCompleted>Active</recallInformationCurrentAndCompleted>
+                <recallInformationDetailsView>Active</recallInformationDetailsView>
+                <recallInformationDetailsViewCompletedOrNot>Active</recallInformationDetailsViewCompletedOrNot>
+            </RecallInformation>
+
+        </Diagnostics>
+
+        <Emergency>
+            <EmergencyServices>Active</EmergencyServices>
+            <Stolen_Vehicle_Location_Assistance>Active</Stolen_Vehicle_Location_Assistance>
+            <RoadsideAssistance>Active</RoadsideAssistance>
+        </Emergency>
+
+    </Connect>
+
+
+    <ConnectCoPilot>
+        <Login>A,I</Login>
+        <HomePage>A,I</HomePage>
+
+        <HamburgerMenu>
+            <Home>A,I</Home>
+            <AppSettings>A,I</AppSettings>
+            <PremiumServices>A,I</PremiumServices>
+            <CustomerSupport>A,I</CustomerSupport>
+            <Profile>A,I</Profile>
+            <FAQs>A,I</FAQs>
+        </HamburgerMenu>
+
+        <Alerts>
+            <AlertSettings>
+                <diagnosticsAlert>Active</diagnosticsAlert>
+                <valetAlert>Active</valetAlert>
+                <speedAlert>UpsellPage</speedAlert>
+                <locationAlert>Active</locationAlert>
+            </AlertSettings>
+            <AlertHistory>
+                <diagnosticsAlertHistory>UpsellPage</diagnosticsAlertHistory>
+                <valetAlertHistory>Active Only</valetAlertHistory>
+                <speedAlertHistory>UpsellPage</speedAlertHistory>
+                <locationAlertHistory>UpsellPage</locationAlertHistory>
+            </AlertHistory>
+        </Alerts>
+
+        <Location>
+            <LocateVehicle>Active</LocateVehicle>
+            <LocationAlerts>UpsellPage</LocationAlerts>
+            <LocationHistory>InActive</LocationHistory>
+        </Location>
+
+        <DrivingData>InActive</DrivingData>
+
+        <Diagnostics>
+            <VehicleHealth>
+                <vehicleHealthShowServiceNotEnabled>Active</vehicleHealthShowServiceNotEnabled>
+                <vehicleHealthDiagnosticsDetailsPage>UpsellPage</vehicleHealthDiagnosticsDetailsPage>
+            </VehicleHealth>
+
+            <MaintenanceRemainders>
+                <maintenanceRemaindersView>Active</maintenanceRemaindersView>
+                <maintenanceRemaindersViewEditButton>InActive</maintenanceRemaindersViewEditButton>
+                <maintenanceRemainderAdd>InActive</maintenanceRemainderAdd>
+                <maintenanceRemainderEditDelete>Active</maintenanceRemainderEditDelete>
+            </MaintenanceRemainders>
+
+            <MaintenanceLogs>
+                <maintenanceLogsView>Active</maintenanceLogsView>
+                <maintenanceLogsViewEditButton>Active</maintenanceLogsViewEditButton>
+                <maintenanceLogsAdd>Active</maintenanceLogsAdd>
+                <maintenanceLogsEditDelete>Active</maintenanceLogsEditDelete>
+            </MaintenanceLogs>
+
+            <RecallInformation>
+                <recallInformationCurrentAndCompleted>Active</recallInformationCurrentAndCompleted>
+                <recallInformationDetailsView>Active</recallInformationDetailsView>
+                <recallInformationDetailsViewCompletedOrNot>Active</recallInformationDetailsViewCompletedOrNot>
+            </RecallInformation>
+
+        </Diagnostics>
+
+        <Emergency>
+            <EmergencyServices>Active</EmergencyServices>
+            <Stolen_Vehicle_Location_Assistance>Active</Stolen_Vehicle_Location_Assistance>
+            <RoadsideAssistance>Active</RoadsideAssistance>
+        </Emergency>
+
+    </ConnectCoPilot>
+
+    <ConnectGuardianCoPilot>
+        <Login>A,I</Login>
+        <HomePage>A,I</HomePage>
+
+        <HamburgerMenu>
+            <Home>A,I</Home>
+            <AppSettings>A,I</AppSettings>
+            <PremiumServices>A,I</PremiumServices>
+            <CustomerSupport>A,I</CustomerSupport>
+            <Profile>A,I</Profile>
+            <FAQs>A,I</FAQs>
+        </HamburgerMenu>
+
+        <Alerts>
+            <AlertSettings>
+                <diagnosticsAlert>Active</diagnosticsAlert>
+                <valetAlert>Active</valetAlert>
+                <speedAlert>UpsellPage</speedAlert>
+                <locationAlert>Active</locationAlert>
+            </AlertSettings>
+            <AlertHistory>
+                <diagnosticsAlertHistory>UpsellPage</diagnosticsAlertHistory>
+                <valetAlertHistory>Active Only</valetAlertHistory>
+                <speedAlertHistory>UpsellPage</speedAlertHistory>
+                <locationAlertHistory>UpsellPage</locationAlertHistory>
+            </AlertHistory>
+        </Alerts>
+
+        <Location>
+            <LocateVehicle>Active</LocateVehicle>
+            <LocationAlerts>UpsellPage</LocationAlerts>
+            <LocationHistory>InActive</LocationHistory>
+        </Location>
+
+        <DrivingData>InActive</DrivingData>
+
+        <Diagnostics>
+            <VehicleHealth>
+                <vehicleHealthShowServiceNotEnabled>Active</vehicleHealthShowServiceNotEnabled>
+                <vehicleHealthDiagnosticsDetailsPage>UpsellPage</vehicleHealthDiagnosticsDetailsPage>
+            </VehicleHealth>
+
+            <MaintenanceRemainders>
+                <maintenanceRemaindersView>Active</maintenanceRemaindersView>
+                <maintenanceRemaindersViewEditButton>InActive</maintenanceRemaindersViewEditButton>
+                <maintenanceRemainderAdd>InActive</maintenanceRemainderAdd>
+                <maintenanceRemainderEditDelete>Active</maintenanceRemainderEditDelete>
+            </MaintenanceRemainders>
+
+            <MaintenanceLogs>
+                <maintenanceLogsView>Active</maintenanceLogsView>
+                <maintenanceLogsViewEditButton>Active</maintenanceLogsViewEditButton>
+                <maintenanceLogsAdd>Active</maintenanceLogsAdd>
+                <maintenanceLogsEditDelete>Active</maintenanceLogsEditDelete>
+            </MaintenanceLogs>
+
+            <RecallInformation>
+                <recallInformationCurrentAndCompleted>Active</recallInformationCurrentAndCompleted>
+                <recallInformationDetailsView>Active</recallInformationDetailsView>
+                <recallInformationDetailsViewCompletedOrNot>Active</recallInformationDetailsViewCompletedOrNot>
+            </RecallInformation>
+
+        </Diagnostics>
+
+        <Emergency>
+            <EmergencyServices>Active</EmergencyServices>
+            <Stolen_Vehicle_Location_Assistance>Active</Stolen_Vehicle_Location_Assistance>
+            <RoadsideAssistance>Active</RoadsideAssistance>
+        </Emergency>
+
+    </ConnectGuardianCoPilot>
+
+
+    <ConnectGuardian>
+        <Login>A,I</Login>
+        <HomePage>A,I</HomePage>
+
+        <HamburgerMenu>
+            <Home>A,I</Home>
+            <AppSettings>A,I</AppSettings>
+            <PremiumServices>A,I</PremiumServices>
+            <CustomerSupport>A,I</CustomerSupport>
+            <Profile>A,I</Profile>
+            <FAQs>A,I</FAQs>
+        </HamburgerMenu>
+
+        <Alerts>
+            <AlertSettings>
+                <diagnosticsAlert>Active</diagnosticsAlert>
+                <valetAlert>Active</valetAlert>
+                <speedAlert>UpsellPage</speedAlert>
+                <locationAlert>Active</locationAlert>
+            </AlertSettings>
+            <AlertHistory>
+                <diagnosticsAlertHistory>UpsellPage</diagnosticsAlertHistory>
+                <valetAlertHistory>Active Only</valetAlertHistory>
+                <speedAlertHistory>UpsellPage</speedAlertHistory>
+                <locationAlertHistory>UpsellPage</locationAlertHistory>
+            </AlertHistory>
+        </Alerts>
+
+        <Location>
+            <LocateVehicle>Active</LocateVehicle>
+            <LocationAlerts>UpsellPage</LocationAlerts>
+            <LocationHistory>InActive</LocationHistory>
+        </Location>
+
+        <DrivingData>InActive</DrivingData>
+
+        <Diagnostics>
+            <VehicleHealth>
+                <vehicleHealthShowServiceNotEnabled>Active</vehicleHealthShowServiceNotEnabled>
+                <vehicleHealthDiagnosticsDetailsPage>UpsellPage</vehicleHealthDiagnosticsDetailsPage>
+            </VehicleHealth>
+
+            <MaintenanceRemainders>
+                <maintenanceRemaindersView>UpsellPage</maintenanceRemaindersView>
+                <maintenanceRemaindersViewEditButton>InActive</maintenanceRemaindersViewEditButton>
+                <maintenanceRemainderAdd>InActive</maintenanceRemainderAdd>
+                <maintenanceRemainderEditDelete>Active</maintenanceRemainderEditDelete>
+            </MaintenanceRemainders>
+
+            <MaintenanceLogs>
+                <maintenanceLogsView>Active</maintenanceLogsView>
+                <maintenanceLogsViewEditButton>Active</maintenanceLogsViewEditButton>
+                <maintenanceLogsAdd>Active</maintenanceLogsAdd>
+                <maintenanceLogsEditDelete>Active</maintenanceLogsEditDelete>
+            </MaintenanceLogs>
+
+            <RecallInformation>
+                <recallInformationCurrentAndCompleted>Active</recallInformationCurrentAndCompleted>
+                <recallInformationDetailsView>Active</recallInformationDetailsView>
+                <recallInformationDetailsViewCompletedOrNot>Active</recallInformationDetailsViewCompletedOrNot>
+            </RecallInformation>
+
+        </Diagnostics>
+
+        <Emergency>
+            <EmergencyServices>Active</EmergencyServices>
+            <Stolen_Vehicle_Location_Assistance>Active</Stolen_Vehicle_Location_Assistance>
+            <RoadsideAssistance>Active</RoadsideAssistance>
+        </Emergency>
+
+    </ConnectGuardian>
+
+
+</InDrive>

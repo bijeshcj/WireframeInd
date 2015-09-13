@@ -1,0 +1,607 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Service;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.DiagnosticController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.fragments.DatePickerFragment;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.MaintenanceLogData;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.BasicUtil;
+import com.verizontelematics.indrivemobile.utils.ui.CurrencyFormat;
+import com.verizontelematics.indrivemobile.utils.ui.DateDataFormat;
+import com.verizontelematics.indrivemobile.utils.ui.InputFilterMinMax;
+import com.verizontelematics.indrivemobile.utils.ui.UiStateHelper;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+
+public class CreateMaintenanceLogActivity extends FragmentActivity implements View.OnClickListener, UIInterface {
+
+    private static final String TAG = CreateMaintenanceLogActivity.class.getSimpleName();
+    private boolean mEditMode = false;
+    private static Calendar dateSelectedCalender = Calendar.getInstance();
+    private static TextView dateTV;
+    private EditText locationET;
+    private TextView mServiceTypeTextView;
+    private Button mDeleteLogBtn;
+    private EditText customLogNameET;
+    private EditText descET;
+    private EditText mEdtCost;
+    private EditText mEdtMileage;
+    private ArrayList<String> lstOfPredefinedServices;
+    private ArrayList<String> mServiceTypes;
+    private MaintenanceLogData mMaintenanceLogData = null;
+    private MaintenanceLogData mPreviousLogData;
+    private CustomProgressDialog mCustomProgressDialog = null;
+    private ImageView service_Arrow;
+    private LinearLayout serviceContainer;
+    private String mServiceType;
+    private static final int GET_SERVICE_TYPE = 11;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_create_maintenance_log);
+        //hideKeyBoard();
+        parseArguments();
+        setupUI();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DiagnosticController.instance().register(this);
+       // hideKeyBoard();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        DiagnosticController.instance().unregister(this);
+    }
+
+    private void setupHeaderView() {
+
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerRL);
+//        headerRL.setBackgroundColor(this.getResources().getColor(R.color.diagnostics_code));
+        headerRL.setBackgroundResource(R.drawable.diagnostic_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        if (mEditMode) {
+            headerTitleTV.setText(this.getResources().getString(R.string.edit_log_entry));
+        } else {
+            headerTitleTV.setText(this.getResources().getString(R.string.create_log_entry));
+        }
+
+        headerBtn.setText(this.getResources().getString(R.string.done));
+        headerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BasicUtil.hideKeyboard(CreateMaintenanceLogActivity.this);
+                if (!mEditMode) {
+                    onCreateLog();
+                } else {
+                    onEditLog();
+                }
+            }
+        });
+
+
+    }
+
+    private boolean onCreateLog() {
+        String serviceType = mServiceType;
+        if (serviceType == null || serviceType.equalsIgnoreCase(getResources().getString(R.string.maintenance_prompt))) {
+            Toast.makeText(this, getResources().getString(R.string.alert_select_service_type), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        String alertType = customLogNameET.getText().toString();
+        if (serviceType.equalsIgnoreCase("Custom")) {
+            if (alertType.isEmpty()) {
+                Toast.makeText(this, getResources().getString(R.string.please_enter_custom_service_name), Toast.LENGTH_SHORT).show();
+                if (customLogNameET.requestFocus()) {
+                    ((InputMethodManager) this.getSystemService(Service.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+                }
+                return false;
+            }
+        }
+
+        String descType = descET.getText().toString();
+        String serviceCentre = locationET.getText().toString();
+        double cost = Double.valueOf(getCost());
+        MaintenanceLogData maintenanceLog;
+        if (mEdtMileage.getText().toString().isEmpty()) {
+            maintenanceLog = new MaintenanceLogData(serviceType, alertType,
+                    descType, cost, "", dateSelectedCalender, serviceCentre);
+        } else {
+            double mileage = Double.valueOf(mEdtMileage.getText().toString());
+            maintenanceLog = new MaintenanceLogData(serviceType, alertType,
+                    descType, cost, mileage, dateSelectedCalender, serviceCentre);
+        }
+        ArrayList<MaintenanceLogData> maintenanceLogData = new ArrayList<MaintenanceLogData>();
+        maintenanceLogData.add(maintenanceLog);
+        DiagnosticController.instance().addMaintenanceLogs(this, maintenanceLogData);
+        return true;
+    }
+
+    private boolean onEditLog() {
+
+        if (mMaintenanceLogData == null)
+            return false;
+        long epochTime = dateSelectedCalender.getTimeInMillis();
+        String description = descET.getText().toString();
+        double cost = Double.valueOf(getCost());
+        mMaintenanceLogData.setDescription(description);
+        mMaintenanceLogData.setCost("" + cost);
+        mMaintenanceLogData.setMileage(mEdtMileage.getText().toString());
+        mMaintenanceLogData.setServiceDate(epochTime);
+        mMaintenanceLogData.setServiceCenter(locationET.getText().toString());
+
+        if (!isDataChanged()) {
+            finish();
+            return false;
+        }
+
+        ArrayList<MaintenanceLogData> maintenanceLogData = new ArrayList<MaintenanceLogData>();
+        maintenanceLogData.add(mMaintenanceLogData);
+        DiagnosticController.instance().updateMaintenanceLogs(this, maintenanceLogData);
+        return true;
+    }
+
+    private String getCost() {
+        String cost = mEdtCost.getText().toString().length() == 0 ? "0" : mEdtCost.getText().toString();
+        return CurrencyFormat.removeCurrencyFormat(cost);
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private void setupUI() {
+
+        setupHeaderView();
+
+        // to make sure all day event.
+        dateSelectedCalender.set(Calendar.HOUR_OF_DAY, 0);
+        dateSelectedCalender.set(Calendar.MINUTE, 0);
+        dateSelectedCalender.set(Calendar.SECOND, 0);
+
+        mDeleteLogBtn = (Button) this.findViewById(R.id.deleteLogBtn);
+        mDeleteLogBtn.setVisibility(View.INVISIBLE);
+        mEdtCost = (EditText) this.findViewById(R.id.costET);
+
+        descET = (EditText) this.findViewById(R.id.alertDescET);
+        locationET = (EditText) this.findViewById(R.id.locationET);
+
+        mServiceTypeTextView = (TextView) this.findViewById(R.id.serviceType);
+        mServiceTypeTextView.setOnClickListener(this);
+
+        serviceContainer = (LinearLayout) this.findViewById(R.id.service_type_container);
+
+        service_Arrow = (ImageView) this.findViewById(R.id.service_type_arrow_btn);
+        service_Arrow.setOnClickListener(this);
+
+        customLogNameET = (EditText) this.findViewById(R.id.alertNameET);
+        customLogNameET.setVisibility(View.GONE);
+
+        mEdtMileage = (EditText) this.findViewById(R.id.mileageET);
+        mEdtMileage.setFilters(new InputFilter[]{new InputFilterMinMax(AppConstants.MIN_MILEAGE_SIZE, AppConstants.MAX_MILEAGE_SIZE, this, AppConstants.USER_SELECTION.MILEAGE)});
+
+        dateTV = (TextView) this.findViewById(R.id.dateET);
+        dateTV.setText(new SimpleDateFormat(AppConstants.LOG_DATE_FORMAT).format(new Date()));
+        dateTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDatePicker();
+            }
+        });
+
+        updateLists();
+
+        mDeleteLogBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showConfirmation();
+            }
+        });
+
+        this.findViewById(R.id.dateRL).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                showDatePicker();
+            }
+        });
+
+        updateFields();
+
+    }
+
+    private void populateUIElements() {
+
+        if (mMaintenanceLogData.getServiceType().equalsIgnoreCase("Custom")) {
+            customLogNameET.setVisibility(View.VISIBLE);
+            mServiceTypeTextView.setText(getResources().getString(R.string.custom));
+            customLogNameET.setText(mMaintenanceLogData.getServiceName());
+        } else {
+            customLogNameET.setVisibility(View.GONE);
+            mServiceTypeTextView.setText(mMaintenanceLogData.getServiceName());
+            customLogNameET.setText(mMaintenanceLogData.getServiceName());
+        }
+
+        descET.setText(mMaintenanceLogData.getDescription());
+        locationET.setText(mMaintenanceLogData.getServiceCenter());
+
+        mEdtCost.setText(CurrencyFormat.applyCurrencyFormat(mMaintenanceLogData.getCost()));
+        // temp fix but need discussion and fix appropriate.
+        mEdtMileage.setText((mMaintenanceLogData.getMileage().isEmpty() || mMaintenanceLogData.getMileage().equalsIgnoreCase("0")) ? "" : "" + mMaintenanceLogData.getMileage());
+        dateTV.setText(DateDataFormat.convertMillisAsDateString(this, mMaintenanceLogData.getServiceDate(), true));
+        dateSelectedCalender.setTimeInMillis(mMaintenanceLogData.getServiceDate());
+    }
+
+    private void updateFields() {
+
+        if (mEditMode) {
+
+            if (mMaintenanceLogData == null) {
+                finish();
+                return;
+            }
+
+            populateUIElements();
+            UiStateHelper.disableView(mServiceTypeTextView);
+            UiStateHelper.disableView(customLogNameET);
+            customLogNameET.setHint(customLogNameET.getText());
+            customLogNameET.setFocusable(false);
+
+            mDeleteLogBtn.setVisibility(View.VISIBLE);
+            service_Arrow.setEnabled(false);
+            mServiceTypeTextView.setEnabled(false);
+            serviceContainer.setEnabled(false);
+            if ((mServiceTypeTextView.getText()).equals(getResources().getStringArray(R.array.maintenance_alert_type)[2])) {
+                // enabling the service type edit text for Custom and hiding for default ones in the edit mode
+                customLogNameET.setVisibility(EditText.VISIBLE);
+            } else {
+                customLogNameET.setVisibility(EditText.GONE);
+            }
+        }
+
+        mEdtCost.addTextChangedListener(new TextWatcher() {
+            boolean isEditing;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mEdtCost.setSelection(s.length());
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mEdtCost.setSelection(s.length());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mEdtCost.setSelection(editable.toString().length());
+                // Restricted to enter max 8 digits and 2 decimals
+                if (mEdtCost.getText().length() >= 15) {
+                    return;
+                }
+                if (isEditing) return;
+                isEditing = true;
+                String formattedString = CurrencyFormat.formatDoubleAsCurrency(editable.toString().trim());
+                editable.replace(0, editable.length(), formattedString);
+                isEditing = false;
+            }
+        });
+    }
+
+    private void updateLists() {
+        String[] predefinedServiceTypes = this.getResources().getStringArray(R.array.maintenance_alert_type);
+        String[] serviceTypes = this.getResources().getStringArray(R.array.maintenance_service_types);
+        lstOfPredefinedServices = new ArrayList<String>(Arrays.asList(predefinedServiceTypes));
+        mServiceTypes = new ArrayList<String>(Arrays.asList(serviceTypes));
+    }
+
+    private void parseArguments() {
+
+        Bundle arguments = getIntent().getExtras();
+
+        if (arguments != null) {
+            if ((arguments.containsKey("selected_data")) && (arguments.getParcelable("selected_data") != null)) {
+                mMaintenanceLogData = arguments.getParcelable("selected_data");
+                if (mMaintenanceLogData != null) {
+                    mPreviousLogData = new MaintenanceLogData();
+                    mPreviousLogData.set(mMaintenanceLogData);
+                }
+                mEditMode = arguments.getBoolean("edit_mode", false);
+            }
+        }
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_create_maintenance_log, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.serviceType:
+            case R.id.service_type_container:
+            case R.id.service_type_arrow_btn:
+                BasicUtil.hideKeyboard(this);
+                Intent serviceTypeIntent = new Intent(CreateMaintenanceLogActivity.this, ServiceTypeActivity.class);
+                serviceTypeIntent.putStringArrayListExtra("Service_Types", lstOfPredefinedServices);
+                serviceTypeIntent.putIntegerArrayListExtra("Disabled_Service_Types", null);
+                startActivityForResult(serviceTypeIntent, GET_SERVICE_TYPE);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+
+        if (opr == null)
+            return;
+
+        if (opr.getId() != Operation.OperationCode.ADD_MAINTENANCE_LOGS.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_MAINTENANCE_LOG.ordinal()
+                && opr.getId() != Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()) {
+            return;
+        }
+        String lAddMaintenanceLogMessage = getResources().getString(R.string.adding_maintenance_log);//"Adding Maintenance Log";
+        String lEditMaintenanceLogMessage = getResources().getString(R.string.editing_maintenance_log);//"Editing Maintenance Log";
+        String lDeleting = getResources().getString(R.string.deleting_maintenance_log);//"Deleting Maintenance Log";
+        if (opr.getId() == Operation.OperationCode.ADD_MAINTENANCE_LOGS.ordinal()) {
+            showProgressDialogFragment(lAddMaintenanceLogMessage);
+        } else if (opr.getId() == Operation.OperationCode.UPDATE_MAINTENANCE_LOG.ordinal()) {
+            showProgressDialogFragment(lEditMaintenanceLogMessage);
+        } else if (opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()) {
+            showProgressDialogFragment(lDeleting);
+        }
+
+    }
+
+    private void showProgressDialogFragment(String aMessage) {
+
+
+        if (mCustomProgressDialog == null) {
+            mCustomProgressDialog = new CustomProgressDialog(this, aMessage);
+            mCustomProgressDialog.show();
+        }
+
+    }
+
+    @Override
+    public void onError(Operation opr) {
+
+        if (opr == null)
+            return;
+
+        if (opr.getId() != Operation.OperationCode.ADD_MAINTENANCE_LOGS.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_MAINTENANCE_LOG.ordinal()
+                && opr.getId() != Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()) {
+            return;
+        }
+        dismissProgressDialog();
+        Toast lToast = Toast.makeText(this, getResources().getString(R.string.error_occurred), Toast.LENGTH_SHORT);
+        lToast.show();
+
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+
+        if (opr == null)
+            return;
+        if (opr.getId() != Operation.OperationCode.ADD_MAINTENANCE_LOGS.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_MAINTENANCE_LOG.ordinal()
+                && opr.getId() != Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()) {
+            return;
+        }
+        dismissProgressDialog();
+        if (opr.getId() == Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal()) {
+            Intent deleteIntent = new Intent();
+            deleteIntent.setAction("deleted");
+            if (getParent() == null)
+                setResult(RESULT_OK, deleteIntent);
+            else {
+                getParent().setResult(RESULT_OK, deleteIntent);
+            }
+
+        } else if (opr.getId() == Operation.OperationCode.UPDATE_MAINTENANCE_LOG.ordinal()) {
+            Intent updatedLogData = new Intent();
+            updatedLogData.putExtra("log_data", mMaintenanceLogData);
+            updatedLogData.setAction("updated");
+            if (getParent() == null)
+                setResult(RESULT_OK, updatedLogData);
+            else {
+                getParent().setResult(RESULT_OK, updatedLogData);
+            }
+        }
+        finish();
+
+    }
+
+    public void dismissProgressDialog() {
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
+        }
+    }
+
+    private void showConfirmation() {
+
+        new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.delete_maintenance_log_header))
+                .setMessage(getResources().getString(R.string.alert_delete))
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        deleteLog();
+
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
+    }
+
+    private void deleteLog() {
+        ArrayList<String> serviceIds = new ArrayList<String>();
+        serviceIds.add(mMaintenanceLogData.getServiceID());
+        DiagnosticController.instance().deleteMaintenanceLogs(this, serviceIds);
+    }
+
+    public void hideKeyBoard() {
+        //hide keyboard
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void showDatePicker() {
+        DatePickerFragment date = new DatePickerFragment();
+        /**
+         * Set Up Current Date Into dialog
+         */
+        Calendar calender = Calendar.getInstance();
+        Bundle args = new Bundle();
+        args.putString("Screen", "LOG");
+        args.putInt("year", calender.get(Calendar.YEAR));
+        args.putInt("month", calender.get(Calendar.MONTH));
+        args.putInt("day", calender.get(Calendar.DAY_OF_MONTH));
+        args.putLong("maxDate", calender.getTimeInMillis());
+        date.setArguments(args);
+        /**
+         * Set Call back to capture selected date
+         */
+        date.setCallBack(dateListener);
+        date.show(getSupportFragmentManager(), "Date Picker");
+
+    }
+
+    public static void setDateUponCancel(Calendar calendar) {
+        if (calendar == null)
+            return;
+        int year, monthOfYear, dayOfMonth;
+        year = calendar.get(Calendar.YEAR);
+        monthOfYear = calendar.get(Calendar.MONTH);
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        dateTV.setText((monthOfYear + 1) + "/" + dayOfMonth + "/" + year);
+        dateSelectedCalender = Calendar.getInstance();
+        dateSelectedCalender.set(Calendar.YEAR, year);
+        dateSelectedCalender.set(Calendar.MONTH, monthOfYear);
+        dateSelectedCalender.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+    }
+
+    DatePickerDialog.OnDateSetListener dateListener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+
+            dateTV.setText((monthOfYear + 1) + "/" + dayOfMonth + "/" + year);
+            dateSelectedCalender = Calendar.getInstance();
+            dateSelectedCalender.set(Calendar.YEAR, year);
+            dateSelectedCalender.set(Calendar.MONTH, monthOfYear);
+            dateSelectedCalender.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        }
+    };
+
+    private boolean isDataChanged() {
+
+        if (mMaintenanceLogData == null)
+            return false;
+        // compare mMaintenanceLogData and mPreviousLogData and return appropriate value
+
+        // required editable fields compare.
+        return (!(mMaintenanceLogData.getServiceDate() == mPreviousLogData.getServiceDate()
+                && (((mMaintenanceLogData.getDescription() == null || mMaintenanceLogData.getDescription().isEmpty()) && (mPreviousLogData.getDescription() == null || mPreviousLogData.getDescription().isEmpty()))
+                || ((mMaintenanceLogData.getDescription() != null) && mMaintenanceLogData.getDescription().equals(mPreviousLogData.getDescription())))
+                && (((mMaintenanceLogData.getServiceCenter() == null || mMaintenanceLogData.getServiceCenter().isEmpty()) && (mPreviousLogData.getServiceCenter() == null || mPreviousLogData.getServiceCenter().isEmpty()))
+                || ((mMaintenanceLogData.getServiceCenter() != null) && mMaintenanceLogData.getServiceCenter().equals(mPreviousLogData.getServiceCenter())))
+                && (((mMaintenanceLogData.getCost() == null || mMaintenanceLogData.getCost().isEmpty()) && (mPreviousLogData.getCost() == null || mPreviousLogData.getCost().isEmpty()))
+                || ((mMaintenanceLogData.getCost() != null) && mMaintenanceLogData.getCost().equals(mPreviousLogData.getCost()))
+                && (((mMaintenanceLogData.getMileage() == null || mMaintenanceLogData.getMileage().isEmpty() || mMaintenanceLogData.getMileage().equals("0")) && (mPreviousLogData.getMileage() == null || mPreviousLogData.getMileage().isEmpty() || mPreviousLogData.getMileage().equals("0")))
+                || ((mMaintenanceLogData.getMileage() != null) && mMaintenanceLogData.getMileage().equals(mPreviousLogData.getMileage()))))));
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GET_SERVICE_TYPE) {
+            if (resultCode == RESULT_OK) {
+                String selectedValue = data.getStringExtra("SelectedServiceType");
+                int position = data.getIntExtra("Position", -1);
+                mServiceTypeTextView.setText(selectedValue);
+                if (mServiceTypes != null)
+                    mServiceType = mServiceTypes.get(position);
+                if (position == (lstOfPredefinedServices.size() - 1)) {
+                    // 2 is for Custom.
+                    customLogNameET.setVisibility(View.VISIBLE);
+                    customLogNameET.setText("");
+                    if (customLogNameET.requestFocus()) {
+                        ((InputMethodManager) this.getSystemService(Service.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+                        BasicUtil.showKeyboard(this);
+                    }
+                } else {
+                    customLogNameET.setVisibility(EditText.GONE);
+                    BasicUtil.hideKeyboard(this);
+                }
+            }
+        }
+
+    }
+
+}

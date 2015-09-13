@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  for categories -->
+    <string name="category_access_app">AccessApp</string>
+
+
+    <!--  for labels -->
+    <string name="label_login">LogIn</string>
+
+
+
+    <!-- for screen names -->
+    <string name="screen_login">Login</string>
+
+</resources>

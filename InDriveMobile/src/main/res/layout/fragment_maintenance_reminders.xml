@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:id="@+id/mainRemindersLL"
+    android:background="@color/time_period">
+
+    <LinearLayout
+        android:id="@+id/reminderLL"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:id="@+id/maintenance_alerts_header_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/maintenance_log_header_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:background="@drawable/gradient_gray_bar">
+
+            <ImageView
+                android:id="@+id/btn_info_maintenance_alert"
+                android:layout_width="wrap_content"
+                android:contentDescription="@string/info_img_cd"
+                android:layout_height="wrap_content"
+               android:layout_marginLeft="10dp"
+               android:layout_marginStart="10dp"
+                android:src="@drawable/info_button"/>
+            <TextView
+                android:id="@+id/maintenanceAlertTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:gravity="end"
+                android:layout_weight="0.6"
+                android:paddingLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/maintenance_reminders"
+                android:textColor="@color/white"
+                android:textSize="@dimen/header_text_size"
+                />
+
+            <ImageView
+                android:id="@+id/btn_create_alert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/add_btn_cd"
+               android:layout_marginRight="10dp"
+               android:layout_marginEnd="10dp"
+                android:src="@drawable/plus"/>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/firstRL">
+
+            <TextView
+                android:id="@+id/emptyAlertTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:ellipsize="end"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:visibility="invisible"
+                android:hint="@string/empty_reminder_text"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                />
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:id="@+id/maintenance_alerts_list_swipe_refresh">
+
+                <ListView
+                    android:id="@+id/maintenance_alerts_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@color/gray"
+                    android:dividerHeight="1px"
+                    />
+            </android.support.v4.widget.SwipeRefreshLayout>
+        </RelativeLayout>
+
+
+    </LinearLayout>
+</LinearLayout>

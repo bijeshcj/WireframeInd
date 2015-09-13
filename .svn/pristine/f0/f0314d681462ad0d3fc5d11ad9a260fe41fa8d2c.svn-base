@@ -1,0 +1,97 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/selectServiceTypeRL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/selectServiceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/select_service_type"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <ListView
+            android:id="@+id/serviceTypeLV"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@id/selectServiceText"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:cacheColorHint="@android:color/transparent"
+            android:choiceMode="singleChoice"
+            android:listSelector="@android:color/transparent"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/enterServiceTypeRL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectServiceTypeRL">
+
+        <TextView
+            android:id="@+id/enterServiceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/enter_service_type"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <CheckBox
+            android:id="@+id/enterServiceTypeCB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/enterServiceTypeET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:inputType="textNoSuggestions"
+        android:layout_below="@id/enterServiceTypeRL"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/enterServiceTypeET">
+
+        <Button
+            android:id="@+id/saveBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:text="@string/save"/>
+
+        <Button
+            android:id="@+id/cancelBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/cancel"
+            tools:ignore="ButtonOrder"/>
+    </RelativeLayout>
+</RelativeLayout>

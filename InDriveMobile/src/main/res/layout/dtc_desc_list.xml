@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rLayout_dtcCode"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        >
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/lbl_dtc_code"
+            android:text="header"
+            android:textSize="@dimen/form_labels_text_size"
+
+
+            />
+
+
+        <ImageView
+            android:layout_centerInParent="true"
+            android:layout_gravity="end"
+            android:id="@+id/infoIV"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:src="@drawable/info_button"
+            android:layout_marginRight="@dimen/list_item_top_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="desc"
+        android:layout_below="@id/rLayout_dtcCode"
+        android:id="@+id/lbl_dtc_description"
+        android:lineSpacingMultiplier="1"
+        android:textColor="@color/gray"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_marginBottom="@dimen/list_item_top_margin"
+        android:layout_marginEnd="@dimen/list_item_right_margin"
+        android:layout_marginRight="@dimen/list_item_right_margin"
+        />
+</RelativeLayout>

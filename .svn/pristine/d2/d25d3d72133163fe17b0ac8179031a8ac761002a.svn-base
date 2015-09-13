@@ -1,0 +1,156 @@
+package com.verizontelematics.indrivemobile.adapters;
+
+import android.app.Activity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.data.DTCData;
+
+import java.util.ArrayList;
+
+/**
+ * Created by z688522 on 2/19/15.
+ */
+public class DTCListAdapter extends BaseAdapter {
+
+    private final Activity mContext;
+
+    private ArrayList<DTCData> mList = new ArrayList<DTCData>();
+
+    public DTCListAdapter(Activity ctx) {
+        mContext = ctx;
+        // Stub started
+        createDTCData();
+        // Stub ended.
+    }
+    @Override
+    public int getCount() {
+        return mList.size();
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return mList.get(i);
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        RelativeLayout rl = (RelativeLayout) view;
+
+        if (rl == null) {
+            LayoutInflater li = mContext.getLayoutInflater();
+            rl = (RelativeLayout) li.inflate(R.layout.dtc_list_item, null);
+        }
+        populateView(i, rl);
+        return rl;
+    }
+
+    private void populateView(int pos, RelativeLayout rl) {
+        DTCData dtcData = mList.get(pos);
+        // Service Area
+        final String serviceArea = (String)dtcData.get("ServiceArea");
+        TextView tvServiceArea = (TextView) rl.findViewById(R.id.lbl_service_area);
+        tvServiceArea.setText(serviceArea);
+
+        ImageView ivInfo = (ImageView) rl.findViewById(R.id.btn_info);
+        ivInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ToBeDecidedDialog dialog = new ToBeDecidedDialog(mContext, mContext.getResources().getString(R.string.dtc_info));
+                dialog.setTitle(serviceArea);
+                dialog.show();
+            }
+        });
+
+
+        // Dtc List description
+        ArrayList<DTCData> dtcList = (ArrayList<DTCData>)dtcData.get("DTCList");
+        LinearLayout ll = (LinearLayout) rl.findViewById(R.id.dtc_desc_list);
+        for (int i = 0; i < dtcList.size(); i++) {
+            RelativeLayout dtcDesc = (RelativeLayout)createView();
+            populateDescView(dtcDesc, dtcList.get(i));
+            ll.addView(dtcDesc);
+        }
+
+    }
+
+    private void populateDescView(RelativeLayout dtcDescView, DTCData dtcData) {
+
+
+        // DTC Code
+        TextView tvDTCCode = (TextView) dtcDescView.findViewById(R.id.lbl_dtc_code);
+        String dtcCode = (String) dtcData.get("Code");
+        tvDTCCode.setText(mContext.getString(R.string.dtc_code_label)+" "+dtcCode);
+
+        // DTC Status
+        ImageView ivDTCStatus = (ImageView) dtcDescView.findViewById(R.id.dtc_status);
+        TextView lblStatus = (TextView) dtcDescView.findViewById(R.id.lbl_dtc_status);
+        String dtcStatus = (String) dtcData.get("Status");
+        if (dtcStatus.equalsIgnoreCase("ServiceRequired")) {
+            lblStatus.setText(mContext.getString(R.string.service_required));
+            ivDTCStatus.setImageResource(R.drawable.warning_red);
+        }
+        else if (dtcStatus.equalsIgnoreCase("MonitorClosely")) {
+            lblStatus.setText(mContext.getString(R.string.monitor_closely));
+            ivDTCStatus.setImageResource(R.drawable.warning_yellow);
+        }
+
+        // DTC Desc
+        TextView tvDTCDesc = (TextView) dtcDescView.findViewById(R.id.lbl_dtc_description);
+        String description = (String) dtcData.get("Description");
+        tvDTCDesc.setText(description);
+    }
+
+    private View createView() {
+        LayoutInflater li = mContext.getLayoutInflater();
+        return li.inflate(R.layout.dtc_desc_list, null);
+    }
+
+    // Stub started
+    private void createDTCData() {
+        DTCData battery = new DTCData();
+        battery.set("ServiceArea", "Battery");
+        ArrayList<DTCData> batteryDTCList = new ArrayList<DTCData>();
+        DTCData ba1 = new DTCData();
+        ba1.set("Code", "B0122-2A");
+        ba1.set("Status", "ServiceRequired");
+        ba1.set("Description", "Blurb on the function of the battery and what can happen when there is a malfunction identified.");
+        batteryDTCList.add(ba1);
+        DTCData ba2 = new DTCData();
+        ba2.set("Code", "B8133-2A");
+        ba2.set("Status", "MonitorClosely");
+        ba2.set("Description", "Blurb on the function of the battery and what can happen when there is a malfunction identified.");
+        batteryDTCList.add(ba2);
+        battery.set("DTCList", batteryDTCList);
+        mList.add(battery);
+        DTCData alternator = new DTCData();
+        alternator.set("ServiceArea", "Alternator");
+        ArrayList<DTCData> alternatorDTCList = new ArrayList<DTCData>();
+        DTCData al1 = new DTCData();
+        al1.set("Code", "ALT43-8C");
+        al1.set("Status", "MonitorClosely");
+        al1.set("Description", "Blurb on the function of the battery and what can happen when there is a malfunction identified.");
+        alternatorDTCList.add(al1);
+        DTCData al2 = new DTCData();
+        al2.set("Code", "ALT56-8C");
+        al2.set("Status", "ServiceRequired");
+        al2.set("Description", "Blurb on the function of the battery and what can happen when there is a malfunction identified.");
+        alternatorDTCList.add(al2);
+        alternator.set("DTCList", alternatorDTCList);
+        mList.add(alternator);
+    }
+    // Stub ended.
+}

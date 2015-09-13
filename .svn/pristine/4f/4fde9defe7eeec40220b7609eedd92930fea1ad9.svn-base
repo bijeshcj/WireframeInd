@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:id="@+id/fragment_recall_detailed">
+
+    <TextView
+        android:id="@+id/txt_recall_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_item_left_margin"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"/>
+
+    <TextView
+        android:id="@+id/txt_recall_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_item_left_margin"
+        android:layout_marginRight="@dimen/list_item_left_margin"
+        android:layout_marginEnd="@dimen/list_item_left_margin"
+        android:layout_alignParentTop="true"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"/>
+    <!--<ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/txt_recall_date"
+        android:layout_above="@+id/statusRL"
+        android:id="@+id/recallDetailLV"
+        android:layout_marginTop="2dp"
+        android:dividerHeight="0dp"
+        android:divider="@null"
+        android:isScrollContainer="true"></ListView>-->
+    <ScrollView
+        android:id="@+id/infoDetailSV"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/scroll_top_margin"
+        android:layout_below="@id/txt_recall_date"
+        android:layout_above="@+id/statusRL"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_marginLeft="@dimen/list_item_left_margin"
+            android:layout_marginStart="@dimen/list_item_left_margin"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/idNoLL"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/idNoTV"
+                    android:text="@string/recall_id_number"
+                    android:layout_width="match_parent"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/componentLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/componentTV"
+                    android:text="@string/recall_component"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/vehicleImpactLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/vehicleImpactTV"
+                    android:text="@string/recall_vehicle_impacted"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/manufacturerLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/manufacturerTV"
+                    android:text="@string/recall_manufacturer"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/manufacturerDatesLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/manufacturerDatesTV"
+                    android:text="@string/recall_manufacturing_dates"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/unitsAffectedLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/unitsAffectedTV"
+                    android:text="@string/recall_units_affected"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/summaryLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/summaryTV"
+                    android:text="@string/recall_summary"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/defectDescLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/defectDescTV"
+                    android:text="@string/recall_defect_desc"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/correctiveActionLL"
+                android:layout_marginTop="@dimen/list_item_top_margin"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/correctiveActionTV"
+                    android:text="@string/recall_corrective_action"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="@dimen/list_item_left_margin"
+                    android:layout_marginEnd="@dimen/list_item_left_margin"
+                    android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:id="@+id/statusRL"
+        android:layout_margin="@dimen/list_item_top_margin"
+        android:layout_height="@dimen/form_labels_text_height"
+        >
+
+        <TextView
+            android:id="@+id/completedTV"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/recall_completed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/form_labels_text_size"/>
+
+        <RelativeLayout
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:orientation="vertical"
+            android:id="@+id/completedSwitch"
+            android:background="@color/white"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            >
+
+            <ImageView
+                android:id="@+id/onStateCompleted"
+                android:src="@drawable/on_state"
+                android:visibility="visible"
+                android:contentDescription="@string/on_state_cd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <ImageView
+                android:id="@+id/offStateCompleted"
+                android:src="@drawable/off_state"
+                android:visibility="invisible"
+                android:contentDescription="@string/off_state_cd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

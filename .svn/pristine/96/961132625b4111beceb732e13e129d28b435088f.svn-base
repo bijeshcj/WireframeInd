@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:descendantFocusability="blocksDescendants"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:id="@+id/lbl_service_area"
+        android:textSize="@dimen/form_labels_text_size"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_marginRight="@dimen/list_item_left_margin"
+        android:layout_marginEnd="@dimen/list_item_left_margin"
+        android:id="@+id/lbl_service_status"
+        android:textSize="@dimen/form_labels_text_size"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dtc_desc_list"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_below="@id/lbl_service_area"
+        android:orientation="vertical"/>
+</RelativeLayout>

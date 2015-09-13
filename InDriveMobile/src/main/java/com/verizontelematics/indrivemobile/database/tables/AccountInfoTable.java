@@ -1,0 +1,73 @@
+package com.verizontelematics.indrivemobile.database.tables;
+
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+
+public class AccountInfoTable extends BaseTable{
+
+	private static final String TAG = AccountInfoTable.class.getCanonicalName();
+
+	public static final String TABLE_NAME_ACCOUNTINFO = "AccountInfo";
+
+	public static final String COLUMN_ACCOUNTINFO_ID = "_id";
+	public static final String COLUMN_MOBILEUSERID = "mobileUserID";
+	public static final String COLUMN_ACCOUNTID = "accountID";
+	public static final String COLUMN_ACCOUNTTYPE = "accountType";
+	public static final String COLUMN_FIRSTNAME = "firstName";
+	public static final String COLUMN_LASTNAME = "lastName";
+	public static final String COLUMN_EMAIL = "email";
+    public static final String COLUMN_EMAIL_TOKEN = "emailToken";
+    public static final String COLUMN_PHONE = "phone";
+    public static final String COLUMN_PHONE_TOKEN = "phoneToken";
+
+    public static final String COLUMN_ACCOUNTSTATUS = "accountStatus";
+	public static final String COLUMN_ADDRESS1 = "address1";
+	public static final String COLUMN_ADDRESS2 = "address2";
+	public static final String COLUMN_CITY = "city";
+	public static final String COLUMN_STATE = "state";
+	public static final String COLUMN_COUNTRY = "country";
+	public static final String COLUMN_ZIPCODE = "zipCode";
+	public static final String COLUMN_ORGANIZATION = "organization";
+	public static final String COLUMN_SUBSCRIPTIONPACKAGENAME = "subscriptionPackageName";
+	public static final String COLUMN_SUBSCRIPTIONPARTNUMBER = "subscriptionPartNumber";
+
+	public static final String ACCOUNTINFOTABLE_TABLE_CREATE = "create table if not exists "+ TABLE_NAME_ACCOUNTINFO+"("+
+		COLUMN_ACCOUNTINFO_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+
+		COLUMN_MOBILEUSERID+" TEXT, "+
+		COLUMN_ACCOUNTID+" TEXT, "+
+		COLUMN_ACCOUNTTYPE+" TEXT, "+
+		COLUMN_FIRSTNAME+" TEXT, "+
+		COLUMN_LASTNAME+" TEXT, "+
+		COLUMN_EMAIL+" TEXT, "+
+        COLUMN_EMAIL_TOKEN+" TEXT, "+
+		COLUMN_PHONE+" TEXT, "+
+        COLUMN_PHONE_TOKEN+" TEXT, "+
+		COLUMN_ACCOUNTSTATUS+" TEXT, "+
+		COLUMN_ADDRESS1+" TEXT, "+
+		COLUMN_ADDRESS2+" TEXT, "+
+		COLUMN_CITY+" TEXT, "+
+		COLUMN_STATE+" TEXT, "+
+		COLUMN_COUNTRY+" TEXT, "+
+		COLUMN_ZIPCODE+" TEXT, "+
+		COLUMN_ORGANIZATION+" TEXT, "+
+		COLUMN_SUBSCRIPTIONPACKAGENAME+" TEXT, "+
+		COLUMN_SUBSCRIPTIONPARTNUMBER+" TEXT"+
+		")";
+
+
+    @Override
+	 public void onCreate(SQLiteDatabase database) {
+		database.execSQL(ACCOUNTINFOTABLE_TABLE_CREATE);
+		Log.d(TAG,"created table "+TABLE_NAME_ACCOUNTINFO);
+	}
+
+
+	@Override
+	 public void onUpgrade(SQLiteDatabase database,int oldVersion,int newVersion) {
+		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_ACCOUNTINFO);
+		onCreate(database);
+	}
+
+}

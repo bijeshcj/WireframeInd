@@ -1,0 +1,98 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+import com.verizontelematics.indrivemobile.models.AppStateModel;
+import com.verizontelematics.indrivemobile.models.BaseModel;
+import com.verizontelematics.indrivemobile.models.data.AppStateData;
+import com.verizontelematics.indrivemobile.utils.config.InDrivePreference;
+import com.verizontelematics.indrivemobile.utils.ui.VehicleType;
+
+/**
+ * Created by z688522 on 8/28/14.
+ */
+public class AppController {
+
+    private BaseModel mAppStateModel;
+    private AppController() {
+        mAppStateModel = new AppStateModel();
+        mAppStateModel.setData(new AppStateData());
+    }
+    static private AppController mInstance = null;
+    synchronized public static AppController instance() {
+        if (mInstance ==  null) {
+            mInstance = new AppController();
+        }
+        return mInstance;
+    }
+
+    public BaseModel getAppStateModel() {
+        return mAppStateModel;
+    }
+
+    public void setVehicleType(int vehicleType) {
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.VEHICLE_TYPE, vehicleType);
+    }
+
+    public int getVehicleType() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.VEHICLE_TYPE);
+        return ((obj == null) ? 0 : (Integer) obj);
+    }
+
+    public void setVehicleAccountId(int accountId) {
+        if (accountId == 0) {
+            accountId = InDrivePreference.getInstance().getIntData(AppStateData.VEHICLE_ACCOUNT, 0);
+        }
+        if (accountId == 0)
+            return;
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.VEHICLE_ACCOUNT, accountId);
+        // stubbed logic for demo
+        setVehicleType(accountId % VehicleType.values().length);
+        InDrivePreference.getInstance().setIntData(AppStateData.VEHICLE_ACCOUNT, accountId);
+
+    }
+
+    public int getVehicleAccountId() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.VEHICLE_ACCOUNT);
+        int vehicleAccountId = 0;
+        if (obj == null) {
+            vehicleAccountId = InDrivePreference.getInstance().getIntData(AppStateData.VEHICLE_ACCOUNT, 0);
+        }
+        else {
+            vehicleAccountId = (Integer) obj;
+        }
+        return vehicleAccountId;
+    }
+
+    public boolean getStayLoggedSetting() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.SETTING_STAY_LOGGED);
+        boolean flag = false;
+        if (obj == null) {
+            flag = InDrivePreference.getInstance().getBooleanData(AppStateData.SETTING_STAY_LOGGED, false);
+        }
+        else {
+            flag = (Boolean) obj;
+        }
+        return flag;
+    }
+
+    public void setStayLoggedSetting(boolean flag) {
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.SETTING_STAY_LOGGED, flag);
+        InDrivePreference.getInstance().setBooleanData(AppStateData.SETTING_STAY_LOGGED, flag);
+    }
+
+    public void setRememberMe(boolean flag) {
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.SETTING_REMEMBER_ME, flag);
+        InDrivePreference.getInstance().setBooleanData(AppStateData.SETTING_REMEMBER_ME, flag);
+    }
+
+    public boolean getRememberMe() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.SETTING_REMEMBER_ME);
+        boolean flag = false;
+        if (obj == null) {
+            flag = InDrivePreference.getInstance().getBooleanData(AppStateData.SETTING_REMEMBER_ME, false);
+        }
+        else {
+            flag = (Boolean) obj;
+        }
+        return flag;
+    }
+}

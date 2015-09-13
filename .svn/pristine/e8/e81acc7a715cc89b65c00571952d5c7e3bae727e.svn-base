@@ -1,0 +1,12 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+/**
+ * Created by bijesh on 1/21/2015.
+ */
+public class ControllerUtils {
+    public static <T extends BaseController> void refreshControllerCache(T anyController){
+        if(anyController instanceof DiagnosticController){
+            DiagnosticController.instance().getVehicleHealthModel().clear();
+        }
+    }
+}

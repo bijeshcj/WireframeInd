@@ -1,0 +1,94 @@
+package com.verizontelematics.indrivemobile.utils;
+
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
+/**
+ * Created by bijesh on 4/13/2015.
+ */
+public class FileUtils {
+
+   private static final String TAG = FileUtils.class.getCanonicalName();
+   private static String fileName = "key.txt";
+
+    public static void saveFileToAppInternal(Context context,String key){
+        FileOutputStream out = null;
+
+        try {
+                out = context.openFileOutput(fileName , Context.MODE_PRIVATE);
+                out.write(key.getBytes());
+                Log.d(TAG, "key stored successfully");
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            try{
+                if(out != null)
+                    out.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String readFileContentFromAppInternal(Context context){
+        String retVal = "";
+
+        BufferedReader input = null;
+        File file = null;
+        try {
+            file = new File(context.getFilesDir(), fileName); // Pass getFilesDir() and "MyFile" to read file   // getCacheDir()
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+
+            retVal = buffer.toString();
+            Log.d(TAG, "read from file "+retVal);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return retVal;
+    }
+
+    public static byte[] readKeyContentFromAppInternal(Context context){
+        byte[] retVal = null;
+
+        BufferedReader input = null;
+        File file = null;
+        try {
+            file = new File(context.getFilesDir(), fileName); // Pass getFilesDir() and "MyFile" to read file   // getCacheDir()
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+
+            retVal = buffer.toString().getBytes();
+            Log.d(TAG, "read from file bytes length "+retVal.length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return retVal;
+    }
+
+
+
+}

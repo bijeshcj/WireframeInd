@@ -1,0 +1,20 @@
+package com.verizontelematics.indrivemobile.models;
+
+/**
+ * Created by z688522 on 3/18/15.
+ */
+public class MessageControllerOpertation extends Operation {
+    public MessageControllerOpertation(int id, int state) {
+        super(id, state);
+    }
+
+    @Override
+    public String getInformation() {
+        return null;
+    }
+
+    @Override
+    public void setInformation(String message) {
+
+    }
+}

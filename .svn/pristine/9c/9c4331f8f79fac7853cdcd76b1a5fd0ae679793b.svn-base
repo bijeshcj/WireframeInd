@@ -1,0 +1,307 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.text.Html;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.DiagnosticController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.RecallData;
+import com.verizontelematics.indrivemobile.models.data.VehicleInfoData;
+import com.verizontelematics.indrivemobile.utils.ui.DateDataFormat;
+
+import java.util.Calendar;
+
+public class RecallDetailsActivity extends Activity implements UIInterface {
+    private static final String TAG = RecallDetailsActivity.class.getSimpleName();
+    private TextView mTxtName;
+    private TextView mTxtDate;
+    private TextView mTxtID;
+    private TextView mTxtComponent;
+    private TextView mTxtVehicleImpacted;
+    private TextView mTxtManufacturer;
+    private TextView mTxtManufacturingDates;
+    private TextView mTxtUnits;
+    private TextView mTxtSummary;
+    private TextView mTxtDesc;
+    private TextView mTxtAction;
+    private ImageView onStateStatus, offStateStatus;
+    private RecallData mRecallData;
+    private CustomProgressDialog mProgressDialogFragment = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_recall_details);
+        parseArguments();
+        setupUI();
+    }
+
+    private void parseArguments() {
+        Bundle arguments = getIntent().getExtras();
+        if (arguments != null) {
+            if ((arguments.containsKey("selected_data")) && (arguments.getParcelable("selected_data") != null)) {
+                mRecallData = arguments.getParcelable("selected_data");
+            }
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        DiagnosticController.instance().unregister(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DiagnosticController.instance().register(this);
+    }
+
+    private void setupHeaderView() {
+
+        RelativeLayout headerRL = (RelativeLayout) this.findViewById(R.id.headerLayout);
+//        headerRL.setBackgroundColor(this.getResources().getColor(R.color.diagnostics_code));
+        headerRL.setBackgroundResource(R.drawable.diagnostic_header_background);
+        TextView headerTitleTV = (TextView) headerRL.findViewById(R.id.title_header_TV);
+        Button headerBtn = (Button) headerRL.findViewById(R.id.action_btn);
+        headerTitleTV.setText(this.getResources().getString(R.string.recall_info_details));
+
+        headerBtn.setText(this.getResources().getString(R.string.done));
+        headerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRecall();
+            }
+        });
+    }
+
+    private void updateRecall() {
+        if (mRecallData != null) {
+            boolean completed = (mRecallData.getDateCompleted() > 0);
+            // check if status changed
+            if (completed == (onStateStatus.getVisibility() == View.VISIBLE)) {
+
+                finish();
+                return;
+            }
+            // update recall by
+            if (onStateStatus.getVisibility() == View.VISIBLE) {
+                mRecallData.setDateCompleted(Calendar.getInstance().getTimeInMillis());
+            } else {
+                mRecallData.setDateCompleted(0);
+            }
+            DiagnosticController.instance().setRecallCompleted(this, mRecallData);
+        }
+    }
+
+
+    private void setupUI() {
+
+        setupHeaderView();
+        mTxtName = (TextView) this.findViewById(R.id.txt_recall_title);
+        mTxtDate = (TextView) this.findViewById(R.id.txt_recall_date);
+        RelativeLayout completedLayout = (RelativeLayout) this.findViewById(R.id.completedSwitch);
+        onStateStatus = (ImageView) this.findViewById(R.id.onStateCompleted);
+        offStateStatus = (ImageView) this.findViewById(R.id.offStateCompleted);
+        completedLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (offStateStatus.getVisibility() == View.VISIBLE) {
+                    //turning the state as ON
+                    onStateStatus.setVisibility(View.VISIBLE);
+                    offStateStatus.setVisibility(View.INVISIBLE);
+                } else if (offStateStatus.getVisibility() == View.INVISIBLE) {
+                    //turning the state as OFF
+                    onStateStatus.setVisibility(View.INVISIBLE);
+                    offStateStatus.setVisibility(View.VISIBLE);
+                } else if (onStateStatus.getVisibility() == View.VISIBLE) {
+                    //turning the state as ON
+                    onStateStatus.setVisibility(View.INVISIBLE);
+                    offStateStatus.setVisibility(View.VISIBLE);
+                } else {
+                    //turning the state as OFF
+                    onStateStatus.setVisibility(View.VISIBLE);
+                    offStateStatus.setVisibility(View.INVISIBLE);
+                }
+
+
+            }
+        });
+
+        mTxtComponent = (TextView) this.findViewById(R.id.componentTV);
+        mTxtID = (TextView) this.findViewById(R.id.idNoTV);
+        mTxtVehicleImpacted = (TextView) this.findViewById(R.id.vehicleImpactTV);
+        mTxtManufacturer = (TextView) this.findViewById(R.id.manufacturerTV);
+        mTxtManufacturingDates = (TextView) this.findViewById(R.id.manufacturerDatesTV);
+        mTxtUnits = (TextView) this.findViewById(R.id.unitsAffectedTV);
+        mTxtSummary = (TextView) this.findViewById(R.id.summaryTV);
+        mTxtDesc = (TextView) this.findViewById(R.id.defectDescTV);
+        mTxtAction = (TextView) this.findViewById(R.id.correctiveActionTV);
+        populateUIElements();
+    }
+
+
+    private void populateUIElements() {
+        // get the data to populate
+        // alert name
+        if (mRecallData == null)
+            return;
+
+
+        mTxtName.setText(getHeaderComponentName(mRecallData.getComponentName()));
+        // date
+        mTxtDate.setText(DateDataFormat.convertMillisAsDateString(this, mRecallData.getDateIssued(), true));
+        // component name
+        String str = mRecallData.getComponentName();
+        str = (str == null || str.equalsIgnoreCase("null")) ? "" : str;
+        mTxtComponent.setText(Html.fromHtml("<b>" + getResources().getString(R.string.component) + ":\t" + "</b> " + str)); //"Component:\t"
+
+        // Recall id
+        str = mRecallData.getRecallID();
+        str = (str == null || str.equalsIgnoreCase("null")) ? "" : str;
+        mTxtID.setText(Html.fromHtml("<b>" + getResources().getString(R.string.id_number) + ":\t" + "</b> " + str));
+
+        // Vehicle Impacted
+        String vehicleImpacted = "";
+        if (DiagnosticController.instance().getVehicleInfoModel() != null) {
+            if (VehicleInfoData.class.isInstance(DiagnosticController.instance().getVehicleInfoModel().getData())) {
+                VehicleInfoData vehicleInfoData = (VehicleInfoData) DiagnosticController.instance().getVehicleInfoModel().getData();
+                vehicleImpacted += vehicleInfoData.get("Model")
+                        + " " + vehicleInfoData.get("Make")
+                        + " " + vehicleInfoData.get("Year");
+            }
+        }
+        mTxtVehicleImpacted.setText(Html.fromHtml("<b>" + getResources().getString(R.string.vehicle_impacted) + ":\t" + "</b> " + vehicleImpacted));
+
+        // Manufacturer
+        str = mRecallData.getManufacturer();
+        str = (str == null || str.equalsIgnoreCase("null")) ? "" : str;
+        mTxtManufacturer.setText(Html.fromHtml("<b>" + getResources().getString(R.string.manufacturer) + ":\t" + "</b> " + str));
+
+        mTxtManufacturingDates.setText(Html.fromHtml("<b>" + getResources().getString(R.string.manufacturing_dates) + ":\t" + "</b> "
+                + DateDataFormat.convertMillisAsDateString(this, mRecallData.getManufacturingBeginDate(), true) + " - "
+                + DateDataFormat.convertMillisAsDateString(this, mRecallData.getManufacturingEndDate(), true)));
+
+        // Potential Number of units Affected
+        str = mRecallData.getPotentialAffectedUnits();
+        str = (str == null || str.equalsIgnoreCase("null")) ? "" : str;
+        mTxtUnits.setText(Html.fromHtml("<b>" + getResources().getString(R.string.potential_number_of_units_affected) + ":\t" + "</b> " + str));
+
+        // Summary
+        str = mRecallData.getSummary();
+        str = (str == null || str.equalsIgnoreCase("null")) ? "" : str;
+        mTxtSummary.setText(Html.fromHtml("<b>" + getResources().getString(R.string.summary) + ":\t" + "</b> " + str));
+
+        // Defected Description
+        str = mRecallData.getDefectDescription();
+        str = (str == null || str.equalsIgnoreCase("null")) ? "" : str;
+        mTxtDesc.setText(Html.fromHtml("<b>" + getResources().getString(R.string.defect_description) + ":\t" + "</b> " + str));
+
+        // CorrectiveAction
+        str = mRecallData.getCorrectiveAction();
+        str = (str == null || str.equalsIgnoreCase("null")) ? "" : str;
+        mTxtAction.setText(Html.fromHtml("<b>" + getResources().getString(R.string.corrective_action) + ":\t" + "</b> " + str));
+
+
+        //Set the switch to OFF-Current; ON-Completed Recalls
+        boolean completed = (mRecallData.getDateCompleted() > 0);
+
+        if (completed) {
+            onStateStatus.setVisibility(View.VISIBLE);
+            offStateStatus.setVisibility(View.INVISIBLE);
+        } else {
+            onStateStatus.setVisibility(View.INVISIBLE);
+            offStateStatus.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private String getHeaderComponentName(String recallComponentName){
+        if(recallComponentName.length() > 20){
+            return recallComponentName.substring(0,20)+"...";
+        }
+        return recallComponentName;
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_recall_details, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onProgress(Operation opr) {
+
+        if (opr.getId() == Operation.OperationCode.SET_RECALL_COMPLETED.ordinal()) {
+            Log.d(TAG, "Progress " + opr.getInformation());
+            // Show progress notification
+            if (mProgressDialogFragment == null) {
+                mProgressDialogFragment = new CustomProgressDialog(this, getResources().getString(R.string.updating_recall));
+                mProgressDialogFragment.show();
+            }
+        }
+
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.SET_RECALL_COMPLETED.ordinal()) {
+            Log.d(TAG, "Error " + opr.getInformation());
+            // stop progress notification
+            dismissProgressDialog();
+            Toast lToast = Toast.makeText(this, getResources().getString(R.string.error_occurred), Toast.LENGTH_SHORT);
+            lToast.show();
+        }
+
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+
+        if (opr.getId() == Operation.OperationCode.SET_RECALL_COMPLETED.ordinal()) {
+            // Stop progress notification
+            Log.d(TAG, "Success " + opr.getInformation());
+            dismissProgressDialog();
+            finish();
+        }
+
+    }
+
+    private void dismissProgressDialog() {
+        if (mProgressDialogFragment != null) {
+            mProgressDialogFragment.dismiss();
+            mProgressDialogFragment = null;
+        }
+    }
+}

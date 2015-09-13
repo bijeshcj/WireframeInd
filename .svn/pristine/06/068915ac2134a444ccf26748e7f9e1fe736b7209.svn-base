@@ -1,0 +1,149 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:orientation="vertical"
+              android:layout_height="match_parent"
+              tools:context="com.verizontelematics.indrivemobile.activity.MaintenanceReminderDetailActivity">
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <LinearLayout
+        android:id="@+id/maintenance_alerts_header_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/maintenance_log_header_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="@drawable/gradient_gray_bar">
+
+        <ImageView
+            android:id="@+id/btn_info"
+            android:layout_width="wrap_content"
+            android:contentDescription="@string/info_img_cd"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:visibility="invisible"
+            android:src="@drawable/info_button"/>
+    </LinearLayout>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/reminderDetailSV"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/time_period">
+
+        <LinearLayout
+            android:id="@+id/remainderDetailLL"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:background="@color/transparent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/serviceTypeText"
+                android:layout_marginTop="15dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/diagnostics_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <TextView
+                android:id="@+id/customServiceTypeText"
+                android:layout_marginTop="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diagnostics_text_color"/>
+
+            <TextView
+                android:id="@+id/serviceDescText"
+                android:layout_marginTop="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diagnostics_text_color"/>
+
+
+            <LinearLayout
+                android:id="@+id/dateDetailLL"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/dateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"/>
+
+                <TextView
+                    android:id="@+id/frequencyText"
+                    android:layout_marginTop="15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/mileageText"
+                android:layout_marginTop="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diagnostics_text_color"/>
+
+           <!-- <LinearLayout
+                android:id="@+id/notifyMeLL"
+                android:orientation="horizontal"
+                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/notifyMeText"
+                    android:text="@string/notify_me"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"/>
+
+                <LinearLayout
+                    android:id="@+id/optionsLL"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/emailText"
+                        android:text="@string/email"
+                        android:layout_marginBottom="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/diagnostics_text_color"/>
+
+                    <TextView
+                        android:id="@+id/messageText"
+                        android:text="@string/text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/diagnostics_text_color"/>
+
+                </LinearLayout>
+
+            </LinearLayout>-->
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+</LinearLayout>

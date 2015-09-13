@@ -1,0 +1,56 @@
+package com.verizontelematics.indrivemobile.models;
+
+import com.verizontelematics.indrivemobile.models.data.UserAccountData;
+import com.verizontelematics.indrivemobile.models.data.UserAccountInfoData;
+import com.verizontelematics.indrivemobile.models.data.UserPreferenceData;
+import com.verizontelematics.indrivemobile.models.data.UserVehicleData;
+
+import java.util.ArrayList;
+
+/**
+ * Created by z688522 on 3/6/15.
+ */
+public class UserAccountInfoModel extends BaseModel {
+
+    UserAccountInfoData mUserAcctInfoData;
+    ArrayList<UserVehicleData> mUserVehicles;
+    UserPreferenceData mUserPreferenceData;
+
+    public UserAccountInfoModel() {
+        mData = new UserAccountData();
+    }
+    public void setData(String inData, String format) {
+        // parse input data as per the format
+        // store the corresponding.
+        //
+        // mUserAcctInfoData = extract the UserAccountInfoData
+        // mUserVehicles = extract the UserVehicles
+        // mUserPreferenceData = extract the UserVehicles
+        setChanged();
+        notifyObservers();
+    }
+
+    private void setUserPreference(UserPreferenceData mUserPreferenceData) {
+
+    }
+
+    private void setUserVehicles(ArrayList<UserVehicleData> mUserVehicles) {
+
+    }
+
+    private void setUserAccountInfo(UserAccountInfoData data) {
+
+    }
+
+    public UserAccountInfoData getUserAccountInfo() {
+        return null;
+    }
+
+    public UserVehicleData[] getUserVehicles() {
+        return null;
+    }
+
+    public UserPreferenceData getUserPreference() {
+        return null;
+    }
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minHeight="@dimen/maintenance_alert_list_item_height">
+
+    <TextView
+        android:id="@+id/txt_recall_alert_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginTop="@dimen/list_item_left_margin"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="@dimen/list_item_left_margin"
+        android:textColor="@color/diagnostics_text_color"
+        />
+
+    <TextView
+        android:id="@+id/txt_recall_alert_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/list_item_right_margin"
+        android:layout_marginTop="@dimen/list_item_left_margin"
+        android:layout_marginEnd="@dimen/list_item_right_margin"
+        android:layout_toLeftOf="@+id/service_type_arrow_btn_list"
+        android:layout_toStartOf="@+id/service_type_arrow_btn_list"
+        android:textColor="@color/diagnostics_text_color"
+        />
+
+    <ImageView
+        android:id="@+id/service_type_arrow_btn_list"
+        android:layout_width="wrap_content"
+        android:contentDescription="@string/service_type_arrow_cd"
+        android:layout_height="wrap_content"
+        android:background="@drawable/forward_arrow_gray"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="center_vertical"/>
+
+</RelativeLayout>

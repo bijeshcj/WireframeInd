@@ -1,0 +1,434 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Location;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.InflateException;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.LocationController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.models.GetLocationModel;
+import com.verizontelematics.indrivemobile.models.LocationDataControllerOperation;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.OperationsModel;
+import com.verizontelematics.indrivemobile.models.data.GetLocationData;
+import com.verizontelematics.indrivemobile.utils.ui.CustomInfoWindowAdapter;
+import com.verizontelematics.indrivemobile.utils.ui.MapUtils;
+
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Created by bijesh on 8/27/2014.
+ */
+public class LocateVehicleFragment extends BaseSubUIFragment implements UIInterface,GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener,LocationListener,GoogleMap.OnMapLoadedCallback,
+        View.OnClickListener, Observer{
+
+    private static final String TAG = LocateVehicleFragment.class.getCanonicalName();
+    private static View view;
+    private GoogleMap googleMap;
+    private MapView mMapView;
+    private Location mVehicleLocation,mCurrentLocation;
+    private double mSelectedLatitude;
+    private double mSelectedLongitude;
+    private LocationClient mLocationClient;
+    private ProgressDialogFragment mProgressDialogFragment;
+    //private CustomProgressDialog mProgressDialogFragment;
+    private boolean isStopped = false;
+    private AlertDialog mAlertDialog = null;
+
+
+    public LocateVehicleFragment(){
+//        Empty constructor
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+
+        if(view != null){
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            view = inflater.inflate(R.layout.map_locate_vehicle, container, false);
+            mMapView = (MapView)view.findViewById(R.id.mapView);
+            mMapView.onCreate(savedInstanceState);
+            View mRootView = view;
+//            mMapView.onResume();
+        }catch (InflateException e){
+            e.printStackTrace();
+        }
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        googleMap = mMapView.getMap();
+        ImageButton btnRefresh = (ImageButton) view.findViewById(R.id.refresh_btn);
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LocationController.instance().getLocation(getActivity());
+            }
+        });
+//        setUpMapIfNeeded();
+        setUpMap();
+        setUpCallBacks();
+        //ToDo: Hard coded as of now.
+        LocationController.instance().getLocation(getActivity());
+//        mSelectedLatitude = 33.7465187;
+//        mSelectedLongitude = -84.4046342;
+        return view;
+    }
+
+    private void setUpCallBacks() {
+        LocationController.instance().register(this);
+        LocationController.instance().getLocationModel().addObserver(this);
+    }
+
+    private void clearCallBacks() {
+        LocationController.instance().unregister(this);
+        LocationController.instance().getLocationModel().deleteObserver(this);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        isStopped =  false;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        clearCallBacks();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        clearCallBacks();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        isStopped = true;
+        clearCallBacks();
+    }
+
+    private void setUpMap(){
+        if (googleMap != null) {
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            googleMap.setOnMapLoadedCallback(this);
+            googleMap.setMyLocationEnabled(true);
+            googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(getActivity()));
+            googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+                    LatLng position = marker.getPosition();
+                    if (googleMap.getMyLocation() == null) {
+                        Toast.makeText(getActivity(), "Current location not available ", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    MapUtils.launchNavigationActivity(getActivity(), new LatLng(googleMap.getMyLocation().getLatitude(), googleMap.getMyLocation().getLongitude()), position);
+                }
+            });
+        }
+    }
+
+//    /***** Sets up the map if it is possible to do so *****/
+//    public  void setUpMapIfNeeded() {
+//        // Do a null check to confirm that we have not already instantiated the map.
+//        if (googleMap == null) {
+//            // Try to obtain the map from the SupportMapFragment.
+//            googleMap = ((SupportMapFragment) //getActivity().getSupportFragmentManager()
+//                    HomeActivity.mFragmentManager.findFragmentById(R.id.location_map)).getMap();
+//            // Check if we were successful in obtaining the map.
+////            if (mMap != null)
+////                setUpMap();
+//        }
+//    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+        mMapView.onResume();
+        setUpLocationClientIfNeeded();
+        mLocationClient.connect();
+        getActivity().setTitle(getResources().getStringArray(R.array.locations_array)[0]);
+        setUpCallBacks();
+        // check progress going on
+        if (mProgressDialogFragment != null && mProgressDialogFragment.isShowing()) {
+            LocationDataControllerOperation operation = (LocationDataControllerOperation)OperationsModel.instance().getOperation(Operation.OperationCode.GET_LOCATION.ordinal());
+            if (operation.getState() == Operation.ERROR
+                    || operation.getState() == Operation.CANCELLED) {
+                onError(operation);
+            }
+            else if (operation.getState() == Operation.FINISHED) {
+                onSuccess(operation);
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause");
+        mMapView.onPause();
+        if (mLocationClient != null) {
+            mLocationClient.disconnect();
+        }
+        clearCallBacks();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
+        clearCallBacks();
+    }
+
+    private void setUpLocationClientIfNeeded() {
+        if (mLocationClient == null) {
+            mLocationClient = new LocationClient(
+                    getActivity(),
+                    this,  // ConnectionCallbacks
+                    this); // OnConnectionFailedListener
+        }
+
+    }
+
+    @Override
+    public void onProgress(final Operation opr) {
+        if (opr ==  null || opr.getId() != Operation.OperationCode.GET_LOCATION.ordinal())
+            return;
+
+        if (mProgressDialogFragment == null) {
+            // below code is commented as it is crashing with invalid window token.
+             //mProgressDialogFragment = new CustomProgressDialog(getActivity(), "Loading location history ...");
+            // Used the below deprecated fragment dialog code to avoid crash. Once the crash is fixed we can revert.
+            mProgressDialogFragment = ProgressDialogFragment.createInstance(getResources().getString(R.string.locating_vehicle), getHomeFragment());
+            mProgressDialogFragment.setOnCancelListener(new ProgressDialogFragment.OnCancelListener() {
+                @Override
+                public void onCancel() {
+                    if (mAlertDialog == null) {
+                        mAlertDialog = new AlertDialog.Builder(getActivity())
+                                .setCancelable(false)
+                                .setTitle(getResources().getString(R.string.locate_vehicle))
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setMessage(getResources().getString(R.string.locate_vehicle_cancel_message))
+                                .setPositiveButton(getResources().getString(R.string.confirm_yes), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        opr.clean();
+                                        removeFragment();
+                                        mAlertDialog = null;
+
+                                    }
+                                })
+                                .setNegativeButton(getResources().getString(R.string.confirm_no), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        // check progress going on
+                                        if (mProgressDialogFragment != null) {
+                                            // LocationDataControllerOperation operation = (LocationDataControllerOperation)OperationsModel.instance().getOperation(Operation.OperationCode.GET_LOCATION.ordinal());
+                                            if (opr.getState() == Operation.ERROR) {
+                                                onError(opr);
+                                            } else if (opr.getState() == Operation.FINISHED) {
+                                                onSuccess(opr);
+                                            } else {
+                                                onProgress(opr);
+                                            }
+                                        }
+                                        mAlertDialog = null;
+                                    }
+                                }).create();
+                        mAlertDialog.show();
+                    }
+                }
+            });
+
+        }
+        //mProgressDialogFragment.show();
+        mProgressDialogFragment.show(getFragmentManager(), R.id.map_locate_vehicle_container);
+    }
+
+    private void removeFragment() {
+
+        getHomeFragment().popFragmentStack();
+    }
+
+    @Override
+    public void onError(final Operation opr) {
+
+        if (opr ==  null || opr.getId() != Operation.OperationCode.GET_LOCATION.ordinal())
+            return;
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+            mAlertDialog = null;
+        }
+        if (mProgressDialogFragment != null) {
+            if (mProgressDialogFragment.isShowing())
+                mProgressDialogFragment.dismiss();
+            mProgressDialogFragment = null;
+        }
+        //showAlertDialog(getResources().getString(R.string.locate_vehicle), getResources().getString(R.string.no_location_history));
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), opr.getInformation() + getResources().getString(R.string.error_locating_vehicle), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr ==  null || opr.getId() != Operation.OperationCode.GET_LOCATION.ordinal())
+            return;
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+            mAlertDialog = null;
+        }
+        if (mProgressDialogFragment != null) {
+            if (mProgressDialogFragment.isShowing())
+                mProgressDialogFragment.dismiss();
+            mProgressDialogFragment = null;
+        }
+    }
+
+    private void getDirections(){
+        if (mSelectedLongitude == 0 || mSelectedLatitude == 0) {
+            Toast.makeText(getActivity(), "Invalid vehicle location", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (getCurrentLocation() == null) {
+            Toast.makeText(getActivity(), "Cannot get direction as current location not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // below code is stubbed for demo,
+        double fromLatitude = getCurrentLocation().latitude;
+        double fromLongitude = getCurrentLocation().longitude;
+        // stub ended.
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?" + "saddr="
+                        + fromLatitude + ","
+                        + fromLongitude + "&daddr="
+                        + mSelectedLatitude + ","
+                        + mSelectedLongitude));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private LatLng getCurrentLocation() {
+        // Stubbed not yet the decision to take exact current location
+        // or last available location.
+        if (googleMap != null && googleMap.getMyLocation() != null) {
+            return new LatLng(googleMap.getMyLocation().getLatitude(), googleMap.getMyLocation().getLongitude());
+        }
+        // stub ended.
+        if (mLocationClient != null && mLocationClient.isConnected() && mLocationClient.getLastLocation() != null) {
+            return new LatLng(mLocationClient.getLastLocation().getLatitude(), mLocationClient.getLastLocation().getLongitude());
+        }
+        return null;
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onDisconnected() {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onMapLoaded() {
+        Log.d(TAG,"$$$ onMapLoaded");
+//        locateVehicle();
+    }
+
+    private void locateVehicle(double latitude, double longitude) {
+        Log.v("LocateVehicle","Lat is "+latitude+ "Long is " +longitude);
+        mSelectedLatitude = latitude;
+        mSelectedLongitude = longitude;
+        ArrayList<LatLng> locations = new ArrayList<LatLng>();
+        if (mSelectedLatitude != 0 && mSelectedLongitude != 0)
+            locations.add(new LatLng(mSelectedLatitude, mSelectedLongitude));
+
+        LatLng currentLocation = getCurrentLocation();
+        if (currentLocation != null)
+            locations.add(currentLocation);
+
+        Marker mMarker = MapUtils.drawVehicleMarker(googleMap, new LatLng(mSelectedLatitude, mSelectedLongitude));
+
+        MapUtils.animateClipTo(googleMap, locations);
+
+        if (mMarker != null) {
+            MapUtils.setMarkerWithAddress(getActivity(), mMarker, new LatLng(mSelectedLatitude, mSelectedLongitude));
+        }
+    }
+
+    @Override
+    public void update(final Observable observable, final Object data) {
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(GetLocationModel.class.isInstance(observable)){
+
+                    GetLocationData locData = (GetLocationData)data;
+                    if(locData!=null)
+                    {
+                        locateVehicle(locData.getLatitude(),locData.getLongitude());
+                    }
+
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onClick(View view) {
+
+    }
+}

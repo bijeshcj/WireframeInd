@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/time_period"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/speed_alert_container_id">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_gray_bar"
+        android:id="@+id/speedAlertHeaderRL"
+        >
+
+        <TextView
+            android:id="@+id/speedAlertHeaderTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:text="@string/speed_alert_text"
+            android:textColor="@color/white"
+            android:textSize="18sp"/>
+
+        <ImageView
+            android:id="@+id/btn_info_speed_alert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:paddingRight="10dp"
+            android:paddingEnd="10dp"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/info_img_cd"
+            android:src="@drawable/info_button"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/speedNPLayout"
+        android:layout_below="@id/speedAlertHeaderRL"
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+
+        <TextView
+            android:id="@+id/speedAlertTV"
+            android:text="@string/speed_alert_text"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <net.simonvt.numberpicker.NumberPicker
+            android:id="@+id/speedAlertNP"
+            android:layout_width="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toLeftOf="@+id/speedAlertUnitTV"
+            android:layout_toStartOf="@+id/speedAlertUnitTV"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content">
+
+        </net.simonvt.numberpicker.NumberPicker>
+
+        <TextView
+            android:id="@+id/speedAlertUnitTV"
+            android:text="@string/speed_unit"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true"
+            android:textStyle="bold"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_below="@id/speedNPLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:id="@+id/layoutSwitch"
+        android:background="@android:color/transparent"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        >
+
+        <ImageView
+            android:id="@+id/onState"
+            android:contentDescription="@string/on_state_cd"
+            android:src="@drawable/toggle_button_on"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/offState"
+            android:contentDescription="@string/off_state_cd"
+            android:src="@drawable/toggle_button_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+    </RelativeLayout>
+</RelativeLayout>
+

@@ -1,0 +1,135 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.HomeActivity;
+import com.verizontelematics.indrivemobile.models.data.VehiclePartData;
+import com.verizontelematics.indrivemobile.utils.BasicUtil;
+
+/**
+ * Created by Priyanga on 8/27/2014.
+ */
+public class VehicleHealthDetailFragment extends BaseSubUIFragment implements HomeActivity.CustomTopBarItemsClickListener {
+
+    public VehicleHealthDetailFragment() {
+
+        super();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        callLifecycle();
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = null;
+        rootView = inflater.inflate(R.layout.fragment_vehiclehealth_details, container, false);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        ((HomeActivity)getActivity()).setCustomActionBarView("Diagnostic Details",true,false,false,false);
+        ((HomeActivity) getActivity()).showTabBar(false);
+        //adding the handlers for done and back button
+        ((HomeActivity)getActivity()).addToDoneButtonClickHandlers(this);
+        ((HomeActivity)getActivity()).addToLeftArrowClickHandlers(this);
+        TextView mBodyPart = (TextView) rootView.findViewById(R.id.diagSummaryTV);
+        TextView mPartStatusTV = (TextView) rootView.findViewById(R.id.diagStatus);
+        if (getArguments() != null) {
+            String mPartData = getArguments().getString("title");
+            String mPartStatus = getArguments().getString("status");
+            if(mPartData !=null)
+            {
+                mBodyPart.setText(mPartData);
+            }
+            if(mPartStatus !=null)
+            {
+                if (mPartStatus.equals(VehiclePartData.STATUS_ERROR)) {
+                    mPartStatusTV.setTextColor(getResources().getColor(R.color.failure_red));
+                    mPartStatusTV.setText(mPartStatus);
+                }
+                else if (mPartStatus.equals(VehiclePartData.STATUS_WARNING)) {
+                    mPartStatusTV.setTextColor(getResources().getColor(R.color.sc_yellowLightFill));
+                    mPartStatusTV.setText(VehiclePartData.TEXT_WARNING);
+                }
+                else
+                {
+                    mPartStatusTV.setTextColor(getResources().getColor(R.color.success_green));
+                    mPartStatusTV.setText(VehiclePartData.TEXT_OK);
+                }
+            }
+        }
+
+
+        return rootView;
+
+    }
+
+
+    @Override
+    public void onTopBarItemClick(View aView) {
+        if(aView.getId() == HomeActivity.LEFT_ARROW_ID){
+            removeFragment();
+            BasicUtil.hideKeyboard(getActivity());
+            return;
+
+        }
+        if(aView.getId() == HomeActivity.DONE_BUTTON_ID){
+            //as of now removing on done also
+            removeFragment();
+            BasicUtil.hideKeyboard(getActivity());
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.v("Detach","Detail Screen");
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        ((HomeActivity)getActivity()).setCustomActionBarView(getActivity().getResources().getStringArray(R.array.diagnosis_data_option_list_array)[0],
+                true, false, false,false);
+        ((HomeActivity)getActivity()).hideActionToggleButton();
+        ((HomeActivity)getActivity()).showSlidingMenus();
+        // ((HomeActivity) getActivity()).showTabBar(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((HomeActivity)getActivity()).removeFromDoneButtonHandlers(this);
+        ((HomeActivity)getActivity()).removeFromLeftArrowHandlers(this);
+       // ((HomeActivity)getActivity()).setCustomActionBarView("", false, false, false);
+
+    }
+
+    private void removeFragment() {
+        //getFragmentManager().popBackStack();
+        getHomeFragment().popFragmentStack();
+        BasicUtil.hideKeyboard(getActivity());
+        // safe unregister.
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+       // ((HomeActivity) getActivity()).hideActionToggleButton();
+        //((HomeActivity)getActivity()).setCustomActionBarView("Diagnostic Details",true,false,false);
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.v("onConfigurationChanged","Detail Screen");
+    }
+}

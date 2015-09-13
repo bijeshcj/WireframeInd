@@ -1,0 +1,32 @@
+package com.verizontelematics.indrivemobile.utils.errormanagement;
+
+import android.content.Context;
+
+import com.verizontelematics.indrivemobile.models.Operation;
+
+/**
+ * Created by bijesh on 3/27/2015.
+ *
+ *
+ * ErrorDescriptionGenerator follows Strategy Pattern
+ *
+ */
+public class ErrorDescriptionGenerator {
+
+    private ErrorManager errorManager;
+
+    public ErrorDescriptionGenerator(ErrorManager errorManager){
+        this.errorManager = errorManager;
+    }
+
+    /**
+     * Entry point to get the Response description for any given particular ErrorController Module type
+     * e.g DiagnosticsErrorController
+     * @param responseCode
+     * @param operationCode
+     * @return
+     */
+    public String executeGetResponseDescription(Context context,int responseCode,Operation.OperationCode operationCode,String exceptionMessage){
+        return errorManager.getResponseDescription(context,responseCode,operationCode,exceptionMessage);
+    }
+}

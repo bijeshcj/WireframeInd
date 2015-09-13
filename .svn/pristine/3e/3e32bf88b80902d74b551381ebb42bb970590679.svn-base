@@ -1,0 +1,255 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_bg"
+                tools:context="com.verizontelematics.indrivemobile.activity.ForgotPwdAuthorizationActivity">
+
+    <ImageView
+        android:id="@+id/infoIV"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/list_item_top_margin"
+        android:layout_marginEnd="@dimen/list_item_top_margin"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:src="@drawable/info_button"
+        android:contentDescription="@string/info_img_cd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:id="@+id/accountSetupRL"
+        android:layout_width="300dp"
+        android:layout_marginTop="@dimen/list_item_top_margin"
+        android:layout_below="@id/infoIV"
+        android:layout_centerHorizontal="true"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:id="@+id/enterVinLNTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_vin_last_name"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/lastNameET"
+            android:inputType="textNoSuggestions"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:layout_below="@id/enterVinLNTV"
+            android:paddingLeft="@dimen/list_item_top_margin"
+            android:background="@color/white"
+            android:text="DEMISSIE"
+            tools:ignore="RtlHardcoded"/>
+
+        <TextView
+            android:id="@+id/lastNameTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/form_labels_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/lastNameET"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/last_name"/>
+
+        <TextView
+            android:id="@+id/andTV"
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/lastNameTV"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/and_text"/>
+
+        <RelativeLayout
+            android:id="@+id/scanSerialNoRL"
+            android:layout_below="@id/andTV"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/scanSerialNoIV"
+                android:layout_width="wrap_content"
+                android:src="@drawable/scan_icon"
+                android:contentDescription="@string/scan_serial_cd"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_toRightOf="@id/scanSerialNoIV"
+                android:layout_toEndOf="@id/scanSerialNoIV"
+                android:text="@string/scan"
+                android:textColor="@color/white"
+                android:layout_marginLeft="@dimen/list_item_top_margin"
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_marginStart="@dimen/list_item_top_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/serialNoET"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:maxLength="20"
+            android:inputType="textNoSuggestions"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+            android:layout_below="@id/scanSerialNoRL"
+            android:paddingLeft="@dimen/list_item_top_margin"
+            android:background="@color/white"
+            />
+
+        <RelativeLayout
+            android:id="@+id/serialNoRL"
+            android:layout_below="@id/serialNoET"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/serialNoTV"
+                android:layout_width="wrap_content"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/white"
+                android:layout_alignParentStart="true"
+                android:layout_height="wrap_content"
+                android:text="@string/serial_number"/>
+
+            <TextView
+                android:layout_alignParentRight="true"
+                android:text="@string/what_is_this"
+                android:id="@+id/whatThisTV"
+                android:textColor="@color/white"
+                android:layout_marginLeft="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_top_margin"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/orTV"
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/header_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/serialNoRL"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/or_text"/>
+
+        <RelativeLayout
+            android:id="@+id/scanVinNoRL"
+            android:layout_below="@id/orTV"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/scanVinIV"
+                android:layout_width="wrap_content"
+                android:src="@drawable/scan_icon"
+                android:contentDescription="@string/scan_vin_cd"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_toRightOf="@id/scanVinIV"
+                android:text="@string/scan"
+                android:textColor="@color/white"
+                android:layout_marginLeft="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_top_margin"
+                android:layout_toEndOf="@id/scanVinIV"
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/form_labels_text_height"
+            android:id="@+id/vinET"
+            android:layout_marginTop="@dimen/form_labels_text_height"
+            android:layout_below="@id/orTV"
+            android:paddingLeft="@dimen/list_item_top_margin"
+            android:inputType="textNoSuggestions"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+            android:maxLength="17"
+            android:text="4T1BE46K37U179529"
+            android:background="@color/white"
+            />
+
+        <!--<TextView
+            android:id="@+id/vinTV"
+            android:layout_width="match_parent"
+            android:textSize="@dimen/form_labels_text_size"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_below="@id/vinET"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:text="@string/prompt_vin"/>-->
+
+        <RelativeLayout
+            android:id="@+id/vinRL"
+            android:layout_below="@id/vinET"
+            android:layout_marginTop="@dimen/list_item_top_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/vinTV"
+                android:layout_width="wrap_content"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textColor="@color/white"
+                android:layout_height="wrap_content"
+                android:text="@string/prompt_vin"/>
+
+            <TextView
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:text="@string/what_is_this"
+                android:id="@+id/whatThisVinTV"
+                android:textColor="@color/white"
+                android:layout_marginLeft="@dimen/list_item_top_margin"
+                android:layout_marginStart="@dimen/list_item_top_margin"
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:text="@string/submit"
+            android:id="@+id/submitBTN"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/vinRL"
+            android:layout_marginTop="@dimen/scroll_top_margin"/>
+    </RelativeLayout>
+</RelativeLayout>

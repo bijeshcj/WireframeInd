@@ -1,0 +1,528 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.location.Location;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.LatLng;
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.controllers.AlertsController;
+import com.verizontelematics.indrivemobile.controllers.LocationController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.customViews.dialogs.CustomProgressDialog;
+import com.verizontelematics.indrivemobile.customViews.dialogs.ToBeDecidedDialog;
+import com.verizontelematics.indrivemobile.models.AlertsDataModel;
+import com.verizontelematics.indrivemobile.models.GetLocationModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.data.Alert;
+import com.verizontelematics.indrivemobile.models.data.CircleCenterType;
+import com.verizontelematics.indrivemobile.models.data.CircleType;
+import com.verizontelematics.indrivemobile.models.data.GetLocationData;
+import com.verizontelematics.indrivemobile.models.data.ValetAlert;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.userprofile.utils.UserUtils;
+import com.verizontelematics.indrivemobile.utils.ui.MapUtils;
+
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Created by z684985 on 9/5/14.
+ */
+public class AlertValetFragment extends BaseSubUIFragment implements UIInterface, Observer,UserRoleConstants {
+
+    private ListView alertHistoryListView;
+    private GoogleMap googleMap;
+    private MapView mapView;
+    private RadioGroup milesRadioGroup;
+    private boolean locationChangedProcessed = false;
+    private final float map_zoom_step = 0.3f;
+    private ImageView onState;
+    private ImageView offState;
+    private boolean mSwitchOn = false;
+    private float[] mMilesRange = { 0.5f, 1.0f, 3.0f };
+    private Circle mPreviousCircle;
+    private CustomProgressDialog mCustomProgressDialog = null;
+    private ValetAlert mValetAlert;
+    private LatLng mLocation;
+    private boolean mPending = false;
+    private CustomProgressDialog mLocateVehicleProgressDialog = null;
+    private Operation mGetLocationOperation = null;
+    private AlertDialog mAlertDialog = null;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_alert_valet, container, false);
+
+        ImageView infoView = (ImageView) rootView.findViewById(R.id.btn_info_valet_alert);
+
+        infoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToBeDecidedDialog dialog = new ToBeDecidedDialog(getActivity(), getActivity().getResources().getString(R.string.info_alerts_settings));
+                dialog.setTitle(getResources().getString(R.string.about_valet_alerts));
+                dialog.show();
+            }
+        });
+
+        RelativeLayout switchLayout = (RelativeLayout) rootView.findViewById(R.id.layoutSwitch);
+        milesRadioGroup = (RadioGroup) rootView.findViewById(R.id.valetAlertRadioGroup);
+        onState = (ImageView) rootView.findViewById(R.id.onState);
+        offState = (ImageView) rootView.findViewById(R.id.offState);
+        switchLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(UserUtils.isUserInactive(getActivity(), inactiveMessage)){
+                    return;
+                }
+                if (offState.getVisibility() == View.VISIBLE) {
+                    //turning the state as ON
+                    onState.setVisibility(View.VISIBLE);
+                    offState.setVisibility(View.GONE);
+                    mSwitchOn = true;
+                } else if (offState.getVisibility() == View.GONE) {
+                    //turning the state as OFF
+                    onState.setVisibility(View.GONE);
+                    offState.setVisibility(View.VISIBLE);
+                    mSwitchOn = false;
+                }
+                onSwitchChanged();
+            }
+        });
+        mapView = (MapView) rootView.findViewById(R.id.mapViewValet);
+        mapView.onCreate(savedInstanceState);
+        googleMap = mapView.getMap();
+        if (googleMap != null) {
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            googleMap.setMyLocationEnabled(true);
+
+        }
+
+        // googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        try {
+            MapsInitializer.initialize(rootView.getContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Updates the location and zoom of the MapView
+        if (googleMap != null) {
+            googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener()
+
+            {
+                @Override
+                public void onMyLocationChange(Location location) {
+
+                    //centerMapOnMyLocation();
+
+
+                }
+            });
+
+            googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    if (onState.getVisibility() == View.VISIBLE) {
+                        if (mValetAlert == null || mValetAlert.getStatus().equals("InActive")) {
+                            //centerMapOnMyLocation();
+                            drawGeoFence();
+                        }
+                        else {
+                            CircleType circle = mValetAlert.getCircle();
+                            double radius = circle.getRadius();
+                            LatLng center = circle.getCircleCenter().getLatLng();
+                            mPreviousCircle = MapUtils.drawGeofenceCircle(googleMap, center,(float) radius);
+                        }
+                        if (mPreviousCircle == null)
+                            return;
+                        mLocation = mPreviousCircle.getCenter();
+                        //MapUtils.animateMoveTo(googleMap, mLocation);
+                        animateMapViewTo(mLocation);
+                        if (mPending) {
+                            createValetAlert();
+                            mPending = false;
+                        }
+                        //MapUtils.updateZoomLevel(googleMap, 15f);
+                    }
+                }
+            });
+        }
+        mapView.setVisibility(mSwitchOn ? View.VISIBLE : View.GONE);
+        editableRadioGroup(!mSwitchOn);
+        rootView.findViewById(R.id.valetAlertHeaderRL).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+        setupCallbacks();
+        populateUI();
+        return rootView;
+    }
+
+
+    private void populateUI() {
+        AlertsDataModel mAlertsDataModel = (AlertsDataModel) AlertsController.instance().getAlertsDataModel();
+        Alert alert = (Alert) mAlertsDataModel.getData();
+        List<ValetAlert> listValetAlert = null;
+        if (alert != null)
+            listValetAlert = alert.getValetAlerts();
+        if (listValetAlert != null && !listValetAlert.isEmpty()) {
+            mValetAlert = listValetAlert.get(0);
+        }
+        populateValetAlert();
+    }
+
+    private void populateValetAlert() {
+        if (mValetAlert != null) {
+            // update status
+            mSwitchOn =  mValetAlert.getStatus().equalsIgnoreCase("Active");
+            setSelectionRange((float)mValetAlert.getCircle().getRadius());
+        }
+        else {
+            mSwitchOn = false;
+        }
+        onState.setVisibility(mSwitchOn ? View.VISIBLE : View.GONE);
+        offState.setVisibility(mSwitchOn ? View.GONE : View.VISIBLE );
+        // update radio visibility
+        editableRadioGroup(!mSwitchOn);
+        // update map.
+        mapView.setVisibility(mSwitchOn ? View.VISIBLE : View.GONE);
+    }
+
+    private void setupCallbacks() {
+        LocationController.instance().register(this);
+        LocationController.instance().getLocationModel().addObserver(this);
+        AlertsController.instance().register(this);
+        AlertsController.instance().getAlertsDataModel().addObserver(this);
+    }
+
+    private void editableRadioGroup(boolean flag)
+    {
+        for (int i = 0; i < milesRadioGroup.getChildCount(); i++) {
+            milesRadioGroup.getChildAt(i).setEnabled(flag);
+        }
+    }
+
+    private void onSwitchChanged() {
+        mapView.setVisibility(mSwitchOn ? View.VISIBLE : View.GONE);
+        //
+        if(mSwitchOn) {
+            mGetLocationOperation = LocationController.instance().getLocation(getActivity());
+            //createValetAlert();
+        }
+        else {
+            if (mValetAlert != null)
+                mValetAlert.setStatus("InActive");
+            updateValetAlert();
+        }
+        //
+        editableRadioGroup(!mSwitchOn);
+        drawGeoFence();
+    }
+
+    private void updateValetAlert() {
+        if (mValetAlert != null)
+            AlertsController.instance().updateValetAlert(getActivity(), mValetAlert.getAlertId(), mValetAlert.getStatus());
+    }
+
+    private void drawGeoFence() {
+        if (!mSwitchOn) {
+            return;
+        }
+        if (googleMap != null) {
+            if (mPreviousCircle != null) {
+                mPreviousCircle.remove();
+            }
+            if (mLocation == null) {
+                return;
+            }
+            //if(googleMap.getMyLocation() != null) {
+            mPreviousCircle = MapUtils.drawGeofenceCircle(googleMap,
+                    mLocation,
+                    getSelectedRange());
+
+            //}
+        }
+    }
+
+    private float getSelectedRange() {
+        for (int i = 0; i < milesRadioGroup.getChildCount(); i++) {
+            if(((RadioButton) milesRadioGroup.getChildAt(i)).isChecked()) {
+                return MapUtils.getMeters(mMilesRange[i]);
+            }
+        }
+        return 0;
+    }
+
+    private void setSelectionRange(float val) {
+        for (int i = 0; i < mMilesRange.length; i++) {
+            if (Math.abs(val - MapUtils.getMeters(mMilesRange[i])) <= 0.01f ) {
+                ((RadioButton) milesRadioGroup.getChildAt(i)).setChecked(true);
+            }
+        }
+    }
+
+    private void centerMapOnMyLocation() {
+        if (googleMap == null)
+            return;
+        Location location = googleMap.getMyLocation();
+        if (location != null) {
+            LatLng myLocation = new LatLng(location.getLatitude(),
+                    location.getLongitude());
+            animateMapViewTo(myLocation);
+        }
+    }
+
+    private void animateMapViewTo(LatLng position) {
+        if (googleMap == null)
+            return;
+        float map_zoom_level = 12.0f;
+        int default_map_tilt = 0;
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(position)
+                .zoom(map_zoom_level)
+                .tilt(default_map_tilt)
+                .build();
+        googleMap.moveCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+        getActivity().setTitle(getActivity().getResources().getStringArray(R.array.alerts_array)[2]);
+    }
+
+    private void createValetAlert() {
+
+        if (!mPending && (googleMap == null || mLocation == null) ) {
+            mPending = true;
+            return;
+        }
+        if (mGetLocationOperation.getState() == Operation.PENDING) {
+            return;
+        }
+        mValetAlert = new ValetAlert();
+        CircleType circle = new CircleType(getSelectedRange(), new CircleCenterType(mLocation));
+        mValetAlert.setCircle(circle);
+        AlertsController.instance().createValetAlert(getActivity(), mValetAlert);
+        //AlertsController.instance().updateValetAlert(getActivity(), 12680, "InActive");
+    }
+
+
+    @Override
+    public void onProgress(final Operation opr) {
+        if (opr == null)
+            return;
+        if (opr.getId() != Operation.OperationCode.CREATE_VALET_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_VALET_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.GET_LOCATION.ordinal()) {
+            return;
+        }
+        if (opr.getId() == Operation.OperationCode.GET_LOCATION.ordinal()) {
+            if (mLocateVehicleProgressDialog == null) {
+                mLocateVehicleProgressDialog = new CustomProgressDialog(getActivity(), getResources().getString(R.string.locating_vehicle));
+                mLocateVehicleProgressDialog.setCanceledOnTouchOutside(false);
+                mLocateVehicleProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        mAlertDialog = new AlertDialog.Builder(getActivity())
+                                .setCancelable(false)
+                                .setTitle(getResources().getString(R.string.locate_vehicle))
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setMessage(getResources().getString(R.string.locate_vehicle_cancel_message))
+                                .setPositiveButton(getResources().getString(R.string.confirm_yes), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        opr.clean();
+                                        revertUI();
+
+                                    }
+                                })
+                                .setNegativeButton(getResources().getString(R.string.confirm_no), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        // check progress going on
+                                        if (mLocateVehicleProgressDialog != null) {
+                                            // LocationDataControllerOperation operation = (LocationDataControllerOperation)OperationsModel.instance().getOperation(Operation.OperationCode.GET_LOCATION.ordinal());
+                                            if (opr.getState() == Operation.ERROR) {
+                                                onError(opr);
+                                            } else if (opr.getState() == Operation.FINISHED) {
+                                                onSuccess(opr);
+                                            } else {
+                                                onProgress(opr);
+                                            }
+                                        }
+                                    }
+                                }).create();
+                        mAlertDialog.show();
+                    }
+                });
+            }
+
+            mLocateVehicleProgressDialog.show();
+            return;
+        }
+        showProgressDialogFragment("Creating Valet Alert...");
+    }
+
+    @Override
+    public void onError(final Operation opr) {
+
+        if (opr == null)
+            return;
+
+        if (opr.getId() != Operation.OperationCode.CREATE_VALET_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_VALET_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.GET_LOCATION.ordinal()) {
+            return;
+        }
+        if (opr.getId() == Operation.OperationCode.GET_LOCATION.ordinal()) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mLocateVehicleProgressDialog != null) {
+                        mLocateVehicleProgressDialog.dismiss();
+                        mLocateVehicleProgressDialog = null;
+                    }
+                    if (mAlertDialog != null) {
+                        mAlertDialog.dismiss();
+                        mAlertDialog = null;
+                    }
+                    Toast.makeText(getActivity(), getResources().getString(R.string.error_occurred)+" "+opr.getInformation(), Toast.LENGTH_SHORT).show();
+                    revertUI();
+                }
+            });
+            return;
+        }
+        dismissProgressDialog();
+        Toast lToast = Toast.makeText(getActivity(), getResources().getString(R.string.error_occurred), Toast.LENGTH_SHORT);
+        lToast.show();
+        mPending = false;
+    }
+
+    private void revertUI() {
+        mSwitchOn = !mSwitchOn;
+        if (mValetAlert != null) {
+            mValetAlert.setStatus(mSwitchOn ? "Active" : "InActive");
+        }
+        populateValetAlert();
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr == null)
+            return;
+        if (opr.getId() != Operation.OperationCode.CREATE_VALET_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.UPDATE_VALET_ALERT.ordinal()
+                && opr.getId() != Operation.OperationCode.GET_LOCATION.ordinal()) {
+            return;
+        }
+
+        if (opr.getId() == Operation.OperationCode.GET_LOCATION.ordinal()) {
+            if (mLocateVehicleProgressDialog != null) {
+                mLocateVehicleProgressDialog.dismiss();
+                mLocateVehicleProgressDialog = null;
+            }
+            if (mAlertDialog != null) {
+                mAlertDialog.dismiss();
+                mAlertDialog = null;
+            }
+            createValetAlert();
+            return;
+        }
+        dismissProgressDialog();
+
+        String context = (opr.getId() == Operation.OperationCode.CREATE_VALET_ALERT.ordinal()) ? "Created" : "Deactivated";
+        mPending = false;
+        Toast lToast = Toast.makeText(getActivity(), "Successfully "+context+" valet Alert", Toast.LENGTH_SHORT);
+        lToast.show();
+
+    }
+    private void showProgressDialogFragment(String aMessage) {
+        if (mCustomProgressDialog == null) {
+            mCustomProgressDialog = new CustomProgressDialog(getActivity(), aMessage);
+            mCustomProgressDialog.show();
+        }
+    }
+
+    public void dismissProgressDialog() {
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
+        }
+    }
+
+    @Override
+    public void update(Observable observable, final Object data) {
+        if (AlertsDataModel.class.isInstance(observable)) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // populate UI
+                    populateUI();
+                }
+            });
+            return;
+        }
+        if (GetLocationModel.class.isInstance(observable)) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    GetLocationData locData = (GetLocationData)data;
+                    if(locData!=null)
+                    {
+                        locateVehicle(locData.getLatitude(),locData.getLongitude());
+                    }
+
+                }
+            });
+        }
+    }
+
+    private void locateVehicle(double latitude, double longitude) {
+        mLocation = new LatLng(latitude, longitude);
+        drawGeoFence();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        cleanup();
+    }
+
+    private void cleanup() {
+        LocationController.instance().unregister(this);
+        LocationController.instance().getLocationModel().deleteObserver(this);
+        AlertsController.instance().unregister(this);
+        AlertsController.instance().getAlertsDataModel().deleteObserver(this);
+    }
+}

@@ -1,0 +1,164 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_bg"
+                tools:context="com.verizontelematics.indrivemobile.activity.LoginActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/loginSV">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/loginMainRL">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/logoIV"
+                android:layout_marginTop="30dp"
+                android:contentDescription="@string/logo_cd"
+                android:layout_centerHorizontal="true"
+                android:background="?app_logo"/>
+
+            <TextView
+                android:id="@+id/userLoginTV"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/logoIV"
+                android:text="@string/user_login"
+                android:textSize="@dimen/header_text_size"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/white"
+                android:layout_height="wrap_content"/>
+
+            <RelativeLayout
+                android:id="@+id/loginRL"
+                android:layout_width="300dp"
+                android:layout_below="@id/logoIV"
+                android:layout_marginTop="40dp"
+                android:layout_centerHorizontal="true"
+                android:layout_height="400dp">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/form_labels_text_height"
+                    android:id="@+id/usernameET"
+                    android:paddingLeft="@dimen/list_item_top_margin"
+                    android:maxLength="30"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+                    android:background="@color/white"
+                    android:hint="@string/prompt_username"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="@dimen/list_item_top_margin"
+                    android:layout_height="@dimen/form_labels_text_height"
+                    android:layout_below="@id/usernameET"
+                    android:id="@+id/passwordET"
+                    android:paddingLeft="@dimen/list_item_top_margin"
+                    android:maxLength="30"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+                    android:background="@color/white"
+                    android:inputType="textPassword"
+                    android:hint="@string/prompt_password"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/list_item_height"
+                    android:text="@string/login"
+                    android:id="@+id/loginBTN"
+                    android:textColor="@color/white"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@id/passwordET"
+                    android:layout_marginTop="@dimen/list_item_top_margin"/>
+
+                <TextView
+                    android:id="@+id/forgotUsernameTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/loginBTN"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:text="@string/forgot_username"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:id="@+id/forgotPasswordTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/forgotUsernameTV"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/forgot_password"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/list_item_height"
+                    android:text="@string/account_setup"
+                    android:id="@+id/accountSetupBtn"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/white"
+                    android:layout_below="@id/forgotPasswordTV"
+                    android:layout_marginTop="@dimen/list_item_top_margin"/>
+
+                <RelativeLayout
+                    android:id="@+id/rememberRL"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@id/accountSetupBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <CheckBox
+                        android:id="@+id/rememberCB"
+                        android:layout_width="wrap_content"
+                        android:checked="true"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/rememberTV"
+                        android:layout_width="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/white"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/form_labels_text_size"
+                        android:text="@string/remember_username"
+                        android:layout_toEndOf="@id/rememberCB"
+                        android:layout_toRightOf="@id/rememberCB"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/stayLoggedInRL"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@id/rememberRL"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <CheckBox
+                        android:id="@+id/stayLoggedInCB"
+                        android:layout_width="wrap_content"
+                        android:checked="true"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/stayLoggedInTV"
+                        android:layout_width="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/form_labels_text_size"
+                        android:text="@string/stay_logged_in"
+                        android:textColor="@color/white"
+                        android:layout_toEndOf="@id/stayLoggedInCB"
+                        android:layout_toRightOf="@id/stayLoggedInCB"/>
+                </RelativeLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

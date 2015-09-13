@@ -1,0 +1,95 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.HomeActivity;
+import com.verizontelematics.indrivemobile.adapters.DashBoardTabsAdapter;
+import com.verizontelematics.indrivemobile.models.AlertHistory;
+
+import java.util.ArrayList;
+
+/**
+ * Created by priyanga on 11/20/2014.
+ */
+public class MenuFragment extends Fragment {
+
+    private DashBoardTabsAdapter mDashBoardTabsAdapter;
+//    private AlertDetailHistoryAdapter mNotificationAdapter;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.dashboard, container, false);
+        setup(rootView);
+        return rootView;
+    }
+
+    private void setup(View rootView) {
+        ListView mDashBoardMenuLV = (ListView) rootView.findViewById(R.id.dashboardMenuLV);
+//        ListView mNotificationAlertLV = (ListView) rootView.findViewById(R.id.dashboard_notification_list);
+
+        if (mDashBoardTabsAdapter == null)
+            mDashBoardTabsAdapter = new DashBoardTabsAdapter(getActivity(), getResources().getStringArray(R.array.module_array));
+        mDashBoardMenuLV.setAdapter(mDashBoardTabsAdapter);
+        mDashBoardMenuLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent homeIntent = new Intent(getActivity(), HomeActivity.class);
+                homeIntent.putExtra("SelectedIndex", position);
+                Log.v("Position is ", "" + position);
+                startActivity(homeIntent);
+
+            }
+        });
+
+        /*if (mNotificationAdapter == null)
+            mNotificationAdapter = new AlertDetailHistoryAdapter(getActivity(),
+                    R.layout.alert_history_detail_lv_item, populateData());
+        mNotificationAlertLV.setAdapter(mNotificationAdapter);
+
+        mNotificationAlertLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent homeIntent = new Intent(getActivity(), HomeActivity.class);
+                startActivity(homeIntent);
+
+            }
+
+        });*/
+
+
+    }
+
+    private ArrayList<AlertHistory> populateData() {
+
+        ArrayList<AlertHistory> alertArrayList = new ArrayList<AlertHistory>();
+
+        AlertHistory alertHistoryObj = new AlertHistory("Battery Low", "Service Required", "");
+
+        alertArrayList.add(alertHistoryObj);
+
+        alertHistoryObj = new AlertHistory("Boundary Alert", "11.42 Pm", "");
+
+        alertArrayList.add(alertHistoryObj);
+
+        alertHistoryObj = new AlertHistory("Speed Alert exceeded", "6/12", "");
+
+        alertArrayList.add(alertHistoryObj);
+
+        return alertArrayList;
+
+    }
+}

@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootViewForMaintenanceLog"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/actionbar_header"/>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white">
+
+        <RelativeLayout
+            android:id="@+id/mainRL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/time_period">
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/et_border"
+                android:id="@+id/service_type_container"
+                android:orientation="horizontal"
+                android:layout_margin="10dp"
+                android:paddingLeft="10dp"
+                >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="50dp"
+                    android:id="@+id/serviceType"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:text="@string/maintenance_prompt">
+                </TextView>
+
+                <ImageView
+                    android:id="@+id/service_type_arrow_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/service_type_arrow_cd"
+                    android:background="@drawable/forward_arrow_gray"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
+
+
+            <EditText
+                android:id="@+id/alertNameET"
+                android:layout_margin="10dp"
+                android:paddingLeft="10dp"
+                android:hint="@string/alert_name"
+                android:background="@drawable/et_border"
+                android:layout_below="@id/service_type_container"
+                android:layout_width="match_parent"
+                android:maxLength="50"
+                android:textSize="@dimen/form_labels_text_size"
+                android:inputType="textCapSentences"
+                android:layout_height="@dimen/form_labels_text_height"
+                android:visibility="gone"/>
+
+            <RelativeLayout
+                android:id="@+id/locationRL"
+                android:layout_margin="10dp"
+                android:layout_below="@id/alertNameET"
+                android:background="@drawable/et_border"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+                <TextView
+                    android:id="@+id/locationTV"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/label_location"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <EditText
+                    android:id="@+id/locationET"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/locationTV"
+                    android:layout_toEndOf="@+id/locationTV"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_alignBaseline="@+id/locationTV"
+                    android:singleLine="true"
+                    android:maxLength="255"
+                    android:inputType="textCapSentences"
+                    android:textSize="@dimen/form_labels_text_size">
+
+                </EditText>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/descriptionRL"
+                android:layout_margin="10dp"
+                android:layout_below="@id/locationRL"
+
+                android:background="@drawable/et_border"
+                android:layout_width="match_parent"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_height="100dp">
+
+                <TextView
+                    android:id="@+id/descriptionTV"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/description"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <EditText
+                    android:id="@+id/alertDescET"
+                    android:layout_margin="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:paddingLeft="10dp"
+                    android:maxLength="255"
+                    android:layout_toRightOf="@id/descriptionTV"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@id/descriptionTV"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:layout_alignBaseline="@+id/descriptionTV"
+                    android:layout_height="60dp"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:overScrollMode="always"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbars="vertical"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/costRL"
+                android:layout_margin="10dp"
+                android:layout_below="@id/descriptionRL"
+                android:background="@drawable/et_border"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+                <TextView
+                    android:id="@+id/costTV"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/cost"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <EditText
+                    android:id="@+id/costET"
+                    android:editable="false"
+                    android:textIsSelectable="false"
+                    android:ellipsize="end"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="150dp"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:inputType="numberDecimal"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:hint="@string/dummy_cost"
+                    android:digits="0123456789.,$"
+                    android:maxLength="14"
+                    android:gravity="end"
+                    android:cursorVisible="true"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/dateRL"
+                android:layout_margin="10dp"
+                android:layout_below="@id/costRL"
+                android:background="@drawable/et_border"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+                <TextView
+                    android:id="@+id/dateTV"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/date"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/dateET"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="100dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:hint="@string/dummy_date"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textSize="@dimen/form_labels_text_size"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/mileageRL"
+                android:layout_margin="10dp"
+                android:layout_below="@id/dateRL"
+                android:background="@drawable/et_border"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+                <TextView
+                    android:id="@+id/mileageTV"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/mileage"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/form_labels_text_size"/>
+
+                <EditText
+                    android:id="@+id/mileageET"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="100dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textColor="@color/diagnostics_text_color"
+                    android:textSize="@dimen/form_labels_text_size"
+                    android:gravity="end"/>
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_below="@id/mileageRL"
+                android:layout_width="match_parent"
+                android:id="@+id/btnRL"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_height="60dp">
+
+                <RelativeLayout
+                    android:layout_width="250dp"
+                    android:id="@+id/innerBtnRL"
+                    android:layout_centerInParent="true"
+                    android:layout_height="wrap_content">
+
+
+                    <Button
+                        android:id="@+id/createLogBTN"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:visibility="gone"
+                        android:textSize="@dimen/form_labels_text_size"
+                        android:text="@string/create_log_entry"/>
+
+                    <Button
+                        android:id="@+id/cancelBTN"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:visibility="gone"
+                        android:textSize="@dimen/form_labels_text_size"
+                        android:text="@string/cancel"
+                        tools:ignore="ButtonOrder"/>
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+            <Button
+                android:layout_margin="10dp"
+                android:id="@+id/deleteLogBtn"
+                android:layout_below="@+id/mileageRL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/delete_maintenance_log"
+                android:textColor="@color/white"
+                android:background="@drawable/button_press"
+                android:textSize="@dimen/form_labels_text_size"/>
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+</LinearLayout>

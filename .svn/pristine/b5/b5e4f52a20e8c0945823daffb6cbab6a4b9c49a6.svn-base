@@ -1,0 +1,286 @@
+package com.verizontelematics.indrivemobile.fragments;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.verizontelematics.indrivemobile.R;
+import com.verizontelematics.indrivemobile.activity.HomeActivity;
+import com.verizontelematics.indrivemobile.adapters.DashBoardTabsAdapter;
+import com.verizontelematics.indrivemobile.controllers.AppController;
+import com.verizontelematics.indrivemobile.controllers.AuthenticateController;
+import com.verizontelematics.indrivemobile.controllers.UIInterface;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.UserAccountInfoModel;
+import com.verizontelematics.indrivemobile.models.data.SubscriptionInfoType;
+import com.verizontelematics.indrivemobile.models.data.UserDetail;
+import com.verizontelematics.indrivemobile.models.data.UserRegistrationData;
+import com.verizontelematics.indrivemobile.models.data.Vehicle;
+import com.verizontelematics.indrivemobile.userprofile.UserFactory;
+import com.verizontelematics.indrivemobile.userprofile.UserRoleConstants;
+import com.verizontelematics.indrivemobile.utils.ui.RefUtil;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+
+/**
+ * Created by priyanga on 11/20/2014.
+ */
+public class MenuFragment extends Fragment implements UIInterface, Observer {
+
+    private static final String TAG = MenuFragment.class.getCanonicalName();
+    private DashBoardTabsAdapter mDashBoardTabsAdapter;
+    UserRegistrationData mUserRegistrationData;
+    private NumberPicker mVehicleSelectionPicker;
+    private RelativeLayout redSplashScreenRL;
+    private TextView usernameTV;
+    private Set<String> mSetSubscriptionPartNumbers = new HashSet<String>();
+    private String mUserRole;
+
+
+    // stub data
+    String vehicles[] = {"1659", "300950406", "1136"};
+    ArrayList<String> mVehicles = new ArrayList<String>();
+
+    // stub ened.
+
+//    private AlertDetailHistoryAdapter mNotificationAdapter;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.dashboard, container, false);
+
+        setup(rootView);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mUserRegistrationData = AuthenticateController.instance().getUserRegistrationData();
+                AuthenticateController.instance().getUserAccountVehicleDeviceInfo(getActivity(), mUserRegistrationData.getMobileUserID());
+            }
+        }, 700);
+
+        return rootView;
+    }
+
+    private void setup(View rootView) {
+        // stub
+        mVehicles.add(vehicles[0]);
+        mVehicles.add(vehicles[1]);
+        mVehicles.add(vehicles[2]);
+        // stub ended.
+        ListView mDashBoardMenuLV = (ListView) rootView.findViewById(R.id.dashboardMenuLV);
+//        ListView mNotificationAlertLV = (ListView) rootView.findViewById(R.id.dashboard_notification_list);
+
+        if (mDashBoardTabsAdapter == null)
+            mDashBoardTabsAdapter = new DashBoardTabsAdapter(getActivity(), getResources().getStringArray(R.array.module_array));
+        mDashBoardMenuLV.setAdapter(mDashBoardTabsAdapter);
+        mDashBoardMenuLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent homeIntent = new Intent(getActivity(), HomeActivity.class);
+                homeIntent.putExtra("SelectedIndex", position);
+                Log.v("Position is ", "" + position);
+                startActivity(homeIntent);
+
+            }
+        });
+        mVehicleSelectionPicker = (NumberPicker) rootView.findViewById(R.id.vehicle_selection);
+        mVehicleSelectionPicker.setWrapSelectorWheel(true);
+        mVehicleSelectionPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int from, int to) {
+                AppController.instance().setVehicleAccountId(Integer.parseInt(vehicles[to]));
+            }
+        });
+        vehicles = new String[mVehicles.size()];
+        mVehicleSelectionPicker.setDisplayedValues(mVehicles.toArray(vehicles));
+        mVehicleSelectionPicker.setMaxValue(vehicles.length - 1);
+        RefUtil.setNumberPickerTextColor(mVehicleSelectionPicker, Color.WHITE);
+        redSplashScreenRL = (RelativeLayout) rootView.findViewById(R.id.splash_screen_red);
+        usernameTV =(TextView)rootView.findViewById(R.id.usernameTV);
+        /*if (mNotificationAdapter == null)
+            mNotificationAdapter = new AlertDetailHistoryAdapter(getActivity(),
+                    R.layout.alert_history_detail_lv_item, populateData());
+        mNotificationAlertLV.setAdapter(mNotificationAdapter);
+
+        mNotificationAlertLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent homeIntent = new Intent(getActivity(), HomeActivity.class);
+                startActivity(homeIntent);
+
+            }
+
+        });*/
+        AuthenticateController.instance().register(this);
+        AuthenticateController.instance().getUserAccountVehicleDeviceInfoModel().addObserver(this);
+        getActivity().getActionBar().hide();
+    }
+
+    private void populateUI(String firstName) {
+        String[] vehicles = new String[mVehicles.size()];
+        vehicles = mVehicles.toArray(vehicles);
+        mVehicleSelectionPicker.setMaxValue(vehicles.length - 1);
+        mVehicleSelectionPicker.setMinValue(0);
+        mVehicleSelectionPicker.setDisplayedValues(vehicles);
+        RefUtil.setNumberPickerTextColor(mVehicleSelectionPicker, Color.WHITE);
+        usernameTV.setText(firstName);
+
+//        Log.d(TAG," lst sub "+mlstSubscriptionPartNumbers);
+        Log.d(TAG," set sub "+mSetSubscriptionPartNumbers);
+        String[] partCodes = new String[mSetSubscriptionPartNumbers.size()];
+        UserFactory.setUserType(mSetSubscriptionPartNumbers.toArray(partCodes));
+    }
+//   number picker issue in progress
+    private String[] getVehicles(String[] vehicles){
+        String[] strings = null;
+        int constant = 0;
+        if(vehicles.length > 0 && vehicles.length < 5){
+//            diff between vehicles length and 5
+            int diff = 5 - vehicles.length ;
+            System.out.println("diff "+diff);
+            int newLen = vehicles.length + diff;
+            strings = new String[newLen];
+            System.out.println("new len "+newLen);
+            for(int i=0,j=0;i<newLen;i++,j++){
+                if(i > vehicles.length -1 ){
+
+                    if(constant > vehicles.length)
+                        constant = 0;
+                    else
+                        constant++;
+
+                    System.out.println("constant "+constant);
+                    j = constant;
+                }
+                System.out.println("setting string["+i+"] from vehicles["+j+"]");
+                strings[i] = vehicles[j];
+            }
+
+        }else{
+            return vehicles;
+        }
+        return strings;
+    }
+
+    private void cleanup() {
+        AuthenticateController.instance().unregister(this);
+        AuthenticateController.instance().getUserAccountVehicleDeviceInfoModel().deleteObserver(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    @Override
+    public void onProgress(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_USER_ACCT_VECH_DEV_INFO.ordinal()) {
+            // show indrive red background splash screen.
+
+        }
+    }
+
+    @Override
+    public void onError(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_USER_ACCT_VECH_DEV_INFO.ordinal()) {
+            // stop progress
+            // show error message
+            // go back to previous screen.
+
+        }
+    }
+
+    @Override
+    public void onSuccess(Operation opr) {
+        if (opr.getId() == Operation.OperationCode.GET_USER_ACCT_VECH_DEV_INFO.ordinal()) {
+            // stop progress.
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getActivity().getActionBar().show();
+                    redSplashScreenRL.setVisibility(View.GONE);
+                    AppController.instance().setVehicleAccountId(Integer.parseInt(vehicles[mVehicleSelectionPicker.getValue()]));
+                }
+            });
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+
+        // integrate vehicle list with picker
+        if (UserAccountInfoModel.class.isInstance(observable)) {
+
+            final List<UserDetail> lstUserDetails = ((UserAccountInfoModel) AuthenticateController.instance().getUserAccountVehicleDeviceInfoModel()).getUserDetails();
+            if (lstUserDetails != null && !lstUserDetails.isEmpty()) {
+                List<Vehicle> lstVehicles = lstUserDetails.get(0).getVehiclesInfo();
+                if (lstVehicles != null && !lstVehicles.isEmpty()) {
+                    mVehicles.clear();
+                    for (Vehicle vehicleData : lstVehicles) {
+                        mVehicles.add(vehicleData.getVehicleID());
+                    }
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            populateUI(lstUserDetails.get(0).getAccountInfo().getFirstName());
+                        }
+                    });
+                }
+            }
+//            printing the subscription info
+//            Log.d(TAG,"user details no: "+lstUserDetails.size());
+            for(UserDetail userDetail:lstUserDetails){
+//                Log.d(TAG," last name "+userDetail.getAccountInfo().getLastName());
+                List<SubscriptionInfoType> subscriptionInfoTypes = userDetail.getAccountInfo().getSubscriptionInfo();
+                setUserRole(userDetail.getAccountInfo().getAccountStatus());
+                for(SubscriptionInfoType subscriptionInfoType:subscriptionInfoTypes) {
+//                    Log.d(TAG, "$$$ subscripto part no: " +subscriptionInfoType.getPartNumber());
+                    mSetSubscriptionPartNumbers.add(subscriptionInfoType.getPartNumber());
+                }
+            }
+        }
+    }
+    private void setUserRole(String accountStatus){
+        if(accountStatus.equalsIgnoreCase(UserRoleConstants.ACTIVE_ROLE) || accountStatus.equalsIgnoreCase(UserRoleConstants.INACTIVE_ROLE)){
+            if(accountStatus.equalsIgnoreCase(UserRoleConstants.ACTIVE_ROLE)){
+                this.mUserRole = UserRoleConstants.ACTIVE_ROLE;
+            }else{
+                this.mUserRole = UserRoleConstants.INACTIVE_ROLE;
+            }
+        }
+    }
+}

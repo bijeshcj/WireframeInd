@@ -1,0 +1,790 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+import android.content.Context;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.Response;
+import com.verizontelematics.indrivemobile.httpwrapper.Impl.VerizonHttpRequest;
+import com.verizontelematics.indrivemobile.httpwrapper.RestClient;
+import com.verizontelematics.indrivemobile.models.BaseModel;
+import com.verizontelematics.indrivemobile.models.DiagnosticControllerOperationData;
+import com.verizontelematics.indrivemobile.models.MaintenanceLogsModel;
+import com.verizontelematics.indrivemobile.models.MaintenanceRemindersModel;
+import com.verizontelematics.indrivemobile.models.Operation;
+import com.verizontelematics.indrivemobile.models.RecallsModel;
+import com.verizontelematics.indrivemobile.models.VehicleHealthModel;
+import com.verizontelematics.indrivemobile.models.VehicleInfoModel;
+import com.verizontelematics.indrivemobile.models.data.MaintenanceLogData;
+import com.verizontelematics.indrivemobile.models.data.MaintenanceReminderData;
+import com.verizontelematics.indrivemobile.models.data.RecallData;
+import com.verizontelematics.indrivemobile.models.data.VehicleInfoData;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.NetworkUtil;
+import com.verizontelematics.indrivemobile.utils.config.Config;
+import com.verizontelematics.indrivemobile.utils.config.ConfigKeys;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by z688522 on 10/22/14.
+ */
+public class DiagnosticController extends BaseController {
+
+    private static final String  TAG = "DiagnosticController";
+
+    private static final int MAINTENANCE_LOGS_MODEL = 0;
+    private static final int MAINTENANCE_REMINDERS_MODEL = 1;
+    private static final int RECALLS_MODEL = 2;
+    private static final int VEHICLE_INFO_MODEL = 3;
+    private static final int VEHICLE_HEALTH_MODEL = 4;
+
+//    private String mVehicleId = "1695";
+
+
+
+    private static DiagnosticController mInstance = null;
+
+    public static DiagnosticController instance() {
+        if (mInstance == null)
+            mInstance = new DiagnosticController();
+        return mInstance;
+    }
+
+    // Maintenance Logs Operation Codes.
+    private int GET_MAINTENANCE_LOGS = Operation.OperationCode.GET_MAINTENANCE_LOGS.ordinal();
+    private int ADD_MAINTENANCE_LOGS = Operation.OperationCode.ADD_MAINTENANCE_LOGS.ordinal();
+    private int DELETE_MAINTENANCE_LOG = Operation.OperationCode.DELETE_MAINTENANCE_LOG.ordinal();
+    private int UPDATE_MAINTENANCE_LOG = Operation.OperationCode.UPDATE_MAINTENANCE_LOG.ordinal();
+
+    // Maintenance Reminder Operation Codes.
+    private int ADD_MAINTENANCE_REMINDERS = Operation.OperationCode.ADD_MAINTENANCE_REMINDERS.ordinal();
+    private int DELETE_MAINTENANCE_REMINDERS = Operation.OperationCode.DELETE_MAINTENANCE_REMINDERS.ordinal();
+    private int UPDATE_MAINTENANCE_REMINDERS = Operation.OperationCode.UPDATE_MAINTENANCE_REMINDERS.ordinal();
+
+    // Recall and Recall Info Operation Codes.
+    private int GET_RECALLS = Operation.OperationCode.GET_RECALLS.ordinal();
+    private int SET_RECALL_COMPLETED = Operation.OperationCode.SET_RECALL_COMPLETED.ordinal();
+
+    // Vehicle Health
+    private static final int GET_VEHICLE_HEALTH = Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal();
+
+    private OperationFactory mOperationFactory = DiagnosticControllerOperationFactory.instance();
+
+    private DiagnosticController() {
+        super();
+        mModels.add(new MaintenanceLogsModel());
+        mModels.add(new MaintenanceRemindersModel());
+        mModels.add(new RecallsModel());
+        mModels.add(new VehicleInfoModel());
+        mModels.add(new VehicleHealthModel());
+    }
+
+    public BaseModel getMaintenanceLogsModel() {
+        return mModels.get(MAINTENANCE_LOGS_MODEL);
+    }
+
+    public BaseModel getMaintenanceRemindersModel() {
+        return mModels.get(MAINTENANCE_REMINDERS_MODEL);
+    }
+
+    public BaseModel getRecallsModel() { return mModels.get(RECALLS_MODEL); }
+
+    public BaseModel getVehicleInfoModel() { return mModels.get(VEHICLE_INFO_MODEL); }
+
+    public BaseModel getVehicleHealthModel() { return mModels.get(VEHICLE_HEALTH_MODEL); }
+
+    public Operation getMaintenanceLogs(Context ctx) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(GET_MAINTENANCE_LOGS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_FETCH_MAINTENANCE_LOGS_REMINDERS));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(GET_MAINTENANCE_LOGS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBody());
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(GET_MAINTENANCE_LOGS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(GET_MAINTENANCE_LOGS);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(GET_MAINTENANCE_LOGS);
+    }
+
+    private String prepareBody() {
+        // Stubbed parameter
+        String str = "{"
+                     +    "\"Data\"" + ":"+ "{"
+                     +        "\"VehicleID\"" + ":"+ "\""+AppController.instance().getVehicleId()+"\""
+                // stub +        "\"VehicleID\"" + ":"+ "\""+3695+"\""
+                     +    "}"
+                     +"}";
+
+        // Stub ended.
+        Log.v("REq si",str);
+        return str;
+    }
+
+    private String prepareBody(ArrayList<String> serviceIds) {
+        Gson gson = new GsonBuilder().create();
+        Type listType = new TypeToken<ArrayList<String>>(){}.getType();
+        // Stubbed parameter
+        String str = "{"
+                +    "\"Data\"" + ":"+ "{"
+                +        "\"VehicleID\"" + ":"+ "\""+AppController.instance().getVehicleId()+"\""
+                +        ","
+                +        "\"ServiceID\"" + ":"+ gson.toJson(serviceIds, listType)
+                +    "}"
+                +"}";
+        // Stub ended.
+        return str;
+    }
+
+    private String prepareBodyReminderIDs(ArrayList<String> lstReminderIDs) {
+        Gson gson = new GsonBuilder().create();
+        Type listType = new TypeToken<ArrayList<String>>(){}.getType();
+        // Stubbed parameter
+        String str = "{"
+                +    "\"Data\"" + ":"+ "{"
+                +        "\"VehicleID\"" + ":"+ "\""+AppController.instance().getVehicleId()+"\""
+                +        ","
+                +        "\"ReminderID\"" + ":"+ gson.toJson(lstReminderIDs, listType)
+                +    "}"
+                +"}";
+        // Stub ended.
+        return str;
+    }
+
+    private String prepareBodyForLogs(ArrayList<MaintenanceLogData> maintenanceLogData) {
+        Gson gson = new GsonBuilder().create();
+
+        Type listType = new TypeToken<ArrayList<MaintenanceLogData>>(){}.getType();
+
+        // set date to MaintenanceLogs model.
+
+        // Stubbed parameter
+        String str = "{"
+                +    "\"Data\"" + ":"+ "{"
+                +        "\"VehicleID\"" + ":"+ "\""+AppController.instance().getVehicleId()+"\""
+                +        ","
+                +        "\"Maintenance\""+ ":"+ gson.toJson(maintenanceLogData, listType)
+                +    "}"
+                +"}";
+        // Stub ended.
+        return str;
+    }
+
+    private String prepareBodyForReminders(ArrayList<MaintenanceReminderData> lstReminders) {
+        Gson gson = new GsonBuilder().create();
+
+        Type listType = new TypeToken<ArrayList<MaintenanceReminderData>>(){}.getType();
+
+        // Stubbed parameter
+        String str = "{"
+                +    "\"Data\"" + ":"+ "{"
+                +        "\"VehicleID\"" + ":"+ "\""+AppController.instance().getVehicleId()+"\""
+                +        ","
+                // stub need to check with webservice and update account id.
+                // +        "\"AccountID\"" + ":"+ "\"\""
+                // +        ","
+                // stub end
+                +        "\"Reminder\""+ ":"+ gson.toJson(lstReminders, listType)
+                +    "}"
+                +"}";
+        // Stub ended.
+        Log.v("Reminder String is ",str);
+        return str;
+    }
+    public Operation addMaintenanceLogs(Context ctx, ArrayList<MaintenanceLogData> maintenanceLogData) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(ADD_MAINTENANCE_LOGS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_ADD_MAINTENANCE_LOGS));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(ADD_MAINTENANCE_LOGS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForLogs(maintenanceLogData));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(ADD_MAINTENANCE_LOGS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(ADD_MAINTENANCE_LOGS);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(ADD_MAINTENANCE_LOGS);
+    }
+
+    public Operation deleteMaintenanceLogs(Context ctx, ArrayList<String> serviceIds) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(DELETE_MAINTENANCE_LOG, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_DELETE_MAINTENANCE_LOGS));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(DELETE_MAINTENANCE_LOG));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBody(serviceIds));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(DELETE_MAINTENANCE_LOG);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(DELETE_MAINTENANCE_LOG);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(DELETE_MAINTENANCE_LOG);
+    }
+
+    public Operation updateMaintenanceLogs(Context context, ArrayList<MaintenanceLogData> maintenanceLogData) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(UPDATE_MAINTENANCE_LOG, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(context)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_UPDATE_MAINTENANCE_LOGS));
+                //aHttpRequest.setUrl("https://api-dev.vtitel.net/REST/SFUS_VehicleMaintenanceV5_0/UpdateMaintenance");
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(UPDATE_MAINTENANCE_LOG));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForLogs(maintenanceLogData));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(UPDATE_MAINTENANCE_LOG);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(UPDATE_MAINTENANCE_LOG);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(UPDATE_MAINTENANCE_LOG);
+    }
+
+    public Operation addMaintenanceReminders(Context ctx, ArrayList<MaintenanceReminderData> lstReminders) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(ADD_MAINTENANCE_REMINDERS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_ADD_MAINTENANCE_REMINDERS));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(ADD_MAINTENANCE_REMINDERS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForReminders(lstReminders));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(ADD_MAINTENANCE_REMINDERS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(ADD_MAINTENANCE_REMINDERS);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(ADD_MAINTENANCE_REMINDERS);
+    }
+
+    public Operation deleteMaintenanceReminders(Context ctx, ArrayList<String> lstReminderIDs) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(DELETE_MAINTENANCE_REMINDERS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_DELETE_MAINTENANCE_REMINDERS));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(DELETE_MAINTENANCE_REMINDERS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyReminderIDs(lstReminderIDs));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(DELETE_MAINTENANCE_REMINDERS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(DELETE_MAINTENANCE_REMINDERS);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(DELETE_MAINTENANCE_REMINDERS);
+    }
+
+    public Operation updateMaintenanceReminders(Context ctx, ArrayList<MaintenanceReminderData> lstReminders) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(UPDATE_MAINTENANCE_REMINDERS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_UPDATE_MAINTENANCE_REMINDERS));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(UPDATE_MAINTENANCE_REMINDERS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBodyForReminders(lstReminders));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(UPDATE_MAINTENANCE_REMINDERS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(UPDATE_MAINTENANCE_REMINDERS);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(UPDATE_MAINTENANCE_REMINDERS);
+    }
+
+    public Operation getRecalls(Context ctx) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(GET_RECALLS, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_FETCH_RECALLS));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(GET_RECALLS));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBody());
+                Log.v("GET RECALLS REQUEST is ---->",prepareBody());
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(GET_RECALLS);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(GET_RECALLS);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(GET_RECALLS);
+    }
+
+    public Operation setRecallCompleted(Context ctx, RecallData recallData) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(SET_RECALL_COMPLETED, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_SET_RECALL_COMPLETE));
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(SET_RECALL_COMPLETED));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                Log.v("RECALLS COMPLETE REQUEST is ---->",prepareBodyForRecall(recallData));
+                aHttpRequest.setData(prepareBodyForRecall(recallData));
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(SET_RECALL_COMPLETED);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(SET_RECALL_COMPLETED);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(SET_RECALL_COMPLETED);
+    }
+
+    private String prepareBodyForRecall(RecallData recallData) {
+        // Stubbed parameter
+        String str = "{"
+                +        "\"Data\"" + ":"+ "{"
+                +            "\"VehicleID\"" + ":"+ "\""+AppController.instance().getVehicleId()+"\""
+                +            ","
+                +            "\"RecallID\""+ ":"+recallData.getRecallID()
+                +            ","
+                +            "\"DateCompleted\"" + ":" + ((recallData.getDateCompleted() <= 0) ? "null" : recallData.getDateCompleted())
+                +        "}"
+                +    "}";
+        // Stub ended.
+        return str;
+    }
+
+    public Operation getVehicleHealth(Context ctx) {
+        if (mOperationsModel.addOperation(mOperationFactory.createOperation(GET_VEHICLE_HEALTH, Operation.CREATED))) {
+            if (NetworkUtil.isNetworkAvailable(ctx)) {
+                VerizonHttpRequest aHttpRequest = (VerizonHttpRequest)createRequest();
+                aHttpRequest.setUrl(getHost()+Config.getInstance(null).getUrlProperty(ConfigKeys.PROP_FETCH_VEHICLE_HEALTH));
+
+                HashMap<String, String> map = (HashMap<String, String>)aHttpRequest.getHeaders();
+                if (map == null)
+                    map = new HashMap<String, String>();
+                map.put("operation", Integer.toString(GET_VEHICLE_HEALTH));
+
+                aHttpRequest.setMethod(RestClient.POST);
+                aHttpRequest.setHeaders(map);
+                aHttpRequest.setData(prepareBody());
+
+                // Set tag is required, as Volley checks for the Tag at the time of cancelling the request.
+                // If Tag is not set and if app is trying to cancel the request then this causes crash with message "Cannot cancelAll with a null tag".
+                aHttpRequest.setTag(TAG);
+                submit(aHttpRequest);
+                Operation opr = mOperationsModel.getOperation(GET_VEHICLE_HEALTH);
+                opr.setState(Operation.PENDING);
+                onProgress(opr);
+            }
+            else{
+                Operation opr = mOperationsModel.getOperation(GET_VEHICLE_HEALTH);
+                opr.setState(Operation.ERROR);
+                ((DiagnosticControllerOperationData)opr.getData()).setMessage(AppConstants.NETWORK_ERROR);
+                onError(opr);
+            }
+        }
+        // if no internet connection
+        // get from database
+        // else
+        // create request submit.
+        return mOperationsModel.getOperation(GET_VEHICLE_HEALTH);
+    }
+
+    public void handleResponseForOperation(Response aResponse, Operation aOperation){
+        Log.d(TAG, "handleResponse for operation "+aOperation.getClass());
+
+        try {
+            Gson gson = new GsonBuilder().create();
+            JSONObject lData = aResponse.getData();
+            if (aOperation.getId() == Operation.OperationCode.GET_VEHICLE_HEALTH.ordinal()) {
+                /*// parse and extract data
+                String strRecallInfo = lData.get("HealthStatus").toString();
+
+
+                if (!strRecallInfo.isEmpty() && !strRecallInfo.equalsIgnoreCase("null")) {
+                    // set date to MaintenanceLogs model.
+                    Type listType = new TypeToken<ArrayList<HealthStatus>>(){}.getType();
+                    List<HealthStatus> healthStatusList = gson.fromJson(lData.getJSONArray("HealthStatus").toString(), listType);
+                    if (healthStatusList != null) {
+                        VehicleHealthModel lModel = (VehicleHealthModel) getVehicleHealthModel();
+                        lModel.setData(healthStatusList);
+                    }
+
+                }
+                else {
+                    getRecallsModel().clear();
+                }*/
+
+                try {
+                    VehicleHealthModel lModel = (VehicleHealthModel) getVehicleHealthModel();
+                    lModel.setData(lData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    aOperation.setState(Operation.ERROR);
+                    aOperation.setInformation("Invalid Data");
+                    onError(aOperation);
+                }
+
+                onSuccess(aOperation);
+            }
+            else if (aOperation.getId() == Operation.OperationCode.GET_RECALLS.ordinal()
+                || aOperation.getId() == Operation.OperationCode.SET_RECALL_COMPLETED.ordinal()) {
+
+                // parse and extract data
+                Type listType = new TypeToken<ArrayList<RecallData>>(){}.getType();
+                String strRecallInfo = lData.get("Recall").toString();
+
+
+                if (!strRecallInfo.isEmpty() && !strRecallInfo.equalsIgnoreCase("null")) {
+                    // set date to MaintenanceLogs model.
+                    List<RecallData> lRecallsList = gson.fromJson(lData.getJSONArray("Recall").toString(), listType);
+                    if (lRecallsList != null) {
+                        RecallsModel lModel = (RecallsModel) getRecallsModel();
+                        lModel.setData(lRecallsList);
+                    }
+                }
+                else {
+                    getRecallsModel().clear();
+                }
+
+                VehicleInfoData vehicleInfoData = new VehicleInfoData();
+                vehicleInfoData.set("Year", lData.has("Year") ? lData.get("Year") : "");
+                vehicleInfoData.set("Manufacturer", lData.has("Manufacturer") ? lData.get("Manufacturer") : "");
+                vehicleInfoData.set("Model", lData.has("Model") ? lData.get("Model") : "");
+                vehicleInfoData.set("Make", lData.has("Make") ? lData.get("Make") : "");
+                vehicleInfoData.set("VehicleID", lData.has("VehicleID") ? lData.get("VehicleID") : "");
+                getVehicleInfoModel().setData(vehicleInfoData);
+
+
+            }
+            else {
+                Type listType = new TypeToken<ArrayList<MaintenanceLogData>>(){}.getType();
+                String strMaintenanceInfo = lData.get("MaintenanceInfoType").toString();
+
+
+                if (!strMaintenanceInfo.isEmpty() && !strMaintenanceInfo.equalsIgnoreCase("null")) {
+                    // set date to MaintenanceLogs model.
+                    List<MaintenanceLogData> maintenanceLogList = gson.fromJson(lData.getJSONArray("MaintenanceInfoType").toString(), listType);
+                    if (maintenanceLogList != null) {
+                        MaintenanceLogsModel lModel = (MaintenanceLogsModel) getMaintenanceLogsModel();
+                        lModel.setData(maintenanceLogList);
+                    }
+                }
+                else {
+                    getMaintenanceLogsModel().clear();
+                }
+
+                // set date to MaintenanceReminders model.
+                String strReminderInfo = lData.get("ReminderInfoType").toString();
+                if (!strReminderInfo.isEmpty() && !strReminderInfo.equalsIgnoreCase("null")) {
+                    Type reminderListType = new TypeToken<ArrayList<MaintenanceReminderData>>() {}.getType();
+                    ArrayList<MaintenanceReminderData> lRemindersList = gson.fromJson(lData.getJSONArray("ReminderInfoType").toString(), reminderListType);
+                    if (lRemindersList != null) {
+                        MaintenanceRemindersModel lModel = (MaintenanceRemindersModel) getMaintenanceRemindersModel();
+                        lModel.setData(lRemindersList);
+                    }
+                }
+                else {
+                    getMaintenanceRemindersModel().clear();
+                }
+            }
+
+            aOperation.setState(Operation.FINISHED);
+            onSuccess(aOperation);
+
+        }catch (JSONException e){
+            aOperation.setState(Operation.ERROR);
+            aOperation.setInformation(e.getLocalizedMessage());
+            onError(aOperation);
+        } catch (JsonSyntaxException syntaxException) {
+            aOperation.setState(Operation.ERROR);
+            aOperation.setInformation(syntaxException.getLocalizedMessage());
+            onError(aOperation);
+        }
+
+    }
+
+    public void handleErrorForOperation(Response aResponse, Operation aOperation) {
+
+            aOperation.setState(Operation.ERROR);
+            aOperation.setInformation(aResponse.getResponseDescription());
+            onError(aOperation);
+    }
+
+
+   /* public void getVehicleHealthDataFromDB(StorageTransaction storageTransaction) {
+        // get from db.
+        List<HealthStatus> healthStatusList = storageTransaction.getHealthStatusRecords();
+        if (healthStatusList != null && !healthStatusList.isEmpty()) {
+            VehicleHealthModel lModel = (VehicleHealthModel) getVehicleHealthModel();
+            lModel.setData(healthStatusList);
+            return;
+        }
+
+        // Stubbed Code
+        // populate dummy data
+
+        ArrayList<VehiclePartModel> list = (ArrayList<VehiclePartModel>)getVehicleHealthModel().getData();
+
+        list.clear();
+        // create model for battery part
+        VehiclePartModel batteryModel = new VehiclePartModel();
+        VehiclePartData batteryData = new VehiclePartData();
+        batteryData.set(VehiclePartData.PART_TITLE, "Battery");
+        batteryData.set(VehiclePartData.DTC_CODE, "");
+        batteryData.set(VehiclePartData.STATUS, "NoIssuesDetected");
+        batteryModel.setData(batteryData);
+
+        // create model for break part
+        VehiclePartModel breakModel = new VehiclePartModel();
+        VehiclePartData breakData = new VehiclePartData();
+        breakData.set(VehiclePartData.PART_TITLE, "Alternator");
+        breakData.set(VehiclePartData.DTC_CODE, "Service not Enabled");
+        breakData.set(VehiclePartData.STATUS, "ServiceRequired");
+        breakModel.setData(breakData);
+
+        // create model for Radiator
+        VehiclePartModel electricalModel = new VehiclePartModel();
+        VehiclePartData electricalData = new VehiclePartData();
+        electricalData.set(VehiclePartData.PART_TITLE, "Electrical");
+        electricalData.set(VehiclePartData.DTC_CODE, "Service not Enabled");
+        electricalData.set(VehiclePartData.STATUS, "MonitorClosely");
+        electricalModel.setData(electricalData);
+
+        // create model for Tire
+        VehiclePartModel tireModel = new VehiclePartModel();
+        VehiclePartData tireData = new VehiclePartData();
+        tireData.set(VehiclePartData.PART_TITLE, "Emissions");
+        tireData.set(VehiclePartData.DTC_CODE, "Service not Enabled");
+        tireData.set(VehiclePartData.STATUS, "NoIssuesDetected");
+        tireModel.setData(tireData);
+
+        // create model for Mechanical
+        VehiclePartModel mechanicalModel = new VehiclePartModel();
+        VehiclePartData mechanicalData = new VehiclePartData();
+        mechanicalData.set(VehiclePartData.PART_TITLE, "Mechanical");
+        mechanicalData.set(VehiclePartData.DTC_CODE, "Service not Enabled");
+        mechanicalData.set(VehiclePartData.STATUS, "MonitorClosely");
+        mechanicalModel.setData(mechanicalData);
+
+        // create model for PowerTrain
+        VehiclePartModel trainModel = new VehiclePartModel();
+        VehiclePartData trainData = new VehiclePartData();
+        trainData.set(VehiclePartData.PART_TITLE, "Powertrain");
+        trainData.set(VehiclePartData.DTC_CODE, "Service not Enabled");
+        trainData.set(VehiclePartData.STATUS, "ServiceRequired");
+        trainModel.setData(trainData);
+
+        // create model for Radiator
+        VehiclePartModel radiatorModel = new VehiclePartModel();
+        VehiclePartData radiatorData = new VehiclePartData();
+        radiatorData.set(VehiclePartData.PART_TITLE, "Radiator");
+        radiatorData.set(VehiclePartData.DTC_CODE, "Service not Enabled");
+        radiatorData.set(VehiclePartData.STATUS, "NoIssuesDetected");
+        radiatorModel.setData(radiatorData);
+
+        // create model for Wiring
+        VehiclePartModel wiringModel = new VehiclePartModel();
+        VehiclePartData wiringData = new VehiclePartData();
+        wiringData.set(VehiclePartData.PART_TITLE, "Wiring");
+        wiringData.set(VehiclePartData.DTC_CODE, "Service not Enabled");
+        wiringData.set(VehiclePartData.STATUS, "ServiceRequired");
+        wiringModel.setData(wiringData);
+
+        list.add(batteryModel);
+        list.add(breakModel);
+        list.add(electricalModel);
+        list.add(tireModel);
+        list.add(mechanicalModel);
+        list.add(trainModel);
+        list.add(radiatorModel);
+        list.add(wiringModel);
+
+        ((VehicleHealthModel)getVehicleHealthModel()).add(list);
+    }*/
+    // Stub Ended
+}

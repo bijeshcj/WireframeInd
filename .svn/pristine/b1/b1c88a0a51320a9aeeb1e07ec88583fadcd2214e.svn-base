@@ -1,0 +1,295 @@
+package com.verizontelematics.indrivemobile.controllers;
+
+import android.content.Context;
+import android.util.Log;
+
+import com.verizontelematics.indrivemobile.models.AppStateModel;
+import com.verizontelematics.indrivemobile.models.BaseModel;
+import com.verizontelematics.indrivemobile.models.data.AppStateData;
+import com.verizontelematics.indrivemobile.models.data.Vehicle;
+import com.verizontelematics.indrivemobile.utils.AppConstants;
+import com.verizontelematics.indrivemobile.utils.config.InDrivePreference;
+import com.verizontelematics.indrivemobile.utils.phone.AppUtils;
+import com.verizontelematics.indrivemobile.utils.ui.VehicleType;
+
+import java.io.File;
+
+/**
+ * Created by z688522 on 8/28/14.
+ */
+public class AppController {
+
+    private static final String TAG = AppController.class.getCanonicalName();
+    private BaseModel mAppStateModel;
+
+
+
+    private AppController() {
+        mAppStateModel = new AppStateModel();
+        mAppStateModel.setData(new AppStateData());
+    }
+    static private AppController mInstance = null;
+    synchronized public static AppController instance() {
+        if (mInstance ==  null) {
+            mInstance = new AppController();
+        }
+        return mInstance;
+    }
+
+    public BaseModel getAppStateModel() {
+        return mAppStateModel;
+    }
+
+    public void setVehicleType(int vehicleType) {
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.VEHICLE_TYPE, vehicleType);
+    }
+
+    public int getVehicleType() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.VEHICLE_TYPE);
+        return ((obj == null) ? 0 : (Integer) obj);
+    }
+
+
+    public String getSessionToken(){
+        String sessionToken = "";
+        sessionToken = InDrivePreference.getInstance().getStringData(AppStateData.SESSION_TOKEN, "");
+        return sessionToken;
+    }
+
+    public void setSessionToken(String sessionToken){
+        InDrivePreference.getInstance().setStringData(AppStateData.SESSION_TOKEN, sessionToken);
+    }
+
+    public void saveAndRestore(){
+        String mobileUserId = getMobileUserId();
+        String vehicleId = getVehicleId();
+        String password = getPasword();
+
+        setMobileUserId(mobileUserId);
+        setVehicleId(vehicleId);
+        setPassword(password);
+
+        Log.d(TAG, "App mobile userId " + getMobileUserId() + " VehicleId " + getVehicleId());
+    }
+
+
+    public void setMobileUserId(String mobileUserId) {
+        if (mobileUserId.isEmpty()) {
+            mobileUserId = InDrivePreference.getInstance().getStringData(AppStateData.MOBILE_USER_ID, "");
+        }
+        if (mobileUserId.isEmpty())
+            return;
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.MOBILE_USER_ID, mobileUserId);
+        // stubbed logic for demo
+        //setVehicleType(VehicleType.findByBodyType());
+        InDrivePreference.getInstance().setStringData(AppStateData.MOBILE_USER_ID, mobileUserId);
+    }
+
+    public void setGCMToken(String token){
+        InDrivePreference.getInstance().setStringData(AppStateData.GCM_TOKEN,token);
+    }
+
+    public String getGCMToken(){
+        return InDrivePreference.getInstance().getStringData(AppStateData.GCM_TOKEN,"");
+    }
+
+    public String getMobileUserId() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.MOBILE_USER_ID);
+        String mobileUserId="";
+        if (obj == null) {
+            mobileUserId = InDrivePreference.getInstance().getStringData(AppStateData.MOBILE_USER_ID, "");
+        }
+        else {
+            mobileUserId = (String) obj;
+        }
+        return mobileUserId;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        if (vehicle != null) {
+            InDrivePreference.getInstance().setIntData(AppStateData.VEHICLE_TYPE, VehicleType.findByBodyType(vehicle.getBodyType()));
+            ((AppStateData)mAppStateModel.getData()).set(AppStateData.VEHICLE_TYPE,VehicleType.findByBodyType(vehicle.getBodyType()));
+            Log.d(TAG,"vehicle status vehicleBodyType "+vehicle.getBodyType()+" as int "+VehicleType.findByBodyType(vehicle.getBodyType()));
+            InDrivePreference.getInstance().setStringData(AppStateData.VEHICLE_ID, vehicle.getVehicleID());
+            ((AppStateData)mAppStateModel.getData()).set(AppStateData.VEHICLE_ID, vehicle.getVehicleID());
+            ((AppStateData)mAppStateModel.getData()).set(AppStateData.VEHICLE_TYPE, VehicleType.findByBodyType(vehicle.getBodyType()));
+        }
+    }
+
+    public String getVehicleId() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.VEHICLE_ID);
+        String vehicleAccountId="";
+        if (obj == null) {
+            vehicleAccountId = InDrivePreference.getInstance().getStringData(AppStateData.VEHICLE_ID, "");
+        }
+        else {
+            vehicleAccountId = (String) obj;
+        }
+        return vehicleAccountId;
+    }
+
+    public boolean getStayLoggedSetting() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.SETTING_STAY_LOGGED);
+        boolean flag = false;
+        if (obj == null) {
+            flag = InDrivePreference.getInstance().getBooleanData(AppStateData.SETTING_STAY_LOGGED, false);
+        }
+        else {
+            flag = (Boolean) obj;
+        }
+        return flag;
+    }
+
+    public void setStayLoggedSetting(boolean flag) {
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.SETTING_STAY_LOGGED, flag);
+        InDrivePreference.getInstance().setBooleanData(AppStateData.SETTING_STAY_LOGGED, flag);
+    }
+
+    public void setRememberMe(boolean flag) {
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.SETTING_REMEMBER_ME, flag);
+        InDrivePreference.getInstance().setBooleanData(AppStateData.SETTING_REMEMBER_ME, flag);
+    }
+
+    public boolean getRememberMe() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.SETTING_REMEMBER_ME);
+        boolean flag = false;
+        if (obj == null) {
+            flag = InDrivePreference.getInstance().getBooleanData(AppStateData.SETTING_REMEMBER_ME, false);
+        }
+        else {
+            flag = (Boolean) obj;
+        }
+        return flag;
+    }
+
+    public void setVehicleId(String vehicleId) {
+        if (vehicleId.isEmpty()) {
+            vehicleId = InDrivePreference.getInstance().getStringData(AppStateData.VEHICLE_ID, "");
+        }
+        if (vehicleId.isEmpty())
+            return;
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.VEHICLE_ID, vehicleId);
+        // stubbed logic for demo
+        //setVehicleType(VehicleType.findByBodyType());
+        InDrivePreference.getInstance().setStringData(AppStateData.VEHICLE_ID, vehicleId);
+    }
+
+    public void setPassword(String password) {
+        if (password.isEmpty()) {
+            password = InDrivePreference.getInstance().getStringData(AppStateData.PASSWORD, "");
+        }
+        if (password.isEmpty())
+            return;
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.PASSWORD, password);
+    }
+
+    public String getPasword() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.PASSWORD);
+        if (obj != null) {
+            return (String)obj;
+        }
+        return "";
+    }
+
+    public String getAppId(Context ctx) {
+        return ""+ AppUtils.getAppId(ctx);
+    }
+
+    public String getAccountIds() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.LINKED_ACCT_IDS);
+        String accountIds="";
+        if (obj == null) {
+            accountIds = InDrivePreference.getInstance().getStringData(AppStateData.LINKED_ACCT_IDS, "");
+        }
+        else {
+            accountIds = (String) obj;
+        }
+        return accountIds;
+    }
+
+    public void setAccountIds(String accountIds) {
+        if (accountIds.isEmpty()) {
+            accountIds = InDrivePreference.getInstance().getStringData(AppStateData.LINKED_ACCT_IDS, "");
+        }
+        if (accountIds.isEmpty())
+            return;
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.LINKED_ACCT_IDS, accountIds);
+        // stubbed logic for demo
+        //setVehicleType(VehicleType.findByBodyType());
+        InDrivePreference.getInstance().setStringData(AppStateData.LINKED_ACCT_IDS, accountIds);
+    }
+
+    @Deprecated
+    public boolean checkAlreadyRegisterd(String username) {
+
+        String cert = InDrivePreference.getInstance().getStringData(username, "");
+
+        if (cert != null && !cert.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkAlreadyRegistered(Context context,String userName){
+        String fileName = userName+".p12";
+        File file = new File(context.getFilesDir(), fileName);
+        boolean retFlag = file.exists();
+        Log.d(TAG,"checkAlreadyRegistered "+retFlag);
+        return retFlag;
+    }
+
+    public String getMobileDeviceID() {
+        Object obj = ((AppStateData)mAppStateModel.getData()).get(AppStateData.MOBILE_DEVICE_ID);
+        String mobileDeviceId="";
+        if (obj == null) {
+            mobileDeviceId = InDrivePreference.getInstance().getStringData(AppStateData.MOBILE_DEVICE_ID, "");
+        }
+        else {
+            mobileDeviceId = (String) obj;
+        }
+        if (mobileDeviceId.isEmpty()) {
+            mobileDeviceId = InDrivePreference.getInstance().getStringData(AppConstants.MOBILE_UNIQUE_DEVICE_ID_KEY,"");
+            setMobileDeviceID(mobileDeviceId);
+        }
+        return mobileDeviceId;
+    }
+
+    public void setMobileDeviceID(String mobileDeviceID) {
+        if (mobileDeviceID.isEmpty()) {
+            mobileDeviceID = InDrivePreference.getInstance().getStringData(AppStateData.MOBILE_DEVICE_ID, "");
+        }
+        if (mobileDeviceID.isEmpty())
+            return;
+        ((AppStateData)mAppStateModel.getData()).set(AppStateData.MOBILE_DEVICE_ID, mobileDeviceID);
+        // stubbed logic for demo
+        //setVehicleType(VehicleType.findByBodyType());
+        InDrivePreference.getInstance().setStringData(AppStateData.MOBILE_DEVICE_ID, mobileDeviceID);
+    }
+
+
+
+    public void setAppSettingsDrivingData(AppConstants.DrivingDataTimePeriod timePeriod,AppConstants.DrivingDataCategory category) {
+
+        InDrivePreference.getInstance().setStringData(AppConstants.DRIVING_DATA_TIME_PERIOD_KEY, timePeriod.toString());
+        InDrivePreference.getInstance().setStringData(AppConstants.DRIVING_DATA_CATEGORY,category.toString());
+
+    }
+
+    public String[] getAppSettingsDrivingData(){
+        String[] retArr = new String[2];
+        retArr[0] = InDrivePreference.getInstance().getStringData(AppConstants.DRIVING_DATA_TIME_PERIOD_KEY,AppConstants.DrivingDataTimePeriod.THIS_WEEK.toString());
+        retArr[1] = InDrivePreference.getInstance().getStringData(AppConstants.DRIVING_DATA_CATEGORY,AppConstants.DrivingDataCategory.TOTAL_MILES.toString());
+        return retArr;
+    }
+
+    public boolean isAppBackground(){
+        boolean retFlag = InDrivePreference.getInstance().getBooleanData(AppConstants.APP_BACKGROUND_STATE,false);
+        return retFlag;
+    }
+
+    public void setAppBackground(boolean flag){
+        InDrivePreference.getInstance().setBooleanData(AppConstants.APP_BACKGROUND_STATE,flag);
+    }
+
+
+}

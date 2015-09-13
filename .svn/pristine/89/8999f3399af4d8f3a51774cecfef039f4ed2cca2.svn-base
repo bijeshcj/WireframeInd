@@ -1,0 +1,18 @@
+package com.verizontelematics.indrivemobile.activity;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import com.verizontelematics.indrivemobile.R;
+
+/**
+ * Created by bijesh on 2/3/2015.
+ */
+public class UpSellPageActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_upsellpage);
+    }
+}

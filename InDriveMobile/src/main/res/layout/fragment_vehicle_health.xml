@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:orientation="vertical"
+              android:id="@+id/container_fragment_vehicle_health"
+              android:layout_height="match_parent"
+              android:background="@drawable/gradient_background"
+    >
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/compact"
+        android:id="@+id/car_type">
+
+        <com.verizontelematics.indrivemobile.customViews.LayeredImageView
+            android:id="@+id/vehicleHealthIV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_vehicle_health_overall_status"
+            android:textSize="@dimen/form_labels_text_size"
+            android:textStyle="bold"
+            android:layout_marginRight="25dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/vehicle_health_overall_status_img"
+                android:contentDescription="@string/info_img_cd"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_vehicle_health_overall_status1"
+                android:textSize="@dimen/form_labels_text_size"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:textStyle="bold"
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/vehicle_health_summary_list_container"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/mid_gray_bar"
+            android:id="@+id/diagnosticSummaryHeader"
+            >
+
+            <TextView
+                android:id="@+id/vehicle_health_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:padding="10dp"
+                android:text="@string/diagnostics_summary"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
+            <ImageView
+                android:id="@+id/btn_info_vehicle_health"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:paddingRight="10dp"
+                android:paddingEnd="10dp"
+                android:contentDescription="@string/info_img_cd"
+                android:src="@drawable/info_button"/>
+
+        </RelativeLayout>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:id="@+id/vehicle_health_list_swipe_refresh"
+            android:background="@color/transparent">
+
+            <ListView
+                android:id="@+id/vehicle_health_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@color/gray"
+                android:dividerHeight="1px">
+
+            </ListView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </LinearLayout>
+</LinearLayout>

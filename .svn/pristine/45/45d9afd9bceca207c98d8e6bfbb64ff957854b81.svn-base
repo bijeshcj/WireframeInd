@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="gray">#808080</color>
+    <color name="gray_separator">#d3d3d3</color>
+    <color name="indrive_anim_green_color">#0047e341</color>
+    <color name="time_period">#E7E8E9</color>
+    <color name="semi_black">#59000000</color>
+
+    <color name="trans">#80ffffff</color>
+
+    <color name="transparent_tutorial">#99000000</color>
+    <color name="tutorial_blue">#0066CC</color>
+    <color name="red">#FF0000</color>
+    <color name="success_green">#2FFF2F</color>
+    <color name="failure_red">#FF6868</color>
+    <color name="transparent_progress_bar">#99000000</color>
+
+    <color name="nav_drawer_menu_background">#0D3638</color>
+
+    <!--Modules Color Codes -->
+
+
+    <!--<color name="alert_module_code">#C5AF1A</color>
+    <color name="location_module_code">#6FAC34</color>
+    <color name="driving_module_code">#014970</color>
+    <color name="diagnostics_code">#FF7D00</color>
+    <color name="emergency_code">#DD1923</color>
+    <color name="list_bg_gray">#AAAAAA</color>-->
+
+    <color name="alert_module_code">#C5AF1A</color>
+    <color name="location_module_code">#6FAC34</color>
+    <color name="driving_module_code">#FF7D00</color>
+    <color name="diagnostics_code">#00557D</color>
+    <color name="emergency_code">#DD1923</color>
+    <color name="sc_yellowLightFill">#FFF0BD1E</color>
+    <color name="alert_module_swipe_refresh">#F5A70C</color>
+
+    <color name="diagnostics_text_color">#6D6E71</color>
+    <color name="sub_header_color">#D1D3D4</color>
+
+</resources>

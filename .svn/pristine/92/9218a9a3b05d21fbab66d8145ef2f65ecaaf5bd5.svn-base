@@ -1,0 +1,34 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+/**
+ * Created by z688522 on 3/6/15.
+ */
+public class UserAccountInfoData extends UserAccountData {
+    private String AccountStatus;
+    private AddressType Address;
+    private SubscriptionInfoType SubscriptionInfo;
+
+    public String getAccountStatus() {
+        return AccountStatus;
+    }
+
+    public void setAccountStatus(String accountStatus) {
+        AccountStatus = accountStatus;
+    }
+
+    public AddressType getAddress() {
+        return Address;
+    }
+
+    public void setAddress(AddressType address) {
+        Address = address;
+    }
+
+    public SubscriptionInfoType getSubscriptionInfo() {
+        return SubscriptionInfo;
+    }
+
+    public void setSubscriptionInfo(SubscriptionInfoType subscriptionInfo) {
+        SubscriptionInfo = subscriptionInfo;
+    }
+}

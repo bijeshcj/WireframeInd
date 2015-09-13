@@ -1,0 +1,36 @@
+package com.verizontelematics.indrivemobile.models.data;
+
+import java.util.ArrayList;
+
+/**
+ * Created by z688522 on 3/12/15.
+ */
+public class UserDetail {
+    UserAccountInfoData AccountInfo;
+    ArrayList<VehicleData> VehicleInfo;
+    UserPreferenceData NotificationPreferenceInfo;
+
+    public UserAccountInfoData getAccountInfo() {
+        return AccountInfo;
+    }
+
+    public void setAccountInfo(UserAccountInfoData accountInfo) {
+        AccountInfo = accountInfo;
+    }
+
+    public ArrayList<VehicleData> getVehicleInfo() {
+        return VehicleInfo;
+    }
+
+    public void setVehicleInfo(ArrayList<VehicleData> vehicleInfo) {
+        VehicleInfo = vehicleInfo;
+    }
+
+    public UserPreferenceData getNotificationPreferenceInfo() {
+        return NotificationPreferenceInfo;
+    }
+
+    public void setNotificationPreferenceInfo(UserPreferenceData notificationPreferenceInfo) {
+        NotificationPreferenceInfo = notificationPreferenceInfo;
+    }
+}
